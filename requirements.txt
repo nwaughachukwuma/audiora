@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+streamlit
+requests
+httpx
+python-slugify
+python-multipart
+openai
+langchain
+pyttsx3
+soundfile
+numpy==1.24.3
+pandas
+python-dotenv
