@@ -1,9 +1,12 @@
 import uuid
 from datetime import datetime
-from typing import List, Literal, Optional
+from typing import Dict, List, Optional
 
+from chat_utils import ChatMessage, SessionChatRequest
+from chat_with_user import chat_with_user
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from slugify import slugify
 
@@ -17,11 +20,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-class ChatMessage(BaseModel):
-    role: Literal["user", "assistant", "system"]
-    content: str
 
 
 class AudioCastRequest(BaseModel):
@@ -39,25 +37,30 @@ class AudioCastResponse(BaseModel):
 
 
 # Store chat sessions (in-memory for now, should be moved to a database in production)
-chat_sessions = {}
+chat_sessions: Dict[str, List[ChatMessage]] = {}
 
 
 @app.post("/api/chat/{session_id}")
-async def chat(session_id: str, message: ChatMessage):
+async def chat(session_id: str, request: SessionChatRequest):
+    message = request.message
+    content_type = request.content_type
+
     if session_id not in chat_sessions:
         chat_sessions[session_id] = []
 
     chat_sessions[session_id].append(message)
 
-    # Process the message and generate AI response
-    # TODO: Implement AI chat logic here
-    ai_response = ChatMessage(
-        role="assistant",
-        content="I understand you're looking for [type] content. Could you provide more specific details about what you'd like to hear?",
+    async def on_finish(text: str):
+        print(f"Chat finished. Text: {text}")
+        chat_sessions[session_id].append(ChatMessage(role="assistant", content=text))
+
+    generator = await chat_with_user(
+        content_type=content_type,
+        previous_messages=chat_sessions[session_id],
+        on_finish=on_finish,
     )
 
-    chat_sessions[session_id].append(ai_response)
-    return ai_response
+    return StreamingResponse(generator, media_type="text/event-stream")
 
 
 @app.post("/api/generate-audiocast")
