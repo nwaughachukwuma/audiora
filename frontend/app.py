@@ -47,33 +47,33 @@ if prompt := st.chat_input("What would you like to listen to?"):
     with st.chat_message("user"):
         st.write(prompt)
 
-    ai_message = chat_request(prompt, content_type)
+    with st.chat_message("assistant"):
+        response_generator = chat_request(prompt, content_type)
 
-    if ai_message:
-        st.session_state.messages.append({"role": "assistant", "content": ai_message})
+        ai_message = st.write_stream(response_generator)
 
-        with st.chat_message("assistant"):
-            st.write(ai_message)
+        if ai_message:
+            st.session_state.messages.append(
+                {"role": "assistant", "content": ai_message}
+            )
 
-            # Show generate button if enough context
-            if len(st.session_state.messages) >= 2:
-                if st.button("Generate Audiocast"):
-                    with st.spinner("Generating your audiocast..."):
-                        # Generate audiocast
-                        audiocast_response = httpx.post(
-                            f"{BACKEND_URL}/api/generate-audiocast",
-                            json={
-                                "query": prompt,
-                                "type": content_type,
-                                "chat_history": st.session_state.messages,
-                            },
-                        )
+        # Show generate button if enough context
+        if len(st.session_state.messages) >= 2:
+            if st.button("Generate Audiocast"):
+                with st.spinner("Generating your audiocast..."):
+                    # Generate audiocast
+                    audiocast_response = httpx.post(
+                        f"{BACKEND_URL}/api/generate-audiocast",
+                        json={
+                            "query": prompt,
+                            "type": content_type,
+                            "chat_history": st.session_state.messages,
+                        },
+                    )
 
-                        if audiocast_response.status_code == 200:
-                            st.session_state.current_audiocast = (
-                                audiocast_response.json()
-                            )
-                            st.rerun()
+                    if audiocast_response.status_code == 200:
+                        st.session_state.current_audiocast = audiocast_response.json()
+                        st.rerun()
 
 # Display current audiocast if available
 if st.session_state.current_audiocast:

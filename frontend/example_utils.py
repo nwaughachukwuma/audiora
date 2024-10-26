@@ -35,7 +35,9 @@ def display_example_cards():
                 # Add selected example to messages and trigger rerun to enter chat mode
                 st.session_state.messages.append({"role": "user", "content": example})
 
-                ai_message = chat_request(example, content_type)
+                response_generator = chat_request(example, content_type)
+
+                ai_message = st.write_stream(response_generator)
                 if ai_message:
                     st.session_state.messages.append(
                         {"role": "assistant", "content": ai_message}

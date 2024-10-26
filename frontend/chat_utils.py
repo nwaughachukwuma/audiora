@@ -1,4 +1,4 @@
-from typing import Dict, List, Literal
+from typing import Any, Callable, Dict, List, Literal, Optional
 
 import httpx
 import streamlit as st
@@ -16,7 +16,11 @@ content_examples: Dict[ContentType, str] = {
 }
 
 
-def chat_request(prompt: str, content_type: ContentType):
+def chat_request(
+    prompt: str,
+    content_type: ContentType,
+    on_finish: Optional[Callable[[str], Any]] = None,
+):
     """
     Send a chat request to the backend server and return the AI response.
     """
@@ -30,9 +34,4 @@ def chat_request(prompt: str, content_type: ContentType):
     )
 
     response.raise_for_status()
-
-    ai_message = ""
-    for line in response.iter_lines():
-        ai_message += line
-
-    return ai_message
+    return response.iter_lines()
