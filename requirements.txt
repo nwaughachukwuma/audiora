@@ -12,3 +12,5 @@ soundfile
 numpy==1.24.3
 pandas
 python-dotenv
+
+ruff

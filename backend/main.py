@@ -81,6 +81,7 @@ async def generate_audiocast(request: AudioCastRequest):
         raise HTTPException(status_code=400, detail="Invalid content type")
 
     # TODO: Implement content generation and audio synthesis
+    print(f"prompt_template: {prompt_template}")
 
     return AudioCastResponse(
         uuid=audiocast_id,
