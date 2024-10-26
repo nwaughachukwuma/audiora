@@ -1,7 +1,7 @@
-from typing import Any, Awaitable, Callable, List, Optional
+from typing import Any, Callable, List, Optional
 
-from chat_utils import ChatMessage, ContentType
-from services.openai_client import get_openai
+from src.services.openai_client import get_openai
+from src.utils.chat_utils import ChatMessage, ContentType
 
 
 def get_system_message(content_type: ContentType):
@@ -21,12 +21,12 @@ def get_system_message(content_type: ContentType):
     """
 
 
-async def chat_with_user(
+def chat_request(
     content_type: ContentType,
     previous_messages: List[ChatMessage],
-    on_finish: Optional[Callable[[str], Awaitable[Any]]] = None,
+    on_finish: Optional[Callable[[str], Any]] = None,
 ):
-    response_stream = await get_openai().chat.completions.create(
+    response_stream = get_openai().chat.completions.create(
         messages=[
             {"role": "system", "content": get_system_message(content_type)},
             *[
@@ -40,18 +40,19 @@ async def chat_with_user(
         stream=True,
     )
 
-    async def generator():
+    def generator():
         text = ""
-        async for chunk in response_stream:
+        for chunk in response_stream:
             for item in chunk.choices:
                 if not item.delta or not item.delta.content:
                     continue
                 content = item.delta.content
                 text += content
                 yield f"{content}"
-            yield "\n"
+
+        yield "\n"
 
         if on_finish:
-            await on_finish(text)
+            on_finish(text)
 
     return generator()

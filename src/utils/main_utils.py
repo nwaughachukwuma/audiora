@@ -2,24 +2,12 @@ import uuid
 from datetime import datetime
 from typing import Dict, List, Optional
 
-from chat_utils import ChatMessage, SessionChatRequest
-from chat_with_user import chat_with_user
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi import HTTPException
 from pydantic import BaseModel
 from slugify import slugify
 
-app = FastAPI()
-
-# Enable CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+from src.utils.chat_request import chat_request
+from src.utils.chat_utils import ChatMessage, SessionChatRequest
 
 
 class AudioCastRequest(BaseModel):
@@ -40,8 +28,7 @@ class AudioCastResponse(BaseModel):
 chat_sessions: Dict[str, List[ChatMessage]] = {}
 
 
-@app.post("/api/chat/{session_id}")
-async def chat(session_id: str, request: SessionChatRequest):
+def chat(session_id: str, request: SessionChatRequest):
     message = request.message
     content_type = request.content_type
 
@@ -50,20 +37,19 @@ async def chat(session_id: str, request: SessionChatRequest):
 
     chat_sessions[session_id].append(message)
 
-    async def on_finish(text: str):
-        print(f"Chat finished. Text: {text}")
+    def on_finish(text: str):
         chat_sessions[session_id].append(ChatMessage(role="assistant", content=text))
+        print(f"{session_id}: {text}; Len: {len(chat_sessions[session_id])}")
 
-    generator = await chat_with_user(
+    generator = chat_request(
         content_type=content_type,
         previous_messages=chat_sessions[session_id],
         on_finish=on_finish,
     )
 
-    return StreamingResponse(generator, media_type="text/event-stream")
+    return generator
 
 
-@app.post("/api/generate-audiocast")
 async def generate_audiocast(request: AudioCastRequest):
     # Generate a unique ID for the audiocast
     audiocast_id = str(uuid.uuid4())
@@ -99,7 +85,6 @@ async def generate_audiocast(request: AudioCastRequest):
     )
 
 
-@app.get("/api/audiocast/{uuid}")
 async def get_audiocast(uuid: str):
     # TODO: Implement audiocast retrieval
     pass

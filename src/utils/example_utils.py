@@ -1,5 +1,10 @@
 import streamlit as st
-from chat_utils import chat_request, content_examples
+from src.utils.chat_utils import (
+    ChatMessage,
+    SessionChatRequest,
+    content_examples,
+)
+from src.utils.main_utils import chat
 
 
 def display_example_cards():
@@ -35,7 +40,13 @@ def display_example_cards():
                 # Add selected example to messages and trigger rerun to enter chat mode
                 st.session_state.messages.append({"role": "user", "content": example})
 
-                response_generator = chat_request(example, content_type)
+                response_generator = chat(
+                    st.session_state.chat_session_id,
+                    SessionChatRequest(
+                        message=ChatMessage(role="user", content=example),
+                        content_type=content_type,
+                    ),
+                )
 
                 ai_message = st.write_stream(response_generator)
                 if ai_message:
