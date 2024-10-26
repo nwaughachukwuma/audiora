@@ -1,6 +1,6 @@
 import uuid
 
-import requests
+import httpx
 import streamlit as st
 from env_var import APP_URL, BACKEND_URL
 
@@ -42,10 +42,12 @@ if prompt := st.chat_input("What would you like to listen to?"):
         st.write(prompt)
 
     # Send message to backend
-    response = requests.post(
+    response = httpx.post(
         f"{BACKEND_URL}/api/chat/{st.session_state.chat_session_id}",
         json={"role": "user", "content": prompt},
     )
+
+    response.raise_for_status()
 
     if response.status_code == 200:
         ai_message = response.json()
@@ -59,7 +61,7 @@ if prompt := st.chat_input("What would you like to listen to?"):
                 if st.button("Generate Audiocast"):
                     with st.spinner("Generating your audiocast..."):
                         # Generate audiocast
-                        audiocast_response = requests.post(
+                        audiocast_response = httpx.post(
                             f"{BACKEND_URL}/api/generate-audiocast",
                             json={
                                 "query": prompt,

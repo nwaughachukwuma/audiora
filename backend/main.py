@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Literal, Optional
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -20,7 +20,7 @@ app.add_middleware(
 
 
 class ChatMessage(BaseModel):
-    role: str
+    role: Literal["user", "assistant", "system"]
     content: str
 
 
