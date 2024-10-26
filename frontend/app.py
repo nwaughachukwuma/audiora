@@ -2,8 +2,9 @@ import uuid
 
 import httpx
 import streamlit as st
+from chat_utils import chat_request, content_types
 from env_var import APP_URL, BACKEND_URL
-from example_utils import content_types, display_example_cards
+from example_utils import display_example_cards
 
 # Initialize session state
 if "chat_session_id" not in st.session_state:
@@ -46,22 +47,9 @@ if prompt := st.chat_input("What would you like to listen to?"):
     with st.chat_message("user"):
         st.write(prompt)
 
-    # Send message to backend
-    response = httpx.post(
-        f"{BACKEND_URL}/api/chat/{st.session_state.chat_session_id}",
-        json={
-            "message": {"role": "user", "content": prompt},
-            "content_type": content_type,
-        },
-        timeout=None,
-    )
+    ai_message = chat_request(prompt, content_type)
 
-    response.raise_for_status()
-
-    if response.status_code == 200:
-        ai_message = ""
-        for line in response.iter_lines():
-            ai_message += line
+    if ai_message:
         st.session_state.messages.append({"role": "assistant", "content": ai_message})
 
         with st.chat_message("assistant"):
