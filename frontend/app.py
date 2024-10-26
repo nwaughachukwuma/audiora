@@ -3,6 +3,7 @@ import uuid
 import httpx
 import streamlit as st
 from env_var import APP_URL, BACKEND_URL
+from example_utils import content_types, display_example_cards
 
 # Initialize session state
 if "chat_session_id" not in st.session_state:
@@ -19,7 +20,7 @@ st.set_page_config(page_title="AudioCaster", page_icon="🎧", layout="wide")
 st.sidebar.title("AudioCaster")
 content_type = st.sidebar.selectbox(
     "Select Content Type",
-    ["story", "podcast", "sermon", "science"],
+    content_types,
     format_func=lambda x: x.title(),
 )
 
@@ -32,7 +33,11 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.write(message["content"])
 
-# Chat input
+# Display example content cards if there are no messages
+if not st.session_state.messages:
+    display_example_cards()
+
+# Chat input for custom prompts
 if prompt := st.chat_input("What would you like to listen to?"):
     # Add user message to chat
     st.session_state.messages.append({"role": "user", "content": prompt})
@@ -56,7 +61,7 @@ if prompt := st.chat_input("What would you like to listen to?"):
         with st.chat_message("assistant"):
             st.write(ai_message["content"])
 
-            # If we have enough context, show the generate button
+            # Show generate button if enough context
             if len(st.session_state.messages) >= 2:
                 if st.button("Generate Audiocast"):
                     with st.spinner("Generating your audiocast..."):
@@ -74,7 +79,7 @@ if prompt := st.chat_input("What would you like to listen to?"):
                             st.session_state.current_audiocast = (
                                 audiocast_response.json()
                             )
-                            st.experimental_rerun()
+                            st.rerun()
 
 # Display current audiocast if available
 if st.session_state.current_audiocast:
