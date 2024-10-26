@@ -50,12 +50,21 @@ def display_example_cards():
                 st.session_state.messages.append({"role": "user", "content": example})
                 response = httpx.post(
                     f"{BACKEND_URL}/api/chat/{st.session_state.chat_session_id}",
-                    json={"role": "user", "content": example},
+                    json={
+                        "message": {"role": "user", "content": example},
+                        "content_type": content_type,
+                    },
+                    timeout=None,
                 )
 
                 response.raise_for_status()
 
                 if response.status_code == 200:
-                    ai_message = response.json()
-                    st.session_state.messages.append(ai_message)
+                    ai_message = ""
+                    for line in response.iter_lines():
+                        ai_message += line
+                    st.session_state.messages.append(
+                        {"role": "assistant", "content": ai_message}
+                    )
+
                     st.rerun()

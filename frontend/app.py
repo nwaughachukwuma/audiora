@@ -49,17 +49,23 @@ if prompt := st.chat_input("What would you like to listen to?"):
     # Send message to backend
     response = httpx.post(
         f"{BACKEND_URL}/api/chat/{st.session_state.chat_session_id}",
-        json={"role": "user", "content": prompt},
+        json={
+            "message": {"role": "user", "content": prompt},
+            "content_type": content_type,
+        },
+        timeout=None,
     )
 
     response.raise_for_status()
 
     if response.status_code == 200:
-        ai_message = response.json()
-        st.session_state.messages.append(ai_message)
+        ai_message = ""
+        for line in response.iter_lines():
+            ai_message += line
+        st.session_state.messages.append({"role": "assistant", "content": ai_message})
 
         with st.chat_message("assistant"):
-            st.write(ai_message["content"])
+            st.write(ai_message)
 
             # Show generate button if enough context
             if len(st.session_state.messages) >= 2:
