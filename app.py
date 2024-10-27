@@ -5,7 +5,7 @@ import streamlit as st
 
 from src.env_var import APP_URL, BACKEND_URL
 from src.utils.chat_utils import ChatMessage, SessionChatRequest, content_types
-from src.utils.example_utils import display_example_cards
+from src.utils.example_utils import display_example_cards, handle_selected_example
 from src.utils.main_utils import chat
 
 # Initialize session state
@@ -15,8 +15,8 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 if "current_audiocast" not in st.session_state:
     st.session_state.current_audiocast = None
-if "generating_content" not in st.session_state:
-    st.session_state.generating_content = False
+if "seleted_example" not in st.session_state:
+    st.session_state.seleted_example = None
 
 # Configure page
 st.set_page_config(page_title="AudioCaster", page_icon="🎧", layout="wide")
@@ -38,9 +38,14 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.write(message["content"])
 
-# Display example content cards if there are no messages
-if not st.session_state.messages and not st.session_state.generating_content:
-    display_example_cards()
+if not st.session_state.messages:
+    with st.container():
+        if not st.session_state.seleted_example:
+            display_example_cards()
+
+if st.session_state.seleted_example:
+    handle_selected_example(content_type)
+
 
 # Chat input for custom prompts
 if prompt := st.chat_input("What would you like to listen to?"):
@@ -52,13 +57,14 @@ if prompt := st.chat_input("What would you like to listen to?"):
         st.write(prompt)
 
     with st.chat_message("assistant"):
-        response_generator = chat(
-            st.session_state.chat_session_id,
-            SessionChatRequest(
-                message=ChatMessage(role="user", content=prompt),
-                content_type=content_type,
-            ),
-        )
+        with st.spinner("Generating response..."):
+            response_generator = chat(
+                st.session_state.chat_session_id,
+                SessionChatRequest(
+                    message=ChatMessage(role="user", content=prompt),
+                    content_type=content_type,
+                ),
+            )
 
         ai_message = st.write_stream(response_generator)
 

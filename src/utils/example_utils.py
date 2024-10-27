@@ -1,6 +1,8 @@
 import streamlit as st
+
 from src.utils.chat_utils import (
     ChatMessage,
+    ContentType,
     SessionChatRequest,
     content_examples,
 )
@@ -37,23 +39,30 @@ def display_example_cards():
     for content_type, example in content_examples.items():
         with col1 if content_type in ["story", "podcast"] else col2:
             if st.button(example, use_container_width=True):
-                # Add selected example to messages and trigger rerun to enter chat mode
                 st.session_state.messages.append({"role": "user", "content": example})
+                st.session_state.seleted_example = example
 
-                response_generator = chat(
-                    st.session_state.chat_session_id,
-                    SessionChatRequest(
-                        message=ChatMessage(role="user", content=example),
-                        content_type=content_type,
-                    ),
-                )
+                st.rerun()
 
-                ai_message = st.write_stream(response_generator)
-                if ai_message:
-                    st.session_state.messages.append(
-                        {"role": "assistant", "content": ai_message}
-                    )
 
-                    st.rerun()
-                else:
-                    st.error("Failed to generate AI response. Please try again.")
+def handle_selected_example(content_type: ContentType):
+    """Handle selected example prompt"""
+    example_prompt = st.session_state.seleted_example
+
+    with st.spinner("Generating response..."):
+        response_generator = chat(
+            st.session_state.chat_session_id,
+            SessionChatRequest(
+                message=ChatMessage(role="user", content=example_prompt),
+                content_type=content_type,
+            ),
+        )
+
+    ai_message = st.write_stream(response_generator)
+    st.session_state.seleted_example = None
+
+    if ai_message:
+        st.session_state.messages.append({"role": "assistant", "content": ai_message})
+        st.rerun()
+    else:
+        st.error("Failed to generate AI response. Please try again.")
