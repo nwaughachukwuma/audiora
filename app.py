@@ -4,9 +4,9 @@ import httpx
 import streamlit as st
 
 from src.env_var import APP_URL, BACKEND_URL
-from src.utils.chat_utils import ChatMessage, SessionChatRequest, content_types
+from src.utils.chat_response import generate_stream_response
+from src.utils.chat_utils import content_types
 from src.utils.example_utils import display_example_cards, handle_selected_example
-from src.utils.main_utils import chat
 
 # Initialize session state
 if "chat_session_id" not in st.session_state:
@@ -38,13 +38,14 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.write(message["content"])
 
-if not st.session_state.messages:
-    with st.container():
+with st.container():
+    if not st.session_state.messages:
         if not st.session_state.seleted_example:
             display_example_cards()
 
-if st.session_state.seleted_example:
-    handle_selected_example(content_type)
+with st.container():
+    if st.session_state.seleted_example:
+        handle_selected_example(content_type)
 
 
 # Chat input for custom prompts
@@ -57,21 +58,14 @@ if prompt := st.chat_input("What would you like to listen to?"):
         st.write(prompt)
 
     with st.chat_message("assistant"):
-        with st.spinner("Generating response..."):
-            response_generator = chat(
-                st.session_state.chat_session_id,
-                SessionChatRequest(
-                    message=ChatMessage(role="user", content=prompt),
-                    content_type=content_type,
-                ),
-            )
-
+        response_generator = generate_stream_response(prompt, content_type)
         ai_message = st.write_stream(response_generator)
 
         if ai_message:
             st.session_state.messages.append(
                 {"role": "assistant", "content": ai_message}
             )
+            st.rerun()
 
         # Show generate button if enough context
         if len(st.session_state.messages) >= 2:
