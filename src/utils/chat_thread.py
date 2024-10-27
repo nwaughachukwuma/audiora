@@ -22,3 +22,19 @@ def handle_selected_example(content_type: ContentType):
             st.rerun()
         else:
             st.error("Failed to generate AI response. Please try again.")
+
+
+def handle_input_prompt(prompt: str, content_type: ContentType):
+    """
+    Handle user input prompt
+    """
+    with st.chat_message("assistant"):
+        response_generator = generate_stream_response(prompt, content_type)
+        ai_message = st.write_stream(response_generator)
+
+        if ai_message:
+            st.session_state.messages.append(
+                {"role": "assistant", "content": ai_message}
+            )
+
+            st.rerun()

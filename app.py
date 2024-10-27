@@ -4,8 +4,7 @@ import httpx
 import streamlit as st
 
 from src.env_var import APP_URL, BACKEND_URL
-from src.utils.chat_response import generate_stream_response
-from src.utils.chat_thread import handle_selected_example
+from src.utils.chat_thread import handle_input_prompt, handle_selected_example
 from src.utils.chat_utils import content_types
 from src.utils.example_utils import display_example_cards
 
@@ -18,6 +17,8 @@ if "current_audiocast" not in st.session_state:
     st.session_state.current_audiocast = None
 if "seleted_example" not in st.session_state:
     st.session_state.seleted_example = None
+if "prompt" not in st.session_state:
+    st.session_state.prompt = None
 
 # Configure page
 st.set_page_config(page_title="AudioCaster", page_icon="🎧", layout="wide")
@@ -51,6 +52,7 @@ with st.container():
 
 # Chat input for custom prompts
 if prompt := st.chat_input("What would you like to listen to?"):
+    st.session_state.prompt = prompt
     # Add user message to chat
     st.session_state.messages.append({"role": "user", "content": prompt})
 
@@ -58,33 +60,33 @@ if prompt := st.chat_input("What would you like to listen to?"):
     with st.chat_message("user"):
         st.write(prompt)
 
-    with st.chat_message("assistant"):
-        response_generator = generate_stream_response(prompt, content_type)
-        ai_message = st.write_stream(response_generator)
+    st.rerun()
 
-        if ai_message:
-            st.session_state.messages.append(
-                {"role": "assistant", "content": ai_message}
-            )
-            st.rerun()
+with st.container():
+    if st.session_state.prompt:
+        prompt = st.session_state.prompt
+        st.session_state.prompt = None
 
-        # Show generate button if enough context
-        if len(st.session_state.messages) >= 2:
-            if st.button("Generate Audiocast"):
-                with st.spinner("Generating your audiocast..."):
-                    # Generate audiocast
-                    audiocast_response = httpx.post(
-                        f"{BACKEND_URL}/api/generate-audiocast",
-                        json={
-                            "query": prompt,
-                            "type": content_type,
-                            "chat_history": st.session_state.messages,
-                        },
-                    )
+        handle_input_prompt(prompt, content_type)
 
-                    if audiocast_response.status_code == 200:
-                        st.session_state.current_audiocast = audiocast_response.json()
-                        st.rerun()
+with st.container():
+    # Show generate button if enough context
+    if len(st.session_state.messages) >= 2:
+        if st.button("Generate Audiocast"):
+            with st.spinner("Generating your audiocast..."):
+                # Generate audiocast
+                audiocast_response = httpx.post(
+                    f"{BACKEND_URL}/api/generate-audiocast",
+                    json={
+                        "query": prompt,
+                        "type": content_type,
+                        "chat_history": st.session_state.messages,
+                    },
+                )
+
+                if audiocast_response.status_code == 200:
+                    st.session_state.current_audiocast = audiocast_response.json()
+                    st.rerun()
 
 # Display current audiocast if available
 if st.session_state.current_audiocast:
