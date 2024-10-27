@@ -1,9 +1,9 @@
 import uuid
 
-import httpx
 import streamlit as st
 
-from src.env_var import APP_URL, BACKEND_URL
+from src.env_var import APP_URL
+from src.utils.audiocast_request import evaluate_final_response
 from src.utils.chat_thread import handle_input_prompt, handle_selected_example
 from src.utils.chat_utils import content_types, display_example_cards
 
@@ -14,8 +14,8 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 if "current_audiocast" not in st.session_state:
     st.session_state.current_audiocast = None
-if "seleted_example" not in st.session_state:
-    st.session_state.seleted_example = None
+if "example_prompt" not in st.session_state:
+    st.session_state.example_prompt = None
 if "prompt" not in st.session_state:
     st.session_state.prompt = None
 
@@ -41,11 +41,11 @@ for message in st.session_state.messages:
 
 with st.container():
     if not st.session_state.messages:
-        if not st.session_state.seleted_example:
+        if not st.session_state.example_prompt:
             display_example_cards()
 
 with st.container():
-    if st.session_state.seleted_example:
+    if st.session_state.example_prompt:
         handle_selected_example(content_type)
 
 
@@ -66,26 +66,11 @@ with st.container():
         prompt = st.session_state.prompt
         st.session_state.prompt = None
 
-        handle_input_prompt(prompt, content_type)
+        ai_message = handle_input_prompt(prompt, content_type)
 
-with st.container():
-    # Show generate button if enough context
-    if len(st.session_state.messages) >= 2:
-        if st.button("Generate Audiocast"):
-            with st.spinner("Generating your audiocast..."):
-                # Generate audiocast
-                audiocast_response = httpx.post(
-                    f"{BACKEND_URL}/api/generate-audiocast",
-                    json={
-                        "query": prompt,
-                        "type": content_type,
-                        "chat_history": st.session_state.messages,
-                    },
-                )
+        if ai_message:
+            evaluate_final_response(prompt, content_type)
 
-                if audiocast_response.status_code == 200:
-                    st.session_state.current_audiocast = audiocast_response.json()
-                    st.rerun()
 
 # Display current audiocast if available
 if st.session_state.current_audiocast:

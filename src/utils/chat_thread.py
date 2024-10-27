@@ -23,12 +23,12 @@ def generate_stream_response(prompt: str, content_type: ContentType):
 
 def handle_selected_example(content_type: ContentType):
     """Handle selected example prompt"""
-    prompt = st.session_state.seleted_example
+    prompt = st.session_state.example_prompt
 
     with st.chat_message("assistant"):
         response_generator = generate_stream_response(prompt, content_type)
         ai_message = st.write_stream(response_generator)
-        st.session_state.seleted_example = None
+        st.session_state.example_prompt = None
 
         if ai_message:
             st.session_state.messages.append(
@@ -52,4 +52,4 @@ def handle_input_prompt(prompt: str, content_type: ContentType):
                 {"role": "assistant", "content": ai_message}
             )
 
-            st.rerun()
+        return ai_message

@@ -39,7 +39,7 @@ def chat(session_id: str, request: SessionChatRequest):
 
     def on_finish(text: str):
         chat_sessions[session_id].append(ChatMessage(role="assistant", content=text))
-        print(f"{session_id}: {text}; Len: {len(chat_sessions[session_id])}")
+        # log text and other metadata to database
 
     generator = chat_request(
         content_type=content_type,

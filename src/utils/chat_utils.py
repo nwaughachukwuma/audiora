@@ -56,6 +56,6 @@ def display_example_cards():
         with col1 if content_type in ["story", "podcast"] else col2:
             if st.button(example, use_container_width=True):
                 st.session_state.messages.append({"role": "user", "content": example})
-                st.session_state.seleted_example = example
+                st.session_state.example_prompt = example
 
                 st.rerun()
