@@ -5,8 +5,7 @@ import streamlit as st
 
 from src.env_var import APP_URL, BACKEND_URL
 from src.utils.chat_thread import handle_input_prompt, handle_selected_example
-from src.utils.chat_utils import content_types
-from src.utils.example_utils import display_example_cards
+from src.utils.chat_utils import content_types, display_example_cards
 
 # Initialize session state
 if "chat_session_id" not in st.session_state:
