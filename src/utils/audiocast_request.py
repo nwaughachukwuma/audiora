@@ -1,26 +1,11 @@
 import asyncio
 import re
-import uuid
 
 import streamlit as st
 
 from src.utils.chat_utils import ContentCategory
 from src.utils.main_utils import GenerateAudioCastRequest, generate_audiocast
-
-
-def reset_session():
-    """Reset all session state"""
-    st.session_state.messages = []
-    st.session_state.chat_session_id = str(uuid.uuid4())
-    st.session_state.current_audiocast = None
-
-    st.session_state.example_prompt = None
-    st.session_state.prompt = None
-    st.session_state.generating_audiocast = False
-    st.cache_data.clear()
-
-    st.rerun()
-
+from src.utils.session_state import reset_session
 
 termination_prefix = "Ok, thanks for clarifying!"
 termination_suffix = "Please click the button below to start generating the audiocast."
@@ -42,11 +27,11 @@ async def evaluate_final_response(ai_message: str, content_category: ContentCate
         unsafe_allow_html=True,
     )
 
-    def onclick_generate_audiocast():
+    def onclick_generate_audiocast(summary: str):
         st.session_state.generating_audiocast = True
 
         async def wrapper():
-            await use_audiocast_request(prompt, content_category)
+            await use_audiocast_request(summary, content_category)
 
         asyncio.run(wrapper())
 
@@ -54,8 +39,8 @@ async def evaluate_final_response(ai_message: str, content_category: ContentCate
     if not termination:
         return st.rerun()
 
-    prompt = re.sub(termination_prefix, "", ai_message, flags=re.IGNORECASE)
-    prompt = re.sub(termination_suffix, "", prompt, flags=re.IGNORECASE)
+    summary = re.sub(termination_prefix, "", ai_message, flags=re.IGNORECASE)
+    summary = re.sub(termination_suffix, "", summary, flags=re.IGNORECASE)
 
     col1, col2 = st.columns(2)
     with col1:
@@ -63,6 +48,7 @@ async def evaluate_final_response(ai_message: str, content_category: ContentCate
             "Generate Audiocast",
             use_container_width=True,
             on_click=onclick_generate_audiocast,
+            args=(summary,),
         ):
             pass
     with col2:
@@ -70,19 +56,17 @@ async def evaluate_final_response(ai_message: str, content_category: ContentCate
             pass
 
 
-async def use_audiocast_request(prompt: str, content_category: ContentCategory):
+async def use_audiocast_request(summary: str, content_category: ContentCategory):
     """
     Call audiocast creating workflow
     """
-    with st.container():
-        with st.spinner("Generating your audiocast..."):
-            # Generate audiocast
-            audiocast_response = await generate_audiocast(
-                GenerateAudioCastRequest(
-                    summary=prompt,
-                    category=content_category,
-                )
+    with st.spinner("Generating your audiocast..."):
+        audiocast_response = await generate_audiocast(
+            GenerateAudioCastRequest(
+                summary=summary,
+                category=content_category,
             )
-            print(f"Generate AudioCast Response: {audiocast_response}")
-            st.session_state.current_audiocast = audiocast_response
-            st.rerun()
+        )
+        print(f"Generate AudioCast Response: {audiocast_response}")
+        st.session_state.current_audiocast = audiocast_response
+        st.rerun()
