@@ -32,7 +32,11 @@ def init_session_state():
 
 
 def reset_session():
-    """Reset all session state"""
+    """
+    Reset all session state.
+
+    #### Client must call st.rerun()
+    """
     st.session_state.messages = []
     st.session_state.chat_session_id = str(uuid.uuid4())
     st.session_state.current_audiocast = None
@@ -41,5 +45,3 @@ def reset_session():
     st.session_state.prompt = None
     st.session_state.generating_audiocast = False
     st.cache_data.clear()
-
-    st.rerun()

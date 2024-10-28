@@ -94,10 +94,10 @@ async def evaluate_final_response(ai_message: str, content_category: ContentCate
             use_container_width=True,
             on_click=UseAudiocast(summary, content_category).run,
         ):
-            pass
+            st.rerun()
     with col2:
         if st.button("Restart", use_container_width=True, on_click=reset_session):
-            pass
+            st.rerun()
 
 
 class UseAudiocast:
@@ -110,7 +110,7 @@ class UseAudiocast:
 
     def run(self):
         """
-        Start generating audiocast
+        Run command to start generating audiocast
         """
         st.session_state.generating_audiocast = True
 
@@ -138,4 +138,3 @@ class UseAudiocast:
             )
             print(f"Generate AudioCast Response: {audiocast_response}")
             st.session_state.current_audiocast = audiocast_response
-            st.rerun()
