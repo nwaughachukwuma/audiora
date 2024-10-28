@@ -1,72 +1,104 @@
-import asyncio
 import re
 
-import streamlit as st
-
+from src.services.gemini_client import GeminiConfig, generate_content
+from src.services.openai_client import get_openai
 from src.utils.chat_utils import ContentCategory
-from src.utils.main_utils import GenerateAudioCastRequest, generate_audiocast
-from src.utils.session_state import reset_session
-
-termination_prefix = "Ok, thanks for clarifying!"
-termination_suffix = "Please click the button below to start generating the audiocast."
+from src.utils.prompt_templates.source_content_prompt import get_content_source_prompt
+from src.utils.prompt_templates.streamline_audio import streamline_audio_script_prompt
+from src.utils.prompt_templates.tts_prompt import Metadata, TTSPromptMaker
 
 
-async def evaluate_final_response(ai_message: str, content_category: ContentCategory):
-    st.markdown(
-        """
-        <style>
-            div[data-testid="stColumn"]:nth-of-type(1) .stButton button {
-                background-color: #059669;
-                color: #d1fae5;
-            }
-            div[data-testid="stColumn"]:nth-of-type(1) .stButton button:hover {
-                border-color: #059669;
-            }
-        </style>
-    """,
-        unsafe_allow_html=True,
+def generate_source_content(category: ContentCategory, summary: str):
+    """
+    Generate audiocast source conntent based on a summary of the user's request
+
+    Args:
+        category (ContentCategory): The content category
+        summary (str): The user's request summary
+    Returns:
+        str: The audiocast source content
+    """
+    refined_summary = re.sub(
+        "You want", "a user who wants", summary, flags=re.IGNORECASE
+    )
+    refined_summary = re.sub("You", "a user", refined_summary, flags=re.IGNORECASE)
+
+    response = get_openai().chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {
+                "role": "system",
+                "content": get_content_source_prompt(category, refined_summary),
+            },
+            {"role": "user", "content": "Now develop content."},
+        ],
+        temperature=0.5,
+        max_tokens=4096,
     )
 
-    def onclick_generate_audiocast(summary: str):
-        st.session_state.generating_audiocast = True
-
-        async def wrapper():
-            await use_audiocast_request(summary, content_category)
-
-        asyncio.run(wrapper())
-
-    termination = termination_suffix.lower() in ai_message.lower()
-    if not termination:
-        return st.rerun()
-
-    summary = re.sub(termination_prefix, "", ai_message, flags=re.IGNORECASE)
-    summary = re.sub(termination_suffix, "", summary, flags=re.IGNORECASE)
-
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button(
-            "Generate Audiocast",
-            use_container_width=True,
-            on_click=onclick_generate_audiocast,
-            args=(summary,),
-        ):
-            pass
-    with col2:
-        if st.button("Restart", use_container_width=True, on_click=reset_session):
-            pass
+    return response.choices[0].message.content
 
 
-async def use_audiocast_request(summary: str, content_category: ContentCategory):
+def create_audio_script(category: ContentCategory, source_content: str):
     """
-    Call audiocast creating workflow
+    Create an audio script based on the source content
+
+    Args:
+        category (ContentCategory): The content category
+        source_content (str): The audiocast source content
+    Returns:
+        str: streamlined audio script
     """
-    with st.spinner("Generating your audiocast..."):
-        audiocast_response = await generate_audiocast(
-            GenerateAudioCastRequest(
-                summary=summary,
-                category=content_category,
-            )
-        )
-        print(f"Generate AudioCast Response: {audiocast_response}")
-        st.session_state.current_audiocast = audiocast_response
-        st.rerun()
+    print("Generating audio script...")
+    print(f"Category: {category}; Source content: {source_content}")
+
+    prompt_maker = TTSPromptMaker(category, Metadata())
+    system_prompt = prompt_maker.get_system_prompt(source_content)
+
+    response = get_openai().chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": "Now create a TTS-optimized audiocast script."},
+        ],
+        temperature=0.5,
+        max_tokens=4096,
+    )
+
+    audio_script = response.choices[0].message.content
+    print(f"Audio script generated successfully: {audio_script}")
+    if not audio_script:
+        raise ValueError("Failed to generate audio script")
+
+    print("Streamlining the  audio script...")
+
+    streamlined_script = streamline_audio_script(
+        instruction=system_prompt, audio_script=audio_script
+    )
+
+    return str(streamlined_script)
+
+
+def streamline_audio_script(instruction: str, audio_script: str):
+    """
+    Streamline the audio script to align with the specified TTS requirements.
+
+    Args:
+        instruction (str): The TTS requirements
+        audio_script (str): The generated audio script
+    Returns:
+        str: The streamlined audio script
+    """
+    response = generate_content(
+        prompt=[
+            "Now streamline the audio script to match the specified TTS requirements."
+        ],
+        config=GeminiConfig(
+            model_name="gemini-1.5-flash-002",
+            system_prompt=streamline_audio_script_prompt(instruction, audio_script),
+            temperature=0.5,
+            max_output_tokens=4096,
+        ),
+    )
+
+    return response

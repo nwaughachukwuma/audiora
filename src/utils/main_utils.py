@@ -5,13 +5,13 @@ from fastapi import HTTPException
 from pydantic import BaseModel
 from slugify import slugify
 
+from src.utils.audiocast_request import create_audio_script, generate_source_content
 from src.utils.chat_request import chat_request
 from src.utils.chat_utils import (
     SessionChatMessage,
     SessionChatRequest,
     content_categories,
 )
-from src.utils.make_audiocast import create_audio_script, generate_source_content
 
 
 class GenerateAudioCastRequest(BaseModel):
