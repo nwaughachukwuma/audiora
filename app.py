@@ -4,10 +4,11 @@ from typing import List, Literal, TypedDict, cast
 
 import streamlit as st
 
-from src.env_var import APP_URL
 from src.utils.audiocast_request import evaluate_final_response
 from src.utils.chat_thread import handle_example_prompt, handle_user_prompt
-from src.utils.chat_utils import content_types, display_example_cards
+from src.utils.chat_utils import ContentType, display_example_cards
+from src.utils.render_audiocast import render_audiocast
+from src.utils.render_chat import render_chat_history
 
 MessageRole = Literal["user", "assistant", "ai", "human"]
 
@@ -29,17 +30,18 @@ async def main():
         st.session_state.example_prompt = None
     if "prompt" not in st.session_state:
         st.session_state.prompt = None
+    if "content_type" not in st.session_state:
+        st.session_state.content_type = cast(ContentType | None, None)
 
     # Configure page
     st.set_page_config(page_title="AudioCaster", page_icon="🎧", layout="wide")
 
     # Sidebar for content type selection
     st.sidebar.title("AudioCaster")
-    content_type = st.sidebar.selectbox(
-        "Select Content Type",
-        content_types,
-        format_func=lambda x: x.title(),
-    )
+    if st.session_state.content_type:
+        st.sidebar.subheader(
+            f"Content Type Preference: {st.session_state.content_type.capitalize()}"
+        )
 
     # Main chat interface
     st.title("🎧 AudioCaster")
@@ -48,11 +50,7 @@ async def main():
     )
 
     if st.session_state.messages:
-        st.info("Chat Session")
-        # Display chat history
-        for message in st.session_state.messages:
-            with st.chat_message(message["role"]):
-                st.write(message["content"])
+        render_chat_history()
     else:
         # Display example prompt cards
         if not st.session_state.example_prompt and not st.session_state.prompt:
@@ -65,38 +63,26 @@ async def main():
         st.session_state.prompt = prompt
         st.rerun()
 
-    with st.container():
-        if st.session_state.example_prompt:
-            handle_example_prompt(content_type)
+    if st.session_state.content_type:
+        content_type = st.session_state.content_type
 
-    with st.container():
-        if st.session_state.prompt:
-            prompt = st.session_state.prompt
-            st.session_state.prompt = None
+        with st.container():
+            if st.session_state.example_prompt:
+                handle_example_prompt(content_type)
 
-            ai_message = handle_user_prompt(prompt, content_type)
+        with st.container():
+            if st.session_state.prompt:
+                prompt = st.session_state.prompt
+                st.session_state.prompt = None
 
-            if isinstance(ai_message, str):
-                evaluate_final_response(ai_message, content_type)
+                ai_message = handle_user_prompt(prompt, content_type)
 
-    # Display current audiocast if available
-    if st.session_state.current_audiocast:
-        st.header("Your Audiocast")
+                if isinstance(ai_message, str):
+                    evaluate_final_response(ai_message, content_type)
 
-        # Audio player
-        st.audio(st.session_state.current_audiocast["audio_url"])
-
-        # Transcript
-        with st.expander("Show Transcript"):
-            st.write(st.session_state.current_audiocast["transcript"])
-
-        # Metadata
-        st.sidebar.subheader("Audiocast Info")
-        st.sidebar.json(st.session_state.current_audiocast["metadata"])
-
-        # Share button
-        share_url = f"{APP_URL}/audiocast/{st.session_state.current_audiocast['uuid']}/{st.session_state.current_audiocast['slug']}"
-        st.sidebar.text_input("Share this audiocast:", share_url)
+        # Display current audiocast if available
+        if st.session_state.current_audiocast:
+            await render_audiocast()
 
 
 if __name__ == "__main__":
