@@ -1,6 +1,6 @@
 import streamlit as st
 
-from src.utils.chat_utils import content_types
+from src.utils.chat_utils import audiocast_categories
 
 
 def set_content_type():
@@ -20,7 +20,7 @@ def set_content_type():
     with st.container():
         st.selectbox(
             "Select Content Type",
-            content_types,
+            audiocast_categories,
             format_func=lambda x: x.title(),
             key="selected_content_type",
             on_change=on_value_change,
@@ -31,7 +31,7 @@ def render_chat_history():
     """
     Render chat history
     """
-    st.info("Chat Session")
+    st.info("Chat session to understand your content preferences")
 
     with st.chat_message("user"):
         message = st.session_state.messages[0]

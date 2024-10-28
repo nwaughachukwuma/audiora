@@ -5,7 +5,7 @@ import httpx
 import streamlit as st
 
 from src.env_var import BACKEND_URL
-from src.utils.chat_utils import ContentType
+from src.utils.chat_utils import AudiocastCategory
 
 termination_prefix = "Ok, thanks for clarifying!"
 termination_suffix = "Please click the button below to start generating the audiocast."
@@ -22,7 +22,7 @@ def reset_session():
     st.cache_data.clear()
 
 
-def evaluate_final_response(ai_message: str, content_type: ContentType):
+def evaluate_final_response(ai_message: str, content_type: AudiocastCategory):
     termination = termination_suffix.lower() in ai_message.lower()
     if not termination:
         return st.rerun()
@@ -56,7 +56,7 @@ def evaluate_final_response(ai_message: str, content_type: ContentType):
             st.rerun()
 
 
-def generate_audiocast(prompt: str, content_type: ContentType):
+def generate_audiocast(prompt: str, content_type: AudiocastCategory):
     if st.button("Generate Audiocast", use_container_width=True):
         with st.spinner("Generating your audiocast..."):
             # Generate audiocast

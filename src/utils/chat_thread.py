@@ -1,14 +1,14 @@
 import streamlit as st
 
 from src.utils.chat_utils import (
-    ContentType,
+    AudiocastCategory,
     SessionChatMessage,
     SessionChatRequest,
 )
 from src.utils.main_utils import chat
 
 
-def generate_stream_response(prompt: str, content_type: ContentType):
+def generate_stream_response(prompt: str, content_type: AudiocastCategory):
     with st.spinner("Generating response..."):
         response_generator = chat(
             st.session_state.chat_session_id,
@@ -21,7 +21,7 @@ def generate_stream_response(prompt: str, content_type: ContentType):
     return response_generator
 
 
-def handle_example_prompt(content_type: ContentType):
+def handle_example_prompt(content_type: AudiocastCategory):
     """Handle selected example prompt"""
     prompt = st.session_state.example_prompt
 
@@ -39,7 +39,7 @@ def handle_example_prompt(content_type: ContentType):
             st.error("Failed to generate AI response. Please try again.")
 
 
-def handle_user_prompt(prompt: str, content_type: ContentType):
+def handle_user_prompt(prompt: str, content_type: AudiocastCategory):
     """
     Handle user input prompt
     """

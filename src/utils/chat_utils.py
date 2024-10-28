@@ -3,15 +3,37 @@ from typing import Dict, List, Literal
 import streamlit as st
 from pydantic import BaseModel
 
-ContentType = Literal["podcast", "story", "sermon", "science"]
+AudiocastCategory = Literal[
+    "podcast",
+    "soundbite",
+    "sermon",
+    "audiodrama",
+    "commentary",
+    "lecture",
+    "voicenote",
+    "interview",
+]
 
-content_types: List[ContentType] = ["podcast", "story", "sermon", "science"]
+audiocast_categories: List[AudiocastCategory] = [
+    "podcast",
+    "soundbite",
+    "sermon",
+    "audiodrama",
+    "commentary",
+    "lecture",
+    "voicenote",
+    "interview",
+]
 
-content_examples: Dict[ContentType, str] = {
-    "story": "Tell me a story about a magical kingdom with dragons and wizards.",
-    "podcast": "Create a podcast about the history of space exploration.",
-    "sermon": "Write a sermon about finding peace in times of trouble.",
-    "science": "A commentary on the concept of black holes.",
+content_examples: Dict[AudiocastCategory, str] = {
+    "podcast": "Create a podcast exploring the intersection of ancient philosophy and artificial intelligence.",
+    "sermon": "Write a sermon connecting the teachings of Augustine with modern digital ethics.",
+    "audiodrama": "A reimagining of Homer's Odyssey set in a cyberpunk future.",
+    "lecture": "A lecture comparing Shakespeare's influence on modern social media communication.",
+    "commentary": "A commentary on how Classical music influences contemporary electronic genres.",
+    "voicenote": "A personal reflection on reading Plato's Republic in today's political climate.",
+    "interview": "An interview with an archaeologist using AI to uncover ancient Roman artifacts.",
+    "soundbite": "A quick take on how ancient Greek democracy shapes modern blockchain governance.",
 }
 
 
@@ -21,7 +43,7 @@ class SessionChatMessage(BaseModel):
 
 
 class SessionChatRequest(BaseModel):
-    content_type: ContentType
+    content_type: AudiocastCategory
     message: SessionChatMessage
 
 
@@ -52,9 +74,15 @@ def display_example_cards():
     # Display example content cards
     col1, col2 = st.columns(2)
     for content_type, example in content_examples.items():
-        with col1 if content_type in ["story", "podcast"] else col2:
+        with col1 if content_type in [
+            "podcast",
+            "soundbite",
+            "sermon",
+            "audiodrama",
+        ] else col2:
             if st.button(example, use_container_width=True):
                 st.session_state.messages.append({"role": "user", "content": example})
                 st.session_state.example_prompt = example
+                st.session_state.content_type = content_type
 
                 st.rerun()

@@ -6,7 +6,7 @@ import streamlit as st
 
 from src.utils.audiocast_request import evaluate_final_response
 from src.utils.chat_thread import handle_example_prompt, handle_user_prompt
-from src.utils.chat_utils import ContentType, display_example_cards
+from src.utils.chat_utils import AudiocastCategory, display_example_cards
 from src.utils.render_audiocast import render_audiocast
 from src.utils.render_chat import render_chat_history
 
@@ -31,16 +31,16 @@ async def main():
     if "prompt" not in st.session_state:
         st.session_state.prompt = None
     if "content_type" not in st.session_state:
-        st.session_state.content_type = cast(ContentType | None, None)
+        st.session_state.content_type = cast(AudiocastCategory | None, None)
 
     # Configure page
     st.set_page_config(page_title="AudioCaster", page_icon="🎧", layout="wide")
 
     # Sidebar for content type selection
-    st.sidebar.title("AudioCaster")
+    st.sidebar.title("Audiocast Info")
     if st.session_state.content_type:
         st.sidebar.subheader(
-            f"Content Type Preference: {st.session_state.content_type.capitalize()}"
+            f"Content Category: {st.session_state.content_type.capitalize()}"
         )
 
     # Main chat interface

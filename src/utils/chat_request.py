@@ -1,10 +1,10 @@
 from typing import Any, Callable, List, Optional
 
 from src.services.openai_client import get_openai
-from src.utils.chat_utils import ContentType, SessionChatMessage
+from src.utils.chat_utils import AudiocastCategory, SessionChatMessage
 
 
-def get_system_message(content_type: ContentType):
+def get_system_message(content_type: AudiocastCategory):
     return f"""
     1. You're a super-intelligent AI. Your task is to understand what audiocast a user wants to listen to.
     2. You will steer the conversation providing eliciting questions until you have enough context.
@@ -25,7 +25,7 @@ def get_system_message(content_type: ContentType):
 
 
 def chat_request(
-    content_type: ContentType,
+    content_type: AudiocastCategory,
     previous_messages: List[SessionChatMessage],
     on_finish: Optional[Callable[[str], Any]] = None,
 ):
