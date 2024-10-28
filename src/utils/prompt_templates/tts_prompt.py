@@ -36,14 +36,14 @@ class TTSPromptMaker:
 
         Optimization Requirements:
         1. Speaker Organization:
-        - Use <Person1>, <Person2>, etc. tags for speaker identification
+        - Use <Person1>, <Person2>, etc., tags for speaker identification
         - <Person1>: Main speaker/host/narrator
         - <Person2> (and others if needed): Supporting roles, discussants, or interviewers
         - Maximum 2 speakers unless content specifically requires more
         - Example Format:
             <Person1>[Expert introduction of topic]</Person1>
             <Person2>[Engaging follow-up, questions, or challenges]</Person2>
-        - Use only <Person1> If the souce content and category requires only one speaker
+        - Use only <Person1> if the souce content or category requires only one speaker
 
         2. SSML Enhancement:
         - Add appropriate SSML tags for improved audio delivery
@@ -56,12 +56,12 @@ class TTSPromptMaker:
         - Insert natural speech patterns and filler words (um, uh, well)
         - Mild stuttering when appropriate
         - When more than 1 Speaker:
-            a. Verbal acknowledgments (uh-huh, I see) when relevant
+            a. Use verbal acknowledgments (uh-huh, I see) when relevant
             b. Maintain authentic dialogue flow
-            c. Speaker interactions, respectful disagreements and challenges
+            c. Apply speaker interactions, respectful disagreements and challenges
 
         4. Content Flow:
-        - Structure: Opening greeting → Topic introduction → Main discussion → Conclusion
+        - Structure: Opening greeting → Topic introduction → Main points/discussion → Conclusion
         - Natural transitions between points
         - Maintain consistent pacing
         - Expert-level discussion of source material
@@ -72,7 +72,7 @@ class TTSPromptMaker:
         - Verify SSML tag accuracy, opening and closure
         - Check speaker tag consistency
         - Clear, accessible language
-        - Maintain accurate representation of source content
+        - Maintain accurate representation of source content, don't deviate
         - Appropriate word counnt for {self.category} format
         - Generate only the audiocast transcript
 
