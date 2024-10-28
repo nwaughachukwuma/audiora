@@ -67,5 +67,7 @@ async def generate_audiocast(prompt: str, content_category: ContentCategory):
                 )
             )
 
+            print(f"Generate AudioCast Responnse: {audiocast_response}")
+
             st.session_state.current_audiocast = audiocast_response
             st.rerun()

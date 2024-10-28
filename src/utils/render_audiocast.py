@@ -15,15 +15,15 @@ async def render_audiocast():
     st.header("Your Audiocast")
 
     # Audio player
-    st.audio(st.session_state.current_audiocast["audio_url"])
+    st.audio(st.session_state.current_audiocast["url"])
 
     # Transcript
     with st.expander("Show Transcript"):
-        st.write(st.session_state.current_audiocast["transcript"])
+        st.write(st.session_state.current_audiocast["script"])
 
     # Metadata
     st.sidebar.subheader("Audiocast Info")
-    st.sidebar.json(st.session_state.current_audiocast["metadata"])
+    st.sidebar.markdown(f"> {st.session_state.current_audiocast['source_content']}")
 
     # Share button
     share_url = f"{APP_URL}/audiocast/{st.session_state.current_audiocast['uuid']}/{st.session_state.current_audiocast['slug']}"

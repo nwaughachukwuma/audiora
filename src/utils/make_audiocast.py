@@ -8,9 +8,12 @@ from src.utils.prompt_templates.streamline_audio import streamline_audio_script_
 from src.utils.prompt_templates.tts_prompt import Metadata, TTSPromptMaker
 
 
-def generate_audiocast_source(category: ContentCategory, summary: str):
+def generate_source_content(category: ContentCategory, summary: str):
     """
-    Generate an audiocast source based on a summary of user's request
+    Generate audiocast source conntent based on a summary of the user's request
+
+    Returns:
+    str: The audiocast source content
     """
     refined_summary = re.sub(
         "You want", "a user who wants", summary, flags=re.IGNORECASE
@@ -33,30 +36,43 @@ def generate_audiocast_source(category: ContentCategory, summary: str):
     return response.choices[0].message.content
 
 
-def structure_content_to_tts(category: ContentCategory, source_content: str):
+def create_audio_script(category: ContentCategory, source_content: str):
     """
-    Structure the content to a more streamlined form
+    Create an audio script based on the source content
+
+    Returns:
+    str: streamlined audio script
     """
 
     prompt_maker = TTSPromptMaker(category, Metadata())
+    system_prompt = prompt_maker.get_system_prompt(source_content)
+
+    print("Generating audio script...")
 
     response = get_openai().chat.completions.create(
         model="gpt-4o",
         messages=[
-            {
-                "role": "system",
-                "content": prompt_maker.get_system_prompt(source_content),
-            },
+            {"role": "system", "content": system_prompt},
             {"role": "user", "content": "Now create a TTS-optimized audiocast script."},
         ],
         temperature=0.5,
         max_tokens=4096,
     )
 
-    return response.choices[0].message.content
+    audio_script = response.choices[0].message.content
+    if not audio_script:
+        raise ValueError("Failed to generate audio script")
+
+    print("Streamlining the  audio script...")
+
+    streamlined_script = streamline_audio_script(
+        instruction=system_prompt, audio_script=audio_script
+    )
+
+    return str(streamlined_script)
 
 
-def streamline_audio_script(tts_prompt: str, audio_script: str):
+def streamline_audio_script(instruction: str, audio_script: str):
     """
     Streamline the audio script to align with the specified TTS requirements.
     """
@@ -66,7 +82,7 @@ def streamline_audio_script(tts_prompt: str, audio_script: str):
         ],
         config=GeminiConfig(
             model_name="gemini-1.5-flash-002",
-            system_prompt=streamline_audio_script_prompt(tts_prompt, audio_script),
+            system_prompt=streamline_audio_script_prompt(instruction, audio_script),
             temperature=0.5,
             max_output_tokens=4096,
         ),

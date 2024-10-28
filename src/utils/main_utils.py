@@ -1,5 +1,4 @@
 import uuid
-from datetime import datetime
 from typing import Dict, List
 
 from fastapi import HTTPException
@@ -12,7 +11,7 @@ from src.utils.chat_utils import (
     SessionChatRequest,
     content_categories,
 )
-from src.utils.make_audiocast import generate_audiocast_source
+from src.utils.make_audiocast import create_audio_script, generate_source_content
 
 
 class GenerateAudioCastRequest(BaseModel):
@@ -23,9 +22,9 @@ class GenerateAudioCastRequest(BaseModel):
 class GenerateAudioCastResponse(BaseModel):
     uuid: str
     slug: str
-    audio_url: str
-    transcript: str
-    metadata: dict
+    url: str
+    script: str
+    source_content: str
 
 
 # Store chat sessions (in-memory for now, should be moved to a database in production)
@@ -60,40 +59,36 @@ async def generate_audiocast(request: GenerateAudioCastRequest):
     """
     Generate an audiocast based on a summary of user's request
     """
-
     summary = request.summary
     category = request.category
-
     if category not in content_categories:
         raise HTTPException(status_code=400, detail="Invalid content type")
 
-    # Generate a unique ID for the audiocast
-    audiocast_id = str(uuid.uuid4())
-
-    result = generate_audiocast_source(category, summary)
-
-    if not result:
+    source_content = generate_source_content(category, summary)
+    print(f"audiocast source content: {source_content}")
+    if not source_content:
         raise HTTPException(
             status_code=500, detail="Failed to develop audiocast source content"
         )
 
-    # TODO: Implement content generation and audio synthesis
-    print(f"audiocast source content: {result}")
+    audio_script = create_audio_script(category, source_content)
+    print(f"streamliend audio_script: {audio_script}")
+    if not audio_script:
+        raise HTTPException(
+            status_code=500, detail="Error while generating audio script"
+        )
 
     # Generate slug from the query
-
     slug = slugify((category + summary)[:50])  # First 50 chars for the slug
+    # Generate a unique ID for the audiocast
+    audiocast_id = str(uuid.uuid4())
 
     return GenerateAudioCastResponse(
         uuid=audiocast_id,
         slug=slug,
-        audio_url=f"/audio/{audiocast_id}.mp3",
-        transcript="Generated transcript will go here",
-        metadata={
-            "category": request.category,
-            "summary": request.summary,
-            "created_at": datetime.now().isoformat(),
-        },
+        url=f"/audio/{audiocast_id}.mp3",
+        script=audio_script,
+        source_content=source_content,
     )
 
 

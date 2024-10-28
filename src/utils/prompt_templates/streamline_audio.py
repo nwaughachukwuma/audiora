@@ -1,10 +1,10 @@
-def streamline_audio_script_prompt(tts_prompt: str, audio_script: str):
+def streamline_audio_script_prompt(instruction: str, audio_script: str):
     """
     Streamline the audio script to align with the specified TTS requirements.
     """
     return f"""Your task is to streamline an auto-generated audio script to match the specified TTS requirements. 
     
-    TTS Requirements: {tts_prompt}
+    TTS Requirements: {instruction}
     Generated Audio Script: {audio_script}
 
     1. Keep a very high fidelity of the structure and content of the generated audio script.
