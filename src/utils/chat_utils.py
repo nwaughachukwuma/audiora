@@ -11,7 +11,7 @@ content_examples: Dict[ContentType, str] = {
     "story": "Tell me a story about a magical kingdom with dragons and wizards.",
     "podcast": "Create a podcast about the history of space exploration.",
     "sermon": "Write a sermon about finding peace in times of trouble.",
-    "science": "Explain the concept of black holes in simple terms.",
+    "science": "A commentary on the concept of black holes.",
 }
 
 
@@ -27,8 +27,7 @@ class SessionChatRequest(BaseModel):
 
 def display_example_cards():
     """Display example content cards if there are no messages"""
-    st.subheader("Examples")
-    st.markdown("**Click on an example to generate an audiocast.**")
+    st.markdown("#### You can start with one of the following")
 
     # CSS for fixed-height buttons and responsive columns
     st.markdown(

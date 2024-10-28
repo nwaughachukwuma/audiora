@@ -1,17 +1,26 @@
 import uuid
+from typing import List, Literal, TypedDict, cast
 
 import streamlit as st
 
 from src.env_var import APP_URL
 from src.utils.audiocast_request import evaluate_final_response
-from src.utils.chat_thread import handle_input_prompt, handle_selected_example
+from src.utils.chat_thread import handle_example_prompt, handle_user_prompt
 from src.utils.chat_utils import content_types, display_example_cards
+
+MessageRole = Literal["user", "assistant", "ai", "human"]
+
+
+class ChatMessage(TypedDict):
+    role: MessageRole
+    content: str
+
 
 # Initialize session state
 if "chat_session_id" not in st.session_state:
     st.session_state.chat_session_id = str(uuid.uuid4())
 if "messages" not in st.session_state:
-    st.session_state.messages = []
+    st.session_state.messages = cast(List[ChatMessage], [])
 if "current_audiocast" not in st.session_state:
     st.session_state.current_audiocast = None
 if "example_prompt" not in st.session_state:
@@ -34,43 +43,47 @@ content_type = st.sidebar.selectbox(
 st.title("🎧 AudioCaster")
 st.write("Tell me what you'd like to listen to, and I'll create an audiocast for you!")
 
-# Display chat history
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.write(message["content"])
 
-with st.container():
-    if not st.session_state.messages:
+if st.session_state.messages:
+    # Display chat history
+    st.info("Chat Session")
+    with st.container():
+        for message in st.session_state.messages:
+            with st.chat_message(message["role"]):
+                st.write(message["content"])
+else:
+    # Display example content cards
+    with st.container():
         if not st.session_state.example_prompt:
-            display_example_cards()
+            if not st.session_state.prompt:
+                display_example_cards()
 
 with st.container():
     if st.session_state.example_prompt:
-        handle_selected_example(content_type)
+        handle_example_prompt(content_type)
 
-
-# Chat input for custom prompts
-if prompt := st.chat_input("What would you like to listen to?"):
-    st.session_state.prompt = prompt
-    # Add user message to chat
-    st.session_state.messages.append({"role": "user", "content": prompt})
-
-    # Display user message
-    with st.chat_message("user"):
-        st.write(prompt)
-
-    st.rerun()
 
 with st.container():
     if st.session_state.prompt:
         prompt = st.session_state.prompt
         st.session_state.prompt = None
 
-        ai_message = handle_input_prompt(prompt, content_type)
+        # Add user message to chat
+        st.session_state.messages.append({"role": "user", "content": prompt})
 
-        if ai_message:
-            evaluate_final_response(prompt, content_type)
+        # Display user message
+        with st.chat_message("user"):
+            st.write(prompt)
 
+        ai_message = handle_user_prompt(prompt, content_type)
+
+        if isinstance(ai_message, str):
+            evaluate_final_response(ai_message, content_type)
+
+# Chat input for custom prompts
+if prompt := st.chat_input("What would you like to listen to?"):
+    st.session_state.prompt = prompt
+    st.rerun()
 
 # Display current audiocast if available
 if st.session_state.current_audiocast:

@@ -21,7 +21,7 @@ def generate_stream_response(prompt: str, content_type: ContentType):
     return response_generator
 
 
-def handle_selected_example(content_type: ContentType):
+def handle_example_prompt(content_type: ContentType):
     """Handle selected example prompt"""
     prompt = st.session_state.example_prompt
 
@@ -39,7 +39,7 @@ def handle_selected_example(content_type: ContentType):
             st.error("Failed to generate AI response. Please try again.")
 
 
-def handle_input_prompt(prompt: str, content_type: ContentType):
+def handle_user_prompt(prompt: str, content_type: ContentType):
     """
     Handle user input prompt
     """
