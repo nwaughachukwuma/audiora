@@ -60,6 +60,7 @@ def create_audio_script(category: ContentCategory, source_content: str):
     )
 
     audio_script = response.choices[0].message.content
+    print(f"Audio script generated successfully: {audio_script}")
     if not audio_script:
         raise ValueError("Failed to generate audio script")
 

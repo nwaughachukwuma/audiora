@@ -62,7 +62,7 @@ async def generate_audiocast(request: GenerateAudioCastRequest):
     summary = request.summary
     category = request.category
     if category not in content_categories:
-        raise HTTPException(status_code=400, detail="Invalid content type")
+        raise HTTPException(status_code=400, detail="Invalid content category")
 
     source_content = generate_source_content(category, summary)
     print(f"audiocast source content: {source_content}")
@@ -83,13 +83,15 @@ async def generate_audiocast(request: GenerateAudioCastRequest):
     # Generate a unique ID for the audiocast
     audiocast_id = str(uuid.uuid4())
 
-    return GenerateAudioCastResponse(
+    response = GenerateAudioCastResponse(
         uuid=audiocast_id,
         slug=slug,
         url=f"/audio/{audiocast_id}.mp3",
         script=audio_script,
         source_content=source_content,
     )
+
+    return response.model_dump()
 
 
 async def get_audiocast(uuid: str):
