@@ -7,13 +7,13 @@ from pydantic import BaseModel
 from slugify import slugify
 
 from src.utils.chat_request import chat_request
-from src.utils.chat_utils import ChatMessage, SessionChatRequest
+from src.utils.chat_utils import SessionChatMessage, SessionChatRequest
 
 
 class AudioCastRequest(BaseModel):
     query: str
     type: str  # 'story', 'podcast', 'sermon', 'science'
-    chat_history: Optional[List[ChatMessage]] = []
+    chat_history: Optional[List[SessionChatMessage]] = []
 
 
 class AudioCastResponse(BaseModel):
@@ -25,7 +25,7 @@ class AudioCastResponse(BaseModel):
 
 
 # Store chat sessions (in-memory for now, should be moved to a database in production)
-chat_sessions: Dict[str, List[ChatMessage]] = {}
+chat_sessions: Dict[str, List[SessionChatMessage]] = {}
 
 
 def chat(session_id: str, request: SessionChatRequest):
@@ -38,7 +38,9 @@ def chat(session_id: str, request: SessionChatRequest):
     chat_sessions[session_id].append(message)
 
     def on_finish(text: str):
-        chat_sessions[session_id].append(ChatMessage(role="assistant", content=text))
+        chat_sessions[session_id].append(
+            SessionChatMessage(role="assistant", content=text)
+        )
         # log text and other metadata to database
 
     generator = chat_request(

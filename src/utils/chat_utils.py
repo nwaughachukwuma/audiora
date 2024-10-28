@@ -3,9 +3,9 @@ from typing import Dict, List, Literal
 import streamlit as st
 from pydantic import BaseModel
 
-ContentType = Literal["story", "podcast", "sermon", "science"]
+ContentType = Literal["podcast", "story", "sermon", "science"]
 
-content_types: List[ContentType] = ["story", "podcast", "sermon", "science"]
+content_types: List[ContentType] = ["podcast", "story", "sermon", "science"]
 
 content_examples: Dict[ContentType, str] = {
     "story": "Tell me a story about a magical kingdom with dragons and wizards.",
@@ -15,14 +15,14 @@ content_examples: Dict[ContentType, str] = {
 }
 
 
-class ChatMessage(BaseModel):
-    role: Literal["user", "assistant", "system"]
+class SessionChatMessage(BaseModel):
+    role: Literal["user", "assistant"]
     content: str
 
 
 class SessionChatRequest(BaseModel):
     content_type: ContentType
-    message: ChatMessage
+    message: SessionChatMessage
 
 
 def display_example_cards():
