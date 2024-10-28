@@ -30,7 +30,7 @@ chat_sessions: Dict[str, List[SessionChatMessage]] = {}
 
 def chat(session_id: str, request: SessionChatRequest):
     message = request.message
-    content_type = request.content_type
+    content_category = request.content_category
 
     if session_id not in chat_sessions:
         chat_sessions[session_id] = []
@@ -44,7 +44,7 @@ def chat(session_id: str, request: SessionChatRequest):
         # log text and other metadata to database
 
     generator = chat_request(
-        content_type=content_type,
+        content_category=content_category,
         previous_messages=chat_sessions[session_id],
         on_finish=on_finish,
     )

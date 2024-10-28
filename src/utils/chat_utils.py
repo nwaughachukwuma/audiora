@@ -3,7 +3,7 @@ from typing import Dict, List, Literal
 import streamlit as st
 from pydantic import BaseModel
 
-AudiocastCategory = Literal[
+ContentCategory = Literal[
     "podcast",
     "soundbite",
     "sermon",
@@ -14,7 +14,7 @@ AudiocastCategory = Literal[
     "interview",
 ]
 
-audiocast_categories: List[AudiocastCategory] = [
+audiocast_categories: List[ContentCategory] = [
     "podcast",
     "soundbite",
     "sermon",
@@ -25,7 +25,7 @@ audiocast_categories: List[AudiocastCategory] = [
     "interview",
 ]
 
-content_examples: Dict[AudiocastCategory, str] = {
+content_examples: Dict[ContentCategory, str] = {
     "podcast": "Create a podcast exploring the intersection of ancient philosophy and artificial intelligence.",
     "sermon": "Write a sermon connecting the teachings of Augustine with modern digital ethics.",
     "audiodrama": "A reimagining of Homer's Odyssey set in a cyberpunk future.",
@@ -43,7 +43,7 @@ class SessionChatMessage(BaseModel):
 
 
 class SessionChatRequest(BaseModel):
-    content_type: AudiocastCategory
+    content_category: ContentCategory
     message: SessionChatMessage
 
 
@@ -73,8 +73,8 @@ def display_example_cards():
 
     # Display example content cards
     col1, col2 = st.columns(2)
-    for content_type, example in content_examples.items():
-        with col1 if content_type in [
+    for content_category, example in content_examples.items():
+        with col1 if content_category in [
             "podcast",
             "soundbite",
             "sermon",
@@ -83,6 +83,6 @@ def display_example_cards():
             if st.button(example, use_container_width=True):
                 st.session_state.messages.append({"role": "user", "content": example})
                 st.session_state.example_prompt = example
-                st.session_state.content_type = content_type
+                st.session_state.content_category = content_category
 
                 st.rerun()

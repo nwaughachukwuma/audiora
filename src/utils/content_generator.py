@@ -36,12 +36,12 @@ class ContentGenerator:
         }
 
     def generate_content(
-        self, query: str, content_type: str, chat_history: List[Dict]
+        self, query: str, content_category: str, chat_history: List[Dict]
     ) -> str:
         # Get the appropriate prompt template
-        prompt_template = self.prompt_templates.get(content_type)
+        prompt_template = self.prompt_templates.get(content_category)
         if not prompt_template:
-            raise ValueError(f"Invalid content type: {content_type}")
+            raise ValueError(f"Invalid content type: {content_category}")
 
         # Create and run the chain
         chain = LLMChain(llm=self.llm, prompt=prompt_template)

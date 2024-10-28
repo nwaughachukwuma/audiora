@@ -6,7 +6,7 @@ import streamlit as st
 
 from src.utils.audiocast_request import evaluate_final_response
 from src.utils.chat_thread import handle_example_prompt, handle_user_prompt
-from src.utils.chat_utils import AudiocastCategory, display_example_cards
+from src.utils.chat_utils import ContentCategory, display_example_cards
 from src.utils.render_audiocast import render_audiocast
 from src.utils.render_chat import render_chat_history
 
@@ -30,17 +30,17 @@ async def main():
         st.session_state.example_prompt = None
     if "prompt" not in st.session_state:
         st.session_state.prompt = None
-    if "content_type" not in st.session_state:
-        st.session_state.content_type = cast(AudiocastCategory | None, None)
+    if "content_category" not in st.session_state:
+        st.session_state.content_category = cast(ContentCategory | None, None)
 
     # Configure page
     st.set_page_config(page_title="AudioCaster", page_icon="🎧", layout="wide")
 
     # Sidebar for content type selection
     st.sidebar.title("Audiocast Info")
-    if st.session_state.content_type:
+    if st.session_state.content_category:
         st.sidebar.subheader(
-            f"Content Category: {st.session_state.content_type.capitalize()}"
+            f"Content Category: {st.session_state.content_category.capitalize()}"
         )
 
     # Main chat interface
@@ -63,22 +63,22 @@ async def main():
         st.session_state.prompt = prompt
         st.rerun()
 
-    if st.session_state.content_type:
-        content_type = st.session_state.content_type
+    if st.session_state.content_category:
+        content_category = st.session_state.content_category
 
         with st.container():
             if st.session_state.example_prompt:
-                handle_example_prompt(content_type)
+                handle_example_prompt(content_category)
 
         with st.container():
             if st.session_state.prompt:
                 prompt = st.session_state.prompt
                 st.session_state.prompt = None
 
-                ai_message = handle_user_prompt(prompt, content_type)
+                ai_message = handle_user_prompt(prompt, content_category)
 
                 if isinstance(ai_message, str):
-                    evaluate_final_response(ai_message, content_type)
+                    evaluate_final_response(ai_message, content_category)
 
         # Display current audiocast if available
         if st.session_state.current_audiocast:

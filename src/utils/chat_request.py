@@ -1,10 +1,10 @@
 from typing import Any, Callable, List, Optional
 
 from src.services.openai_client import get_openai
-from src.utils.chat_utils import AudiocastCategory, SessionChatMessage
+from src.utils.chat_utils import ContentCategory, SessionChatMessage
 
 
-def get_system_message(content_type: AudiocastCategory):
+def get_system_message(content_category: ContentCategory):
     return f"""
     1. You're a super-intelligent AI. Your task is to understand what audiocast a user wants to listen to.
     2. You will steer the conversation providing eliciting questions until you have enough context.
@@ -14,7 +14,7 @@ def get_system_message(content_type: AudiocastCategory):
 
 
     GENERAL IDEA AND WORKFLOW:
-    1. A user comes to you with a request for an audiocast of type {content_type}.
+    1. A user comes to you with a request for an audiocast of type {content_category}.
     2. You need to ask the user questions (elicitation) to understand what kind of audiocast they want to listen to. 
     3. Once you have enough context, within 3-5 exchanges, you should terminate the conversation.
     
@@ -25,14 +25,14 @@ def get_system_message(content_type: AudiocastCategory):
 
 
 def chat_request(
-    content_type: AudiocastCategory,
+    content_category: ContentCategory,
     previous_messages: List[SessionChatMessage],
     on_finish: Optional[Callable[[str], Any]] = None,
 ):
     response_stream = get_openai().chat.completions.create(
         model="gpt-4o",
         messages=[
-            {"role": "system", "content": get_system_message(content_type)},
+            {"role": "system", "content": get_system_message(content_category)},
             *[
                 {"role": "user", "content": msg.content}
                 if msg.role == "user"
