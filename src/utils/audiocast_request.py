@@ -37,7 +37,7 @@ def evaluate_final_response(ai_message: str, content_type: ContentType):
                     color: #d1fae5;
                 }
 
-                div[data-testid="stColumn"]:nth-of-type(1) .stButton button::hover {
+                div[data-testid="stColumn"]:nth-of-type(1) .stButton button:hover {
                     border-color: #059669;
                 }
             </style>
