@@ -21,6 +21,7 @@ def get_system_message(content_category: ContentCategory):
     IMPORTANT NOTES:
     1. Your task is to understand the user's request only by eliciting questions.
     2. Do not generate the audiocast or any other content yourself.
+    3. Strictly keep the conversation short with 3-5 exchanges.
     """
 
 

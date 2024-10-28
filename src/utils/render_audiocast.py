@@ -3,6 +3,10 @@ import streamlit as st
 from src.env_var import APP_URL
 
 
+async def create_audiocast():
+    pass
+
+
 async def render_audiocast():
     """
     Render the audiocast based on the user's specifications

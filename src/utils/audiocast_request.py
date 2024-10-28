@@ -62,11 +62,7 @@ def generate_audiocast(prompt: str, content_category: ContentCategory):
             # Generate audiocast
             audiocast_response = httpx.post(
                 f"{BACKEND_URL}/api/generate-audiocast",
-                json={
-                    "query": prompt,
-                    "type": content_category,
-                    "chat_history": st.session_state.messages,
-                },
+                json={"summary": prompt, "category": content_category},
             )
 
             if audiocast_response.status_code == 200:

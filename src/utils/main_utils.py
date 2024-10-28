@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime
-from typing import Dict, List, Optional
+from typing import Dict, List
 
 from fastapi import HTTPException
 from pydantic import BaseModel
@@ -11,9 +11,8 @@ from src.utils.chat_utils import SessionChatMessage, SessionChatRequest
 
 
 class AudioCastRequest(BaseModel):
-    query: str
-    type: str  # 'story', 'podcast', 'sermon', 'science'
-    chat_history: Optional[List[SessionChatMessage]] = []
+    summary: str
+    category: str
 
 
 class AudioCastResponse(BaseModel):
@@ -57,16 +56,16 @@ async def generate_audiocast(request: AudioCastRequest):
     audiocast_id = str(uuid.uuid4())
 
     # Generate slug from the query
-    slug = slugify(request.query[:50])  # First 50 chars for the slug
+    slug = slugify(request.summary[:50])  # First 50 chars for the slug
 
     # TODO: Implement content generation based on type
-    if request.type == "story":
+    if request.category == "story":
         prompt_template = "Create an engaging story about {query}"
-    elif request.type == "podcast":
+    elif request.category == "podcast":
         prompt_template = "Create an informative podcast script about {query}"
-    elif request.type == "sermon":
+    elif request.category == "sermon":
         prompt_template = "Create an inspiring sermon about {query}"
-    elif request.type == "science":
+    elif request.category == "science":
         prompt_template = "Create an educational scientific explanation about {query}"
     else:
         raise HTTPException(status_code=400, detail="Invalid content type")
@@ -80,8 +79,8 @@ async def generate_audiocast(request: AudioCastRequest):
         audio_url=f"/audio/{audiocast_id}.mp3",
         transcript="Generated transcript will go here",
         metadata={
-            "type": request.type,
-            "query": request.query,
+            "category": request.category,
+            "summary": request.summary,
             "created_at": datetime.now().isoformat(),
         },
     )
