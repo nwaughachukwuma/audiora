@@ -6,6 +6,7 @@ from src.utils.chat_thread import (
     evaluate_final_response,
     handle_example_prompt,
     handle_user_prompt,
+    use_audiocast_request,
 )
 from src.utils.chat_utils import display_example_cards
 from src.utils.render_audiocast import render_audiocast
@@ -29,7 +30,13 @@ async def main():
     # Main chat interface
     st.title("🎧 AudioCaster")
 
-    if st.session_state.generating_audiocast:
+    if st.session_state.user_specification:
+        st.info("Generating audiocast from your specifications")
+
+        summary = st.session_state.user_specification
+        content_category = st.session_state.content_category
+        await use_audiocast_request(summary, content_category)
+
         if st.session_state.current_audiocast:
             render_audiocast()
     else:
