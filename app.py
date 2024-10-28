@@ -18,8 +18,8 @@ class ChatMessage(TypedDict):
     content: str
 
 
-async def main():
-    # Initialize session state
+def init_session_state():
+    """Initialize session state"""
     if "chat_session_id" not in st.session_state:
         st.session_state.chat_session_id = str(uuid.uuid4())
     if "messages" not in st.session_state:
@@ -32,6 +32,12 @@ async def main():
         st.session_state.prompt = None
     if "content_category" not in st.session_state:
         st.session_state.content_category = cast(ContentCategory | None, None)
+    if "generating_audiocast" not in st.session_state:
+        st.session_state.generating_audiocast = False
+
+
+async def main():
+    init_session_state()
 
     # Configure page
     st.set_page_config(page_title="AudioCaster", page_icon="🎧", layout="wide")
@@ -45,23 +51,25 @@ async def main():
 
     # Main chat interface
     st.title("🎧 AudioCaster")
-    st.write(
-        "Tell me what you'd like to listen to, and I'll create an audiocast for you!"
-    )
 
-    if st.session_state.messages:
-        render_chat_history()
+    if st.session_state.generating_audiocast:
+        if st.session_state.current_audiocast:
+            render_audiocast()
     else:
-        # Display example prompt cards
-        if not st.session_state.example_prompt and not st.session_state.prompt:
-            display_example_cards()
+        st.write(
+            "Tell me what you'd like to listen to, and I'll create an audiocast for you!"
+        )
+        if st.session_state.messages:
+            render_chat_history()
+        else:
+            if not st.session_state.example_prompt and not st.session_state.prompt:
+                display_example_cards()
 
-    # Chat input for custom prompts
-    if prompt := st.chat_input("What would you like to listen to?"):
-        # Add user message to chat
-        st.session_state.messages.append({"role": "user", "content": prompt})
-        st.session_state.prompt = prompt
-        st.rerun()
+        # Chat input for custom prompts
+        if prompt := st.chat_input("What would you like to listen to?"):
+            st.session_state.messages.append({"role": "user", "content": prompt})
+            st.session_state.prompt = prompt
+            st.rerun()
 
     if st.session_state.content_category:
         content_category = st.session_state.content_category
@@ -79,10 +87,6 @@ async def main():
 
                 if isinstance(ai_message, str):
                     await evaluate_final_response(ai_message, content_category)
-
-        # Display current audiocast if available
-        if st.session_state.current_audiocast:
-            await render_audiocast()
 
 
 if __name__ == "__main__":

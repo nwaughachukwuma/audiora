@@ -12,8 +12,11 @@ def generate_source_content(category: ContentCategory, summary: str):
     """
     Generate audiocast source conntent based on a summary of the user's request
 
+    Args:
+        category (ContentCategory): The content category
+        summary (str): The user's request summary
     Returns:
-    str: The audiocast source content
+        str: The audiocast source content
     """
     refined_summary = re.sub(
         "You want", "a user who wants", summary, flags=re.IGNORECASE
@@ -40,14 +43,17 @@ def create_audio_script(category: ContentCategory, source_content: str):
     """
     Create an audio script based on the source content
 
+    Args:
+        category (ContentCategory): The content category
+        source_content (str): The audiocast source content
     Returns:
-    str: streamlined audio script
+        str: streamlined audio script
     """
+    print("Generating audio script...")
+    print(f"Category: {category}; Source content: {source_content}")
 
     prompt_maker = TTSPromptMaker(category, Metadata())
     system_prompt = prompt_maker.get_system_prompt(source_content)
-
-    print("Generating audio script...")
 
     response = get_openai().chat.completions.create(
         model="gpt-4o",
@@ -76,6 +82,12 @@ def create_audio_script(category: ContentCategory, source_content: str):
 def streamline_audio_script(instruction: str, audio_script: str):
     """
     Streamline the audio script to align with the specified TTS requirements.
+
+    Args:
+        instruction (str): The TTS requirements
+        audio_script (str): The generated audio script
+    Returns:
+        str: The streamlined audio script
     """
     response = generate_content(
         prompt=[

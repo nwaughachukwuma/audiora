@@ -13,11 +13,7 @@ class GenerateAudiocastDict(TypedDict):
     source_content: str
 
 
-async def create_audiocast():
-    pass
-
-
-async def render_audiocast():
+def render_audiocast():
     """
     Render the audiocast based on the user's specifications
     - Display current audiocast if available
@@ -33,8 +29,8 @@ async def render_audiocast():
         st.write(current_audiocast["script"])
 
     # Metadata
-    st.sidebar.subheader("Audiocast Info")
-    st.sidebar.markdown(f"> {current_audiocast['source_content']}")
+    st.sidebar.subheader("Audiocast Source")
+    st.sidebar.markdown(current_audiocast["source_content"])
 
     # Share button
     share_url = (
