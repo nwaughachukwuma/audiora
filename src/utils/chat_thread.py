@@ -92,8 +92,7 @@ async def evaluate_final_response(ai_message: str, content_category: ContentCate
         if st.button(
             "Generate Audiocast",
             use_container_width=True,
-            on_click=onclick_generate_audiocast,
-            args=(summary, content_category),
+            on_click=UseAudiocast(summary, content_category).run,
         ):
             pass
     with col2:
@@ -101,31 +100,42 @@ async def evaluate_final_response(ai_message: str, content_category: ContentCate
             pass
 
 
-# Use a class here
-def onclick_generate_audiocast(summary: str, content_category: ContentCategory):
-    st.session_state.generating_audiocast = True
+class UseAudiocast:
+    summary: str
+    content_category: ContentCategory
 
-    async def wrapper():
-        await use_audiocast_request(summary, content_category)
+    def __init__(self, summary: str, content_category: ContentCategory):
+        self.summary = summary
+        self.content_category = content_category
 
-    asyncio.run(wrapper())
+    def run(self):
+        """
+        Start generating audiocast
+        """
+        st.session_state.generating_audiocast = True
 
+        async def handler():
+            await self.__use_audiocast_request(self.summary, self.content_category)
 
-async def use_audiocast_request(summary: str, content_category: ContentCategory):
-    """
-    Call audiocast creating workflow
+        asyncio.run(handler())
 
-    Args:
-        summary (str): user request summary or user specification
-        content_category (ContentCategory): content category
-    """
-    with st.spinner("Generating your audiocast..."):
-        audiocast_response = await generate_audiocast(
-            GenerateAudioCastRequest(
-                summary=summary,
-                category=content_category,
+    async def __use_audiocast_request(
+        self, summary: str, content_category: ContentCategory
+    ):
+        """
+        Call audiocast creating workflow
+
+        Args:
+            summary (str): user request summary or user specification
+            content_category (ContentCategory): content category
+        """
+        with st.spinner("Generating your audiocast..."):
+            audiocast_response = await generate_audiocast(
+                GenerateAudioCastRequest(
+                    summary=summary,
+                    category=content_category,
+                )
             )
-        )
-        print(f"Generate AudioCast Response: {audiocast_response}")
-        st.session_state.current_audiocast = audiocast_response
-        st.rerun()
+            print(f"Generate AudioCast Response: {audiocast_response}")
+            st.session_state.current_audiocast = audiocast_response
+            st.rerun()
