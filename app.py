@@ -78,7 +78,7 @@ async def main():
                 ai_message = handle_user_prompt(prompt, content_category)
 
                 if isinstance(ai_message, str):
-                    evaluate_final_response(ai_message, content_category)
+                    await evaluate_final_response(ai_message, content_category)
 
         # Display current audiocast if available
         if st.session_state.current_audiocast:

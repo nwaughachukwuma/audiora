@@ -7,15 +7,20 @@ from pydantic import BaseModel
 from slugify import slugify
 
 from src.utils.chat_request import chat_request
-from src.utils.chat_utils import SessionChatMessage, SessionChatRequest
+from src.utils.chat_utils import (
+    SessionChatMessage,
+    SessionChatRequest,
+    content_categories,
+)
+from src.utils.make_audiocast import generate_audiocast_source
 
 
-class AudioCastRequest(BaseModel):
+class GenerateAudioCastRequest(BaseModel):
     summary: str
     category: str
 
 
-class AudioCastResponse(BaseModel):
+class GenerateAudioCastResponse(BaseModel):
     uuid: str
     slug: str
     audio_url: str
@@ -51,29 +56,35 @@ def chat(session_id: str, request: SessionChatRequest):
     return generator
 
 
-async def generate_audiocast(request: AudioCastRequest):
+async def generate_audiocast(request: GenerateAudioCastRequest):
+    """
+    Generate an audiocast based on a summary of user's request
+    """
+
+    summary = request.summary
+    category = request.category
+
+    if category not in content_categories:
+        raise HTTPException(status_code=400, detail="Invalid content type")
+
     # Generate a unique ID for the audiocast
     audiocast_id = str(uuid.uuid4())
 
-    # Generate slug from the query
-    slug = slugify(request.summary[:50])  # First 50 chars for the slug
+    result = generate_audiocast_source(category, summary)
 
-    # TODO: Implement content generation based on type
-    if request.category == "story":
-        prompt_template = "Create an engaging story about {query}"
-    elif request.category == "podcast":
-        prompt_template = "Create an informative podcast script about {query}"
-    elif request.category == "sermon":
-        prompt_template = "Create an inspiring sermon about {query}"
-    elif request.category == "science":
-        prompt_template = "Create an educational scientific explanation about {query}"
-    else:
-        raise HTTPException(status_code=400, detail="Invalid content type")
+    if not result:
+        raise HTTPException(
+            status_code=500, detail="Failed to develop audiocast source content"
+        )
 
     # TODO: Implement content generation and audio synthesis
-    print(f"prompt_template: {prompt_template}")
+    print(f"audiocast source content: {result}")
 
-    return AudioCastResponse(
+    # Generate slug from the query
+
+    slug = slugify((category + summary)[:50])  # First 50 chars for the slug
+
+    return GenerateAudioCastResponse(
         uuid=audiocast_id,
         slug=slug,
         audio_url=f"/audio/{audiocast_id}.mp3",

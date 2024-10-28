@@ -1,11 +1,11 @@
 import re
 import uuid
 
-import httpx
 import streamlit as st
 
-from src.env_var import BACKEND_URL
 from src.utils.chat_utils import ContentCategory
+from src.utils.main_utils import GenerateAudioCastRequest
+from src.utils.main_utils import generate_audiocast as _generate_audiocast
 
 termination_prefix = "Ok, thanks for clarifying!"
 termination_suffix = "Please click the button below to start generating the audiocast."
@@ -22,7 +22,7 @@ def reset_session():
     st.cache_data.clear()
 
 
-def evaluate_final_response(ai_message: str, content_category: ContentCategory):
+async def evaluate_final_response(ai_message: str, content_category: ContentCategory):
     termination = termination_suffix.lower() in ai_message.lower()
     if not termination:
         return st.rerun()
@@ -49,22 +49,23 @@ def evaluate_final_response(ai_message: str, content_category: ContentCategory):
     col1, col2 = st.columns(2)
 
     with col1:
-        generate_audiocast(prompt, content_category)
+        await generate_audiocast(prompt, content_category)
 
     with col2:
         if st.button("Restart", use_container_width=True, on_click=reset_session):
             st.rerun()
 
 
-def generate_audiocast(prompt: str, content_category: ContentCategory):
+async def generate_audiocast(prompt: str, content_category: ContentCategory):
     if st.button("Generate Audiocast", use_container_width=True):
         with st.spinner("Generating your audiocast..."):
             # Generate audiocast
-            audiocast_response = httpx.post(
-                f"{BACKEND_URL}/api/generate-audiocast",
-                json={"summary": prompt, "category": content_category},
+            audiocast_response = await _generate_audiocast(
+                GenerateAudioCastRequest(
+                    summary=prompt,
+                    category=content_category,
+                )
             )
 
-            if audiocast_response.status_code == 200:
-                st.session_state.current_audiocast = audiocast_response.json()
-                st.rerun()
+            st.session_state.current_audiocast = audiocast_response
+            st.rerun()

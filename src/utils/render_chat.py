@@ -1,6 +1,6 @@
 import streamlit as st
 
-from src.utils.chat_utils import audiocast_categories
+from src.utils.chat_utils import content_categories
 
 
 def set_content_category():
@@ -20,7 +20,7 @@ def set_content_category():
     with st.container():
         st.selectbox(
             "Select Content Type",
-            audiocast_categories,
+            content_categories,
             format_func=lambda x: x.title(),
             key="selected_content_category",
             on_change=on_value_change,
