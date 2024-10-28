@@ -24,35 +24,36 @@ def reset_session():
 
 def evaluate_final_response(ai_message: str, content_type: ContentType):
     termination = termination_suffix.lower() in ai_message.lower()
-    if termination:
-        prompt = re.sub(termination_prefix, "", ai_message, flags=re.IGNORECASE)
-        prompt = re.sub(termination_suffix, "", prompt, flags=re.IGNORECASE)
+    if not termination:
+        return st.rerun()
 
-        # Add CSS for colored buttons
-        st.markdown(
-            """
-            <style>
-                div[data-testid="stColumn"]:nth-of-type(1) .stButton button {
-                    background-color: #059669;
-                    color: #d1fae5;
-                }
+    prompt = re.sub(termination_prefix, "", ai_message, flags=re.IGNORECASE)
+    prompt = re.sub(termination_suffix, "", prompt, flags=re.IGNORECASE)
 
-                div[data-testid="stColumn"]:nth-of-type(1) .stButton button:hover {
-                    border-color: #059669;
-                }
-            </style>
-        """,
-            unsafe_allow_html=True,
-        )
+    # Add CSS for colored buttons
+    st.markdown(
+        """
+        <style>
+            div[data-testid="stColumn"]:nth-of-type(1) .stButton button {
+                background-color: #059669;
+                color: #d1fae5;
+            }
+            div[data-testid="stColumn"]:nth-of-type(1) .stButton button:hover {
+                border-color: #059669;
+            }
+        </style>
+    """,
+        unsafe_allow_html=True,
+    )
 
-        col1, col2 = st.columns(2)
+    col1, col2 = st.columns(2)
 
-        with col1:
-            generate_audiocast(prompt, content_type)
+    with col1:
+        generate_audiocast(prompt, content_type)
 
-        with col2:
-            if st.button("Restart", use_container_width=True, on_click=reset_session):
-                st.rerun()
+    with col2:
+        if st.button("Restart", use_container_width=True, on_click=reset_session):
+            st.rerun()
 
 
 def generate_audiocast(prompt: str, content_type: ContentType):

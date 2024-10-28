@@ -48,21 +48,20 @@ async def main():
     )
 
     if st.session_state.messages:
-        # Display chat history
         st.info("Chat Session")
-        with st.container():
-            for message in st.session_state.messages:
-                with st.chat_message(message["role"]):
-                    st.write(message["content"])
+        # Display chat history
+        for message in st.session_state.messages:
+            with st.chat_message(message["role"]):
+                st.write(message["content"])
     else:
-        # Display example content cards
-        with st.container():
-            if not st.session_state.example_prompt:
-                if not st.session_state.prompt:
-                    display_example_cards()
+        # Display example prompt cards
+        if not st.session_state.example_prompt and not st.session_state.prompt:
+            display_example_cards()
 
     # Chat input for custom prompts
     if prompt := st.chat_input("What would you like to listen to?"):
+        # Add user message to chat
+        st.session_state.messages.append({"role": "user", "content": prompt})
         st.session_state.prompt = prompt
         st.rerun()
 
@@ -74,13 +73,6 @@ async def main():
         if st.session_state.prompt:
             prompt = st.session_state.prompt
             st.session_state.prompt = None
-
-            # Add user message to chat
-            st.session_state.messages.append({"role": "user", "content": prompt})
-
-            # Display user message
-            with st.chat_message("user"):
-                st.write(prompt)
 
             ai_message = handle_user_prompt(prompt, content_type)
 
