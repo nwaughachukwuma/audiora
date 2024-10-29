@@ -22,7 +22,7 @@ def render_audiocast():
     current_audiocast: GenerateAudiocastDict = st.session_state.current_audiocast
 
     # Audio player
-    # st.audio(current_audiocast["url"])
+    st.audio(current_audiocast["url"])
 
     # Transcript
     with st.expander("Show Transcript"):

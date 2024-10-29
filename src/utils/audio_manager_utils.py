@@ -1,5 +1,4 @@
 import asyncio
-import logging
 import os
 import re
 from concurrent.futures import ThreadPoolExecutor
@@ -11,7 +10,6 @@ from typing import Any, List, Literal, Optional, Tuple
 
 from src.services.openai_client import get_openai
 
-logger = logging.getLogger(__name__)
 OpenaiVoice = Literal["echo", "shimmer", "onyx", "nova", "alloy"]
 openai_voices: List[OpenaiVoice] = ["echo", "shimmer", "onyx", "nova", "alloy"]
 
@@ -89,10 +87,10 @@ class AudioManagerSpeechGenerator:
             with open(job.output_file, "wb") as file:
                 file.write(response.content)
 
-            logger.debug(f"Generated speech for tag {job.tag} at index {job.index}")
+            print(f"Generated speech for tag {job.tag} at index {job.index}")
             return job.output_file
         except Exception as e:
-            logger.error(f"Failed to generate speech for tag {job.tag}: {str(e)}")
+            print(f"Failed to generate speech for tag {job.tag}: {str(e)}")
             return ""
 
     async def _process_speech_jobs(self, jobs: List[SpeechJob]) -> List[str]:
@@ -120,7 +118,7 @@ class ContentSplitter:
             Input: "<Tag1>Hello</Tag1><Tag2>Hi</Tag2>"
             Output: [("Hello", "Hi")]
         """
-        logger.debug(f"Processing script with tags: {tags}")
+        print(f"Processing script with tags: {tags}")
 
         if not self.validate_content(content, tags):
             raise Exception("Content does not contain proper tag structure")
@@ -136,22 +134,24 @@ class ContentSplitter:
             cleaned_matches = [" ".join(m.split()).strip() for m in matches]
             tag_contents.append(cleaned_matches)
 
-            logger.debug(f"Found {len(cleaned_matches)} matches for tag {tag}")
+            print(f"Found {len(cleaned_matches)} matches for tag {tag}")
 
         # Validate we have content
         if not any(tag_contents):
-            logger.warning("No content found for any tags")
+            print("No content found for any tags")
             return []
 
-        # Validate all tags have same number of entries
+        # Get the last tag where there's a mismatch in speaker tags represented
         lengths = [len(content) for content in tag_contents]
-        if len(set(lengths)) > 1:
-            logger.warning(f"Inconsistent number of entries across tags: {lengths}")
-            return []
+        last_tag_content = tag_contents[-1] if len(set(lengths)) > 1 else None
 
-        logger.debug(f"Generated {tag_contents} dialogue tags")
         # Zip the contents together
-        return list(zip(*tag_contents))
+        zipped = list(zip(*tag_contents))
+        if last_tag_content:
+            zipped.append(tuple(last_tag_content))
+
+        print(f"Generated {tag_contents} dialogue tags. Zipped: {zipped}")
+        return zipped
 
     @staticmethod
     def validate_content(content: str, tags: List[str]) -> bool:
@@ -168,14 +168,14 @@ class ContentSplitter:
             opening_count = content.count(f"<{tag}>")
             closing_count = content.count(f"</{tag}>")
             if opening_count != closing_count:
-                logger.warning(
+                print(
                     f"Mismatched tags for {tag}: "
                     f"{opening_count} opening, {closing_count} closing"
                 )
                 return False
 
             if opening_count == 0:
-                logger.warning(f"No instances of tag {tag} found")
+                print(f"No instances of tag {tag} found")
                 return False
 
         return True
