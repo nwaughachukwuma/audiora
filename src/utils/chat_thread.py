@@ -89,16 +89,21 @@ async def evaluate_final_response(ai_message: str, content_category: ContentCate
     col1, col2 = st.columns(2)
     with col1:
 
-        def onclick(v: str):
-            st.session_state.user_specification = v
+        def onclick(summary: str):
+            st.session_state.user_specification = summary
+            st.session_state.should_rerun = True  # Add a flag for rerun
 
-        if st.button(
+        st.button(
             "Generate Audiocast",
             use_container_width=True,
             on_click=onclick,
             args=(summary,),
-        ):
+        )
+
+        if st.session_state.get("should_rerun", False):
+            st.session_state.should_rerun = False  # Reset the flag
             st.rerun()
+
     with col2:
         if st.button("Restart", use_container_width=True, on_click=reset_session):
             st.rerun()
@@ -112,12 +117,19 @@ async def use_audiocast_request(summary: str, content_category: ContentCategory)
         summary (str): user request summary or user specification
         content_category (ContentCategory): content category
     """
-    with st.spinner("Generating your audiocast..."):
-        audiocast_response = await generate_audiocast(
-            GenerateAudioCastRequest(
-                summary=summary,
-                category=content_category,
+    try:
+        with st.spinner("Generating your audiocast..."):
+            audiocast_response = await generate_audiocast(
+                GenerateAudioCastRequest(summary=summary, category=content_category)
             )
-        )
-        print(f"Generate AudioCast Response: {audiocast_response}")
-        st.session_state.current_audiocast = audiocast_response
+            print(f"Generate AudioCast Response: {audiocast_response}")
+            st.session_state.current_audiocast = audiocast_response
+            st.session_state.messages = []  # Clear messages
+            st.rerun()
+    except Exception as e:
+        st.info("Error while generating your audiocast. Please start afresh!")
+        st.error(f"Error generating audiocast: {str(e)}")
+        st.session_state.user_specification = None
+
+        if st.button("Restart", use_container_width=True):
+            st.rerun()

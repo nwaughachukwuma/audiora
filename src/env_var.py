@@ -2,7 +2,10 @@ from os import environ
 
 from dotenv import load_dotenv
 
-load_dotenv()
+if environ.get("ENV", "local") == "local":
+    load_dotenv(dotenv_path="./.env.local")
+else:
+    load_dotenv()
 
 BACKEND_URL = environ.get("BACKEND_URL", "http://localhost:8000")
 APP_URL = environ.get("APP_URL", "http://localhost:8501")
