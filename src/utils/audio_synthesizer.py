@@ -1,79 +1,105 @@
+import logging
+import os
+import re
 from pathlib import Path
+from typing import List, Union
 
-import numpy as np
-import pyttsx3
-import soundfile as sf
+from pydub import AudioSegment
+
+logger = logging.getLogger(__name__)
 
 
-class AudioSynthesizer:
-    def __init__(self, output_dir: str = "audio_files"):
-        self.engine = pyttsx3.init()
+class AudioEnhancer:
+    def enhance_audio(
+        self,
+        file_path: Path,
+        target_loudness=-20.0,
+        attack=5.0,
+        release=100.0,
+        threshold=-20.0,
+        ratio=2.5,
+    ) -> None:
+        """
+        Enhance audio using professional-grade processing.
+        Args:
+            file_path (Path): Path to the audio file
+            target_loudness (float): Target loudness in dBFS (default: -20.0)
+            attack (float): Compressor attack time in ms (default: 5.0)
+            release (float): Compressor release time in ms (default: 100.0)
+            threshold (float): Compression threshold in dBFS (default: -20.0)
+            ratio (float): Compression ratio (default: 2.5)
+        """
+        try:
+            audio = AudioSegment.from_file(str(file_path))
+            enhanced = (
+                audio.apply_gain(-audio.dBFS + target_loudness)
+                .compress_dynamic_range(
+                    threshold=threshold, ratio=ratio, attack=attack, release=release
+                )
+                .normalize(headroom=0.1)
+            )
+
+            # Export processed audio
+            enhanced.export(
+                str(file_path),
+                format=file_path.suffix.lstrip("."),
+                parameters=["-q:a", "2"],  # High quality encoding
+            )
+            logger.info(f"Successfully enhanced audio: {file_path}")
+        except Exception as e:
+            logger.warning(f"Audio enhancement failed: {str(e)}")
+            logger.warning("Continuing with original audio")
+
+
+class AudioSynthesizer(AudioEnhancer):
+    def __init__(self, output_dir: str = "/tmp/audio_files"):
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
-        # Configure voice properties
-        self.engine.setProperty("rate", 150)  # Speed of speech
-        self.engine.setProperty("volume", 0.9)  # Volume (0.0 to 1.0)
-
-        # Get available voices and set a good quality one
-        voices = self.engine.getProperty("voices")
-        if voices:
-            # Usually, the second voice is better quality
-            self.engine.setProperty(
-                "voice", voices[1].id if len(voices) > 1 else voices[0].id
-            )
-
-    def synthesize(self, text: str, file_id: str) -> str:
+    def merge_audio_files(self, input_dir: str, output_file: str) -> None:
         """
-        Synthesize text to speech and save as audio file
+        Merge all audio files in the input directory sequentially and save the result.
 
         Args:
-            text (str): The text to synthesize
-            file_id (str): Unique identifier for the audio file
-
-        Returns:
-            str: Path to the generated audio file
-        """
-        output_path = self.output_dir / f"{file_id}.mp3"
-
-        # Save audio to file
-        self.engine.save_to_file(text, str(output_path))
-        self.engine.runAndWait()
-
-        # Enhance audio quality (optional post-processing)
-        self._enhance_audio(output_path)
-
-        return str(output_path)
-
-    def _enhance_audio(self, file_path: Path):
-        """
-        Apply basic audio enhancements
-
-        Args:
-            file_path (Path): Path to the audio file
+            input_dir (str): Path to the directory containing audio files.
+            output_file (str): Path to save the merged audio file.
         """
         try:
-            # Read the audio file
-            data, samplerate = sf.read(file_path)
 
-            # Apply basic normalization
-            normalized_data = data / np.max(np.abs(data))
+            def natural_sort_key(filename: str) -> List[Union[int, str]]:
+                return [
+                    int(text) if text.isdigit() else text
+                    for text in re.split(r"(\d+)", filename)
+                ]
 
-            # Apply very slight compression
-            threshold = 0.3
-            ratio = 0.7
-            compressed_data = np.where(
-                np.abs(normalized_data) > threshold,
-                threshold
-                + (np.abs(normalized_data) - threshold)
-                * ratio
-                * np.sign(normalized_data),
-                normalized_data,
+            combined = AudioSegment.empty()
+            audio_files = sorted(
+                [f for f in os.listdir(input_dir) if f.endswith("mp3")],
+                key=natural_sort_key,
             )
+            for file in audio_files:
+                if file.endswith("mp3"):
+                    file_path = os.path.join(input_dir, file)
+                    combined += AudioSegment.from_file(file_path, format="mp3")
 
-            # Write the enhanced audio
-            sf.write(file_path, compressed_data, samplerate)
-
+            combined.export(output_file, format="mp3")
+            print(f"Merged audio saved to {output_file}")
         except Exception as e:
-            print(f"Warning: Audio enhancement failed: {e}")
-            # Continue with original audio if enhancement fails
+            raise Exception(f"Error merging audio files: {str(e)}")
+
+    def enhance_audio(self, file_path: Path) -> None:
+        """
+        Enhanced audio processing with voice-optimized settings
+        Args:
+            file_path (Path): Path to the audio file
+            voice_mode (bool): Use voice-optimized settings if True
+        """
+        # Voice-optimized settings
+        super().enhance_audio(
+            file_path,
+            target_loudness=-18.0,  # Slightly louder for voice
+            attack=10.0,  # Slower attack to preserve transients
+            release=50.0,  # Faster release for natural speech
+            threshold=-24.0,  # Lower threshold for voice
+            ratio=2.0,  # Gentler compression for voice
+        )

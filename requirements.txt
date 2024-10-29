@@ -14,9 +14,6 @@ pandas
 python-multipart
 python-slugify
 python-dotenv
-
-pyttsx3
-soundfile
 pydub
 
 ruff
