@@ -70,7 +70,6 @@ def display_example_cards():
                 height: 125px;
                 white-space: normal;
                 word-wrap: break-word;
-                color: #030712
             }
             @media (max-width: 960px) {
                 div[data-testid="stColumn"] {
