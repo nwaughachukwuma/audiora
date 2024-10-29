@@ -51,6 +51,7 @@ class TTSPromptMaker:
         - Use <emphasis level="moderate"> for key points
         - Apply <phoneme> tags for complex terms
         - Ensure all tags are properly closed
+        - Keep all SSML tags within the appropriate speaker tags
 
         3. Conversational Elements:
         - Insert natural speech patterns and filler words (um, uh, well)
@@ -75,6 +76,7 @@ class TTSPromptMaker:
         - Maintain accurate representation of source content, don't deviate
         - Appropriate word counnt for {self.category} format
         - Generate only the audiocast transcript
+        - Ensure all SSML tags are properly formatted and within the speaker tags
 
         Output Format Example for 2 speakers:
         <Person1>Hello there! [Content Intro & Overview].</Person1>

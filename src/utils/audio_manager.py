@@ -4,11 +4,12 @@ import os
 import re
 import uuid
 from pathlib import Path
-from typing import List, Optional, Tuple
+from typing import List, Optional
 
 from src.utils.audio_manager_utils import (
-    AudioCasterConfig,
+    AudioManagerConfig,
     AudioManagerSpeechGenerator,
+    ContentSplitter,
     openai_voices,
 )
 from src.utils.audio_synthesizer import AudioSynthesizer
@@ -17,68 +18,54 @@ from src.utils.clean_tss_markup import clean_tss_markup
 logger = logging.getLogger(__name__)
 
 
-class AudioCaster(AudioManagerSpeechGenerator):
-    def __init__(self, custom_config: Optional[AudioCasterConfig] = None):
+class AudioManager(AudioManagerSpeechGenerator, ContentSplitter):
+    def __init__(self, custom_config: Optional[AudioManagerConfig] = None):
         super().__init__()
 
         self.config = (
-            AudioCasterConfig(**custom_config.__dict__)
+            AudioManagerConfig(**custom_config.__dict__)
             if custom_config
-            else AudioCasterConfig()
+            else AudioManagerConfig()
         )
         self.config.ensure_directories()
 
-    def __get_tags(self, content: str) -> List[str]:
-        tags = re.findall(r"<(Person\d+)>", content)
+    def _get_tags(self, audio_script: str) -> List[str]:
+        tags = re.findall(r"<(Person\d+)>", audio_script)
         return list(set(tags))
 
-    async def run(self, content: str):
+    async def generate_speech(self, audio_script: str):
         """
-        Logic to make audiocast audio content
+        Logic to make audiocast from audio script.
         Args:
-            content (str): Audio content to convert to speech.
+            audio_script (str): Audio script to convert to speech.
         """
         output_file = f"{self.config.outdir_base}/{str(uuid.uuid4())}.mp3"
-        await self.convert_to_speech(content, output_file)
+        await self.text_to_speech(audio_script, output_file)
 
         return output_file
 
-    def split_content(self, content: str, tags: List[str]) -> List[Tuple[str, ...]]:
+    async def text_to_speech(self, audio_script: str, output_file: str):
         """
-        Split the input text into n-way dialogues based on the provided content.
+        Convert audio script to speech and save as an audio file.
         Args:
-            content (str): Audio content containing tagged, Tag1, Tag2,..., TagN, dialogues.
-        Returns:
-            List[Tuple[str, ...]]: List of tuples containing dialogues for present speakers.
-        """
-        # Regular expression pattern to match Tag0, Tag1, ..., TagN speaker dialogues
-        pattern = "\\s*".join([f"<{tag}>(.*?)</{tag}>" for tag in tags])
-        matches = re.findall(rf"{pattern}", content, re.DOTALL)
-        # Process the matches to remove extra whitespace and newlines
-        return [
-            tuple(" ".join(part.split()).strip() for part in match) for match in matches
-        ]
-
-    async def convert_to_speech(self, content: str, output_file: str) -> None:
-        """
-        Convert audio content to speech and save as an audio file.
-        Args:
-            content (str): Audio content to convert to speech.
+            audio_script (str): Audio script to convert to speech.
             output_file (str): path to save the output audio file.
         Raises:
             Exception: If there's an error in converting text to speech.
         """
-        cleaned_content = clean_tss_markup(content)
+        tags = self._get_tags(audio_script)
+        audio_script = clean_tss_markup(audio_script, tags)
 
         if self.config.tts_provider == "openai":
-            await self.__convert_to_speech_openai(cleaned_content, output_file)
+            return await self.__text_to_speech_openai(audio_script, output_file, tags)
         else:
             raise Exception("Invalid TTS model specified")
 
-    async def __convert_to_speech_openai(self, content: str, output_file: str) -> None:
+    async def __text_to_speech_openai(
+        self, audio_script: str, output_file: str, tags: List[str]
+    ):
         try:
-            tags = self.__get_tags(content)
-            nway_content = self.split_content(content, tags)
+            nway_content = self.split_content(audio_script, tags)
             print(f"nway_content: {nway_content}")
 
             jobs = self._prepare_speech_jobs(
@@ -89,13 +76,19 @@ class AudioCaster(AudioManagerSpeechGenerator):
             if not audio_files:
                 raise Exception("No audio files were generated")
 
-            await self.__finalize_audio(audio_files, output_file)
+            await self.__finalize(audio_files, output_file)
             logger.info(f"Audio saved to {output_file}")
 
         except Exception as e:
             raise Exception(f"Error converting text to speech with OpenAI: {str(e)}")
 
-    async def __finalize_audio(self, audio_files: List[str], output_file: str) -> None:
+    async def __finalize(self, audio_files: List[str], output_file: str) -> None:
+        """
+        Merge and enhance audio files and save the final output.
+        Args:
+            audio_files (List[str]): List of audio files to merge.
+            output_file (str): Path to save the final audio output.
+        """
         try:
             synthesizer = AudioSynthesizer(output_dir=self.config.outdir_base)
             # Run audio processing in thread pool to avoid blocking

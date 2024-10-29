@@ -1,10 +1,12 @@
 import uuid
 from typing import Dict, List
 
+import streamlit as st
 from fastapi import HTTPException
 from pydantic import BaseModel
 from slugify import slugify
 
+from src.utils.audio_manager import AudioManager
 from src.utils.audiocast_request import create_audio_script, generate_source_content
 from src.utils.chat_request import chat_request
 from src.utils.chat_utils import (
@@ -64,19 +66,37 @@ async def generate_audiocast(request: GenerateAudioCastRequest):
     if category not in content_categories:
         raise HTTPException(status_code=400, detail="Invalid content category")
 
-    source_content = generate_source_content(category, summary)
-    print(f"audiocast source content: {source_content}")
-    if not source_content:
-        raise HTTPException(
-            status_code=500, detail="Failed to develop audiocast source content"
-        )
+    container = st.empty()
 
-    audio_script = create_audio_script(category, source_content)
-    print(f"streamliend audio_script: {audio_script}")
-    if not audio_script:
-        raise HTTPException(
-            status_code=500, detail="Error while generating audio script"
-        )
+    # TODO: We can keep the process for generating source content and audio content separate
+    # STEP 1: Generate source content
+    with container.container():
+        container.info("Generating source content...")
+
+        source_content = generate_source_content(category, summary)
+        print(f"audiocast source content: {source_content}")
+        if not source_content:
+            raise HTTPException(
+                status_code=500, detail="Failed to develop audiocast source content"
+            )
+
+    # STEP 2: Generate audio script
+    with container.container():
+        container.info("Generating audio script...")
+
+        audio_script = create_audio_script(category, source_content)
+        print(f"streamlined audio_script: {audio_script}")
+        if not audio_script:
+            raise HTTPException(
+                status_code=500, detail="Error while generating audio script"
+            )
+
+    # TODO: Ingest audio file to a storage service (e.g., GCS, S3) using a background service
+    # STEP 3: Generate audio from the audio script
+    with container.container():
+        container.info("Generating audio...")
+        outputfile = await AudioManager().generate_speech(audio_script)
+        print(f"outputfile: {outputfile}")
 
     # Generate slug from the query
     slug = slugify((category + summary)[:50])  # First 50 chars for the slug
@@ -86,7 +106,7 @@ async def generate_audiocast(request: GenerateAudioCastRequest):
     response = GenerateAudioCastResponse(
         uuid=audiocast_id,
         slug=slug,
-        url=f"/audio/{audiocast_id}.mp3",
+        url=outputfile,
         script=audio_script,
         source_content=source_content,
     )
