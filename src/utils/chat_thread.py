@@ -123,13 +123,14 @@ async def use_audiocast_request(summary: str, content_category: ContentCategory)
                 GenerateAudioCastRequest(summary=summary, category=content_category)
             )
             print(f"Generate AudioCast Response: {audiocast_response}")
+
             st.session_state.current_audiocast = audiocast_response
             st.session_state.messages = []  # Clear messages
             st.rerun()
     except Exception as e:
         st.info("Error while generating your audiocast. Please start afresh!")
         st.error(f"Error generating audiocast: {str(e)}")
-        st.session_state.user_specification = None
 
+        st.session_state.user_specification = None
         if st.button("Restart", use_container_width=True):
             st.rerun()
