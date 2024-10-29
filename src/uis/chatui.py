@@ -11,7 +11,7 @@ from src.utils.render_chat import render_chat_history
 
 async def chatui(uichat=st.empty()):
     """
-    chat interface
+    Chat interface
     """
     st.write(
         "Tell me what you'd like to listen to, and I'll create an audiocast for you!"

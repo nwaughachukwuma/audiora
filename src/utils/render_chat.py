@@ -31,7 +31,7 @@ def render_chat_history():
     """
     Render chat history
     """
-    st.info("Chat session to understand your content preferences")
+    st.info("Chat session to understand your preferences")
 
     with st.chat_message("user"):
         message = st.session_state.messages[0]
