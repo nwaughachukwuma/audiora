@@ -11,7 +11,7 @@ async def main():
     init_session_state()
 
     # Configure page
-    # st.set_page_config(page_title="AudioCastr", page_icon="🎧", layout="wide")
+    st.set_page_config(page_title="Audiora", page_icon="🎧", layout="wide")
 
     # Sidebar for content type selection
     st.sidebar.title("Audiocast Info")
@@ -22,7 +22,8 @@ async def main():
         )
 
     # Main chat interface
-    st.title("🎧 AudioCastr")
+    st.title("🎧 Audiora")
+    st.subheader("Learn anything, anytime, through the power of AI-generated audio.")
 
     # Declare chat interface container
     uichat = st.empty()
