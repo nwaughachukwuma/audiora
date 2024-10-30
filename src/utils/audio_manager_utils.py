@@ -118,7 +118,7 @@ class ContentSplitter:
             raise Exception("Content does not contain proper tag structure")
 
         # Regular expression pattern to match Tag0, Tag1, ..., TagN speaker dialogues
-        matches = re.findall(r"<(Person\d+)>(.*?)</Person\d+>", content, re.DOTALL)
+        matches = re.findall(r"<(Speaker\d+)>(.*?)</Speaker\d+>", content, re.DOTALL)
         return [
             (str(person), " ".join(content.split()).strip())
             for person, content in matches

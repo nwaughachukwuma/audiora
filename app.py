@@ -11,7 +11,7 @@ async def main():
     init_session_state()
 
     # Configure page
-    st.set_page_config(page_title="AudioCastr", page_icon="🎧", layout="wide")
+    # st.set_page_config(page_title="AudioCastr", page_icon="🎧", layout="wide")
 
     # Sidebar for content type selection
     st.sidebar.title("Audiocast Info")

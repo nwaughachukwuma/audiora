@@ -17,7 +17,7 @@ class TTSPromptMaker:
 
     def get_tags(self) -> list[str]:
         """Get connection tags based on the number of speakers."""
-        return [f"<Person{i}>" for i in range(1, 10)]
+        return [f"<Speaker{i}>" for i in range(1, 10)]
 
     def get_system_prompt(self, source_content: str) -> str:
         """
@@ -38,14 +38,14 @@ class TTSPromptMaker:
 
         Optimization Requirements:
         1. Speaker Organization:
-        - Use <Person1>, <Person2>, etc., tags for speaker identification
-        - <Person1>: Main speaker/host/narrator
-        - <Person2> (and others if needed): Supporting roles, discussants, or interviewers
+        - Use <Speaker1>, <Speaker2>, etc., tags for speaker identification
+        - <Speaker1>: Main speaker/host/narrator
+        - <Speaker2> (and others if needed): Supporting roles, discussants, or interviewers
         - Maximum 2 speakers unless content specifically requires more
         - Example Format:
-            <Person1>[Expert introduction of topic]</Person1>
-            <Person2>[Engaging follow-up, questions, or challenges]</Person2>
-        - Use only <Person1> if the souce content or category requires only one speaker
+            <Speaker1>[Expert introduction of topic]</Speaker1>
+            <Speaker2>[Engaging follow-up, questions, or challenges]</Speaker2>
+        - Use only <Speaker1> if the souce content or category requires only one speaker
 
         2. SSML Enhancement:
         - Add appropriate SSML tags for improved audio delivery
@@ -83,9 +83,9 @@ class TTSPromptMaker:
         - Ensure all SSML tags are properly formatted and within the speaker tags
 
         Output Format Example for 2 speakers:
-        <Person1>Hello there! [Content Intro & Overview].</Person1>
-        <Person2>I'm particularly excited about [Specific Aspect]. What caught your attention about this?</Person2>
-        <Person1>Well <break time="0.2s"/> what really stands out is [Key Point]...</Person1>
+        <Speaker1>Hello there! [Content Intro & Overview].</Speaker1>
+        <Speaker2>I'm particularly excited about [Specific Aspect]. What caught your attention about this?</Speaker2>
+        <Speaker1>Well <break time="0.2s"/> what really stands out is [Key Point]...</Speaker1>
 
         Remember: Focus solely on conveying the source content in an engaging audio format while optimizing for audio delivery.
         """

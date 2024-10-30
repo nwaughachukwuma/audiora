@@ -30,7 +30,7 @@ class AudioManager(AudioManagerSpeechGenerator, ContentSplitter):
         self.config.ensure_directories()
 
     def _get_tags(self, audio_script: str) -> List[str]:
-        tags = re.findall(r"<(Person\d+)>", audio_script)
+        tags = re.findall(r"<(Speaker\d+)>", audio_script)
         tags.sort()
         return list(set(tags))
 
