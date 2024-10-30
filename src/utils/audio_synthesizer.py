@@ -62,7 +62,9 @@ class AudioEnhancer:
             audio = audio.speedup(playback_speed=speed_factor)
             # Only normalize if significant volume differences
             if abs(audio.dBFS + 18.0) > 3.0:  # +/- 3dB tolerance
-                audio = audio.normalize(target_level=-18.0)
+                # Calculate gain needed to reach target dBFS of -18.0
+                gain_needed = -18.0 - audio.dBFS
+                audio = audio.apply_gain(gain_needed)
 
             # Export with high quality
             audio.export(

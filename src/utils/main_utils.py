@@ -4,7 +4,6 @@ from typing import Dict, List
 
 import streamlit as st
 from pydantic import BaseModel
-from slugify import slugify
 
 from src.services.storage import StorageManager
 from src.utils.audio_manager import AudioManager
@@ -25,7 +24,6 @@ class GenerateAudioCastRequest(BaseModel):
 
 class GenerateAudioCastResponse(BaseModel):
     uuid: str
-    slug: str
     url: str
     script: str
     source_content: str
@@ -99,19 +97,21 @@ async def generate_audiocast(request: GenerateAudioCastRequest):
         AudioSynthesizer().enhance_audio_minimal(Path(output_file))
         print(f"output_file: {output_file}")
 
+    # unique ID for the audiocast
     uniq_id = str(uuid.uuid4())
 
     # TODO: Use a background service
     # STEP 4: Ingest audio file to a storage service (e.g., GCS, S3)
     with container.container():
-        container.info("Storing a copy of your audiocast...")
-        storage_manager = StorageManager()
-        storage_manager.upload_audio_to_gcs(output_file, uniq_id)
+        try:
+            container.info("Storing a copy of your audiocast...")
+            storage_manager = StorageManager()
+            storage_manager.upload_audio_to_gcs(output_file, uniq_id)
+        except Exception as e:
+            print(f"Error while storing audiocast: {str(e)}")
 
     response = GenerateAudioCastResponse(
-        # unique ID for the audiocast
         uuid=uniq_id,
-        slug=slugify((category + summary)[:50]),
         url=output_file,
         script=audio_script,
         source_content=source_content,

@@ -57,7 +57,7 @@ class StorageManager:
         """upload audio file to GCS"""
         blobname = f"{BLOB_BASE_URI}/{filename}"
         self.upload_to_gcs(
-            tmp_audio_path,
+            Path(tmp_audio_path),
             blobname,
             UploadItemParams(content_type="audio/mpeg"),
         )
