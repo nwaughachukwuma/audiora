@@ -94,7 +94,7 @@ jobs:
           service: ${{ env.SERVICE }}
           source: ./
           tag: ${{ needs.prepare.outputs.VERSION }}
-          no_traffic: true
+          # no_traffic: true
           timeout: "5m"
           gcloud_version: "482.0.0"
           env_vars: |
