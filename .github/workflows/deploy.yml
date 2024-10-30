@@ -104,7 +104,7 @@ jobs:
             ANTHROPIC_API_KEY=${{ secrets.ANTHROPIC_API_KEY }}
             ELEVENLABS_API_KEY=${{ secrets.ELEVENLABS_API_KEY }}
 
-          flags: "--allow-unauthenticated --memory=32Gi --cpu=8 --execution-environment=gen2 --concurrency=80"
+          flags: "--allow-unauthenticated --memory=32Gi --cpu=8 --execution-environment=gen2 --concurrency=80 --max-instances=10"
 
       - name: health-check
         run: curl -f "${{ steps.deploy.outputs.url }}"
