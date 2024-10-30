@@ -9,7 +9,7 @@ from slugify import slugify
 
 from src.utils.audio_manager import AudioManager
 from src.utils.audio_synthesizer import AudioSynthesizer
-from src.utils.audiocast_request import create_audio_script, generate_source_content
+from src.utils.audiocast_request import AudioScriptMaker, generate_source_content
 from src.utils.chat_request import chat_request
 from src.utils.chat_utils import (
     SessionChatMessage,
@@ -86,7 +86,8 @@ async def generate_audiocast(request: GenerateAudioCastRequest):
     with container.container():
         container.info("Generating audio script...")
 
-        audio_script = create_audio_script(category, source_content)
+        audio_script_maker = AudioScriptMaker(category, source_content)
+        audio_script = audio_script_maker.create(provider="anthropic")
         print(f"streamlined audio_script: {audio_script}")
         if not audio_script:
             raise HTTPException(
