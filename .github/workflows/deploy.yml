@@ -32,6 +32,10 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       VERSION: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.number) || format('main-{0}', steps.prepare_env.outputs.SHORT_SHA) }}
+<<<<<<< HEAD
+=======
+      MAIN_OR_TAGGED: ${{ fromJSON(env.MAIN) || (fromJSON(steps.prepare_env.outputs.TAGGED) && steps.prepare_env.outputs.TAG_BRANCH_NAME == 'main') }}
+>>>>>>> origin/main
     steps:
       - uses: actions/checkout@v4
         with:
@@ -39,7 +43,17 @@ jobs:
       - id: prepare_env
         run: |
           echo "TAGGED=${{ startsWith(github.ref, 'refs/tags/api') }}" >> $GITHUB_OUTPUT
+<<<<<<< HEAD
           echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+=======
+
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          echo "SHORT_SHA=$SHORT_SHA" >> $GITHUB_OUTPUT
+
+          RAW=$(git branch -r --contains $SHORT_SHA)
+          TAG_BRANCH_NAME="${RAW##*/}"
+          echo "TAG_BRANCH_NAME=$TAG_BRANCH_NAME" >> $GITHUB_OUTPUT
+>>>>>>> origin/main
 
   lint:
     runs-on: ubuntu-latest
@@ -99,10 +113,18 @@ jobs:
 
           flags: "--allow-unauthenticated --memory=32Gi --cpu=8 --execution-environment=gen2 --concurrency=80 --max-instances=10"
 
+<<<<<<< HEAD
       - run: curl -f "${{ steps.deploy.outputs.url }}"
       - uses: marocchino/sticky-pull-request-comment@v2
         with:
           header: app
+=======
+      - name: health-check
+        run: curl -f "${{ steps.deploy.outputs.url }}"
+      - uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: api
+>>>>>>> origin/main
           message: |
             app: ${{ steps.deploy.outputs.url }} (${{ github.event.pull_request.head.sha }})
 
