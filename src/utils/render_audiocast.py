@@ -33,7 +33,7 @@ def render_audiocast():
     st.sidebar.subheader("Audiocast Source")
     st.sidebar.markdown(current_audiocast["source_content"])
 
-    share_url = f"{APP_URL}/audiocast/{current_audiocast['uuid']}"
+    share_url = f"{APP_URL}/audiocast?uuid={current_audiocast['uuid']}"
     st.text_input("Share this audiocast:", share_url)
 
     share_col, restart_row = st.columns(2, vertical_alignment="bottom")
