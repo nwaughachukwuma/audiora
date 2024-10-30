@@ -48,7 +48,7 @@ class AudioManagerSpeechGenerator:
 
     def _prepare_speech_jobs(
         self,
-        nway_content: List[Tuple[str, ...]],
+        nway_content: List[Tuple[str, str]],
         tags: List[str],
         voices: List[Any],
         temp_audio_dir: str,
@@ -58,21 +58,20 @@ class AudioManagerSpeechGenerator:
         # Create tag-to-voice mapping
         voice_mapping = self._create_voice_mapping(tags, voices)
 
-        for dialogue_parts in nway_content:
-            for tag, content_part in zip(tags, dialogue_parts):
-                if not content_part.strip():
-                    continue
-                counter += 1
-                file_name = f"{temp_audio_dir}/{counter}.mp3"
-                jobs.append(
-                    SpeechJob(
-                        content=content_part,
-                        voice=voice_mapping[tag],
-                        output_file=file_name,
-                        tag=tag,
-                        index=counter,
-                    )
+        for tag, content_part in nway_content:
+            if not content_part.strip():
+                continue
+            counter += 1
+            file_name = f"{temp_audio_dir}/{counter}.mp3"
+            jobs.append(
+                SpeechJob(
+                    content=content_part,
+                    voice=voice_mapping[tag],
+                    output_file=file_name,
+                    tag=tag,
+                    index=counter,
                 )
+            )
 
         return jobs
 
@@ -106,52 +105,24 @@ class AudioManagerSpeechGenerator:
 
 
 class ContentSplitter:
-    def split_content(self, content: str, tags: List[str]) -> List[Tuple[str, ...]]:
+    def split_content(self, content: str, tags: List[str]) -> List[Tuple[str, str]]:
         """
-        Split text content into n-way dialogues based.
+        Split the input text into n-way dialogues based on the provided content.
         Args:
-            content (str): Audio script containing tagged dialogues
-            tags (List[str]): List of tags to match (e.g., ["Tag1", "Tag2"])
+            content (str): Audio content containing tagged, Tag1, Tag2,..., TagN, dialogues.
+            tags (List[str]): List of tags to split the content
         Returns:
-            List[Tuple[str, ...]]: List of tuples containing dialogues for each tag
-        Example:
-            Input: "<Tag1>Hello</Tag1><Tag2>Hi</Tag2>"
-            Output: [("Hello", "Hi")]
+            List[Tuple[str, str]]: List of tuples containing dialogues for present speakers.
         """
-        print(f"Processing script with tags: {tags}")
-
         if not self.validate_content(content, tags):
             raise Exception("Content does not contain proper tag structure")
 
-        # Extract content for each tag separately
-        tag_contents: List[List[str]] = []
-
-        for tag in tags:
-            pattern = f"<{tag}>(.*?)</{tag}>"
-            matches = re.findall(pattern, content, re.DOTALL)
-
-            # Clean up matches
-            cleaned_matches = [" ".join(m.split()).strip() for m in matches]
-            tag_contents.append(cleaned_matches)
-
-            print(f"Found {len(cleaned_matches)} matches for tag {tag}")
-
-        # Validate we have content
-        if not any(tag_contents):
-            print("No content found for any tags")
-            return []
-
-        # Get the last tag where there's a mismatch in speaker tags represented
-        lengths = [len(content) for content in tag_contents]
-        last_tag_content = tag_contents[-1] if len(set(lengths)) > 1 else None
-
-        # Zip the contents together
-        zipped = list(zip(*tag_contents))
-        if last_tag_content:
-            zipped.append(tuple(last_tag_content))
-
-        print(f"Generated {tag_contents} dialogue tags. Zipped: {zipped}")
-        return zipped
+        # Regular expression pattern to match Tag0, Tag1, ..., TagN speaker dialogues
+        matches = re.findall(r"<(Person\d+)>(.*?)</Person\d+>", content, re.DOTALL)
+        return [
+            (str(person), " ".join(content.split()).strip())
+            for person, content in matches
+        ]
 
     @staticmethod
     def validate_content(content: str, tags: List[str]) -> bool:

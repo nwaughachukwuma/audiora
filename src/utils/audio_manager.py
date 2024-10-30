@@ -31,6 +31,7 @@ class AudioManager(AudioManagerSpeechGenerator, ContentSplitter):
 
     def _get_tags(self, audio_script: str) -> List[str]:
         tags = re.findall(r"<(Person\d+)>", audio_script)
+        tags.sort()
         return list(set(tags))
 
     async def generate_speech(self, audio_script: str):
