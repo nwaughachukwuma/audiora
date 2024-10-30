@@ -115,7 +115,7 @@ async def use_audiocast_request(summary: str, content_category: ContentCategory)
     Call audiocast creating workflow
 
     Args:
-        summary (str): user request summary or user specification
+        summary (str): user request summary or preferences
         content_category (ContentCategory): content category
     """
     try:
