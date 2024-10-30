@@ -1,6 +1,6 @@
-import re
 from dataclasses import dataclass
 from io import BytesIO
+from pathlib import Path
 from typing import Any, Dict
 from uuid import uuid4
 
@@ -8,29 +8,14 @@ from google.cloud import storage
 
 from src.env_var import BUCKET_NAME
 
-# Instantiates a client
 storage_client = storage.Client()
 bucket = storage_client.bucket(BUCKET_NAME)
+BLOB_BASE_URI = "audiora/assets"
 
 
 def listBlobs(prefix):
     blobs = bucket.list_blobs(prefix=prefix)
     return [blob for blob in blobs]
-
-
-def download_audio_file(root_cloud_path: str, tmp_path: str):
-    """download the video file from the bucket"""
-    blobs = listBlobs(prefix=root_cloud_path)
-    pattern = re.compile("audio/mpeg|audio/mp3|audio/wav|audio/ogg|audio/aac")
-    audio_blobs = [blob for blob in blobs if bool(pattern.match(blob.content_type))]
-
-    if not len(audio_blobs):
-        return None
-
-    audio_file = audio_blobs[0]
-    audio_file.download_to_filename(f"{tmp_path}")
-
-    return tmp_path
 
 
 def check_file_exists(root_path: str, filename: str):
@@ -47,54 +32,46 @@ class UploadItemParams:
     metadata: Dict[str, Any] | None = None
 
 
-def upload_string_to_gcs(content: str, blobname: str, params: UploadItemParams):
-    """upload string content to GCS"""
-    blob = bucket.blob(blobname)
-    blob.content_type = "text/plain"
-    blob.cache_control = params.content_type
+class StorageManager:
+    def upload_to_gcs(
+        self, item: str | Path | BytesIO, blobname: str, params: UploadItemParams
+    ):
+        """upload item to GCS"""
+        blob = bucket.blob(blobname)
+        blob.content_type = params.content_type
+        blob.cache_control = params.cache_control
 
-    if params.metadata:
-        blob.metadata = {**(blob.metadata or dict()), **params.metadata}
+        if params.metadata:
+            blob.metadata = {**(blob.metadata or dict()), **params.metadata}
 
-    blob.upload_from_string(content)
+        if isinstance(item, Path):
+            blob.upload_from_filename(str(item))
+        elif isinstance(item, str):
+            blob.upload_from_string(item)
+        else:
+            blob.upload_from_file(item)
 
-    return f"gs://{BUCKET_NAME}/{blob.name}"
+        return f"gs://{BUCKET_NAME}/{blob.name}"
 
+    def upload_audio_to_gcs(self, tmp_audio_path: str, filename=str(uuid4())):
+        """upload audio file to GCS"""
+        blobname = f"{BLOB_BASE_URI}/{filename}"
+        self.upload_to_gcs(
+            tmp_audio_path,
+            blobname,
+            UploadItemParams(content_type="audio/mpeg"),
+        )
 
-def upload_file_to_gcs(tmp_path: str, blobname: str, params: UploadItemParams):
-    """upload file to GCS"""
-    blob = bucket.blob(blobname)
-    blob.content_type = params.content_type
-    blob.cache_control = params.cache_control
+        return f"gs://{BUCKET_NAME}/{blobname}"
 
-    if params.metadata:
-        blob.metadata = {**(blob.metadata or dict()), **params.metadata}
+    def download_from_gcs(self, filename: str):
+        """
+        Download any item on GCS to disk
+        """
+        blobname = f"{BLOB_BASE_URI}/{filename}"
+        blob = bucket.blob(blobname)
+        tmp_file_path = f"/tmp/{str(uuid4())}"
 
-    blob.upload_from_filename(tmp_path)
+        blob.download_to_filename(tmp_file_path)
 
-    return f"gs://{BUCKET_NAME}/{blob.name}"
-
-
-def upload_bytes_to_gcs(bytes: BytesIO, blobname: str, params: UploadItemParams):
-    """upload bytes to GCS"""
-    blob = bucket.blob(blobname)
-    blob.content_type = params.content_type
-    blob.cache_control = params.cache_control
-
-    if params.metadata:
-        blob.metadata = {**(blob.metadata or dict()), **params.metadata}
-
-    blob.upload_from_file(bytes)
-
-    return f"gs://{BUCKET_NAME}/{blobname}"
-
-
-def download_file_from_gcs(blobname: str):
-    """
-    Download any item on GCS to disk
-    """
-    blob = bucket.blob(blobname)
-    tmp_file_path = f"/tmp/{str(uuid4())}"
-    blob.download_to_filename(tmp_file_path)
-
-    return tmp_file_path
+        return tmp_file_path
