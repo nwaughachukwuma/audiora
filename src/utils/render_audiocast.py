@@ -3,6 +3,7 @@ from typing import TypedDict
 import streamlit as st
 
 from src.env_var import APP_URL
+from src.utils.session_state import reset_session
 
 
 class GenerateAudiocastDict(TypedDict):
@@ -32,8 +33,17 @@ def render_audiocast():
     st.sidebar.subheader("Audiocast Source")
     st.sidebar.markdown(current_audiocast["source_content"])
 
-    # Share button
-    share_url = (
-        f"{APP_URL}/audiocast/{current_audiocast['uuid']}/{current_audiocast['slug']}"
-    )
-    st.sidebar.text_input("Share this audiocast:", share_url)
+    share_row, _ = st.columns(2)
+
+    with share_row:
+        # Share button
+        share_url = f"{APP_URL}/audiocast/{current_audiocast['uuid']}/{current_audiocast['slug']}"
+        st.text_input("Share this audiocast:", share_url)
+
+    restart_row, _ = st.columns(2)
+
+    with restart_row:
+        # New audiocast button
+        if st.button("Generate New Audiocast", use_container_width=True):
+            reset_session()
+            st.rerun()

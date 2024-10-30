@@ -12,7 +12,7 @@ async def audioui(uichat=st.empty()):
     uichat.empty()
 
     if not st.session_state.current_audiocast:
-        st.info("Using your audiocast specifications")
+        st.info("Using your specifications")
 
         summary = st.session_state.user_specification
         content_category = st.session_state.content_category

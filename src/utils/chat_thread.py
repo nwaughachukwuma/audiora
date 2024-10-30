@@ -79,8 +79,9 @@ async def evaluate_final_response(ai_message: str, content_category: ContentCate
     """,
         unsafe_allow_html=True,
     )
-    termination = termination_suffix.lower() in ai_message.lower()
-    if not termination:
+
+    end_chat_session = termination_suffix.lower() in ai_message.lower()
+    if not end_chat_session:
         return st.rerun()
 
     summary = re.sub(termination_prefix, "", ai_message, flags=re.IGNORECASE)
