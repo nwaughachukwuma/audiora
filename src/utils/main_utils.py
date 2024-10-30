@@ -4,8 +4,8 @@ from typing import Dict, List
 
 import streamlit as st
 from pydantic import BaseModel
-from slugify import slugify
 
+from src.services.storage import StorageManager
 from src.utils.audio_manager import AudioManager
 from src.utils.audio_synthesizer import AudioSynthesizer
 from src.utils.audiocast_request import AudioScriptMaker, generate_source_content
@@ -24,7 +24,6 @@ class GenerateAudioCastRequest(BaseModel):
 
 class GenerateAudioCastResponse(BaseModel):
     uuid: str
-    slug: str
     url: str
     script: str
     source_content: str
@@ -89,25 +88,31 @@ async def generate_audiocast(request: GenerateAudioCastRequest):
         if not audio_script:
             raise Exception("Error while generating audio script")
 
-    # TODO: Ingest audio file to a storage service (e.g., GCS, S3) using a background service
     # STEP 3: Generate audio from the audio script
     with container.container():
         container.info("Generating audio...")
-        outputfile = await AudioManager().generate_speech(audio_script)
+        output_file = await AudioManager().generate_speech(audio_script)
 
         container.info("Enhancing audio quality...")
-        AudioSynthesizer().enhance_audio_minimal(Path(outputfile))
-        print(f"outputfile: {outputfile}")
+        AudioSynthesizer().enhance_audio_minimal(Path(output_file))
+        print(f"output_file: {output_file}")
 
-    # Generate slug from the query
-    slug = slugify((category + summary)[:50])  # First 50 chars for the slug
-    # Generate a unique ID for the audiocast
-    audiocast_id = str(uuid.uuid4())
+    # unique ID for the audiocast
+    uniq_id = str(uuid.uuid4())
+
+    # TODO: Use a background service
+    # STEP 4: Ingest audio file to a storage service (e.g., GCS, S3)
+    with container.container():
+        try:
+            container.info("Storing a copy of your audiocast...")
+            storage_manager = StorageManager()
+            storage_manager.upload_audio_to_gcs(output_file, uniq_id)
+        except Exception as e:
+            print(f"Error while storing audiocast: {str(e)}")
 
     response = GenerateAudioCastResponse(
-        uuid=audiocast_id,
-        slug=slug,
-        url=outputfile,
+        uuid=uniq_id,
+        url=output_file,
         script=audio_script,
         source_content=source_content,
     )
@@ -115,6 +120,9 @@ async def generate_audiocast(request: GenerateAudioCastRequest):
     return response.model_dump()
 
 
-async def get_audiocast(uuid: str):
-    # TODO: Implement audiocast retrieval
-    pass
+async def get_audiocast_uri(uuid: str):
+    """
+    Get the URI for the audiocast
+    """
+    storage_manager = StorageManager()
+    return storage_manager.download_from_gcs(uuid)
