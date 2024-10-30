@@ -23,7 +23,9 @@ class TTSPromptMaker:
         """
         Generate an optimized system prompt for converting a source content into the appropriate format.
         """
-        return f"""Transform the following source content into an engaging {self.category} TTS-optimized audiocast script.
+        return f"""You're a super-intelligent AI who generates different forms, styles and genres of audiocast script.
+        
+        Your task is to transform the following source content into an engaging {self.category} TTS-optimized audiocast script.
 
         Source Content: {source_content}
 
@@ -62,12 +64,14 @@ class TTSPromptMaker:
             c. Apply speaker interactions, respectful disagreements and challenges
 
         4. Content Flow:
+        - Content name: Use the source title or "Audiocast", and nothing else. Some content won't require a title
         - Structure: Opening greeting → Topic introduction → Main points/discussion → Conclusion
         - Natural transitions between points
         - Maintain consistent pacing
         - Expert-level discussion of source material
         - Reference source material naturally
         - "Key terms" in quotation marks
+        - Always end the script with a clear conclusion
 
         5. Quality Standards:
         - Verify SSML tag accuracy, opening and closure

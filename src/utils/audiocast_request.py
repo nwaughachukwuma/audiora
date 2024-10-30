@@ -83,7 +83,7 @@ class AudioScriptMaker:
 
         print("Streamlining the  audio script...")
 
-        streamlined_script = streamline_audio_script(
+        streamlined_script = self.streamline_audio_script(
             instruction=system_prompt, audio_script=audio_script
         )
 
@@ -121,27 +121,26 @@ class AudioScriptMaker:
 
         return "".join(item.text for item in result.content if item.type == "text")
 
+    def streamline_audio_script(self, instruction: str, audio_script: str):
+        """
+        Streamline the audio script to align with the specified TTS requirements.
 
-def streamline_audio_script(instruction: str, audio_script: str):
-    """
-    Streamline the audio script to align with the specified TTS requirements.
+        Args:
+            instruction (str): The TTS requirements
+            audio_script (str): The generated audio script
+        Returns:
+            str: The streamlined audio script
+        """
+        response = generate_content(
+            prompt=[
+                "Now streamline the audio script to match the specified TTS requirements."
+            ],
+            config=GeminiConfig(
+                model_name="gemini-1.5-flash-002",
+                system_prompt=streamline_audio_script_prompt(instruction, audio_script),
+                temperature=0.5,
+                max_output_tokens=4096,
+            ),
+        )
 
-    Args:
-        instruction (str): The TTS requirements
-        audio_script (str): The generated audio script
-    Returns:
-        str: The streamlined audio script
-    """
-    response = generate_content(
-        prompt=[
-            "Now streamline the audio script to match the specified TTS requirements."
-        ],
-        config=GeminiConfig(
-            model_name="gemini-1.5-flash-002",
-            system_prompt=streamline_audio_script_prompt(instruction, audio_script),
-            temperature=0.5,
-            max_output_tokens=4096,
-        ),
-    )
-
-    return response
+        return response

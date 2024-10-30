@@ -10,8 +10,8 @@ from typing import Any, List, Literal, Optional, Tuple
 
 from src.services.openai_client import get_openai
 
-OpenaiVoice = Literal["echo", "shimmer", "onyx", "nova", "alloy"]
-openai_voices: List[OpenaiVoice] = ["echo", "shimmer", "onyx", "nova", "alloy"]
+OpenaiVoice = Literal["onyx", "shimmer", "echo", "nova", "alloy"]
+openai_voices: List[OpenaiVoice] = ["onyx", "shimmer", "echo", "nova", "alloy"]
 
 
 @dataclass
