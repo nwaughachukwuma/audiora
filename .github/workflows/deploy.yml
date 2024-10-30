@@ -21,7 +21,7 @@ env:
   CI: true
   PROJECT_ID: ${{ secrets.PROJECT_ID }}
   MAIN: ${{ github.ref == 'refs/heads/main' }}
-  SERVICE: app
+  SERVICE: audiora
   OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
   GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
   ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -94,7 +94,7 @@ jobs:
           service: ${{ env.SERVICE }}
           source: ./
           tag: ${{ needs.prepare.outputs.VERSION }}
-          no_traffic: true
+          no_traffic: false
           timeout: "5m"
           gcloud_version: "482.0.0"
           env_vars: |
