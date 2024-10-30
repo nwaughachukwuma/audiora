@@ -17,7 +17,7 @@ class GenerateAudiocastDict(TypedDict):
 
 def render_audiocast():
     """
-    Render the audiocast based on the user's specifications
+    Render the audiocast based on the user's preferences
     - Display current audiocast if available
     """
     st.header("Your Audiocast")
