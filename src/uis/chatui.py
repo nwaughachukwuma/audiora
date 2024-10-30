@@ -1,4 +1,5 @@
 import streamlit as st
+from streamlit.delta_generator import DeltaGenerator
 
 from src.utils.chat_thread import (
     evaluate_final_response,
@@ -9,7 +10,7 @@ from src.utils.chat_utils import display_example_cards
 from src.utils.render_chat import render_chat_history
 
 
-async def chatui(uichat=st.empty()):
+async def chatui(uichat: DeltaGenerator):
     """
     Chat interface
     """

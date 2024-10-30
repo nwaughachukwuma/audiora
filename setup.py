@@ -24,7 +24,7 @@ setup(
         "google-cloud-storage",
         "google-api-python-client",
         "google-generativeai",
-        "ruff"
+        "ruff",
     ],
     classifiers=[
         "Development Status :: 3 - Alpha",

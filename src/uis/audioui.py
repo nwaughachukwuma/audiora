@@ -1,10 +1,11 @@
 import streamlit as st
+from streamlit.delta_generator import DeltaGenerator
 
 from src.utils.chat_thread import use_audiocast_request
 from src.utils.render_audiocast import render_audiocast
 
 
-async def audioui(uichat=st.empty()):
+async def audioui(uichat: DeltaGenerator):
     """
     Audiocast interface
     """

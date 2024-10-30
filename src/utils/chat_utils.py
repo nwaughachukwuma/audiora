@@ -60,7 +60,7 @@ class SessionChatRequest(BaseModel):
 
 def display_example_cards():
     """Display example content cards if there are no messages"""
-    st.markdown("#### You can start with one of the following")
+    st.markdown("##### You can start with one of the following")
 
     # CSS for fixed-height buttons and responsive columns
     st.markdown(
