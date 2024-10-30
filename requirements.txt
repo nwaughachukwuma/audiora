@@ -6,7 +6,7 @@ requests
 httpx
 
 openai
-langchain
+anthropic
 
 numpy==1.24.3
 pandas
