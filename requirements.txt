@@ -1,27 +1,21 @@
 streamlit
-
-fastapi
-uvicorn
-requests
 httpx
+asyncio
 
 openai
 anthropic
 
-numpy==1.24.3
-pandas
-
+pyperclip
 python-multipart
 python-slugify
 python-dotenv
 pydub
 
-ruff
-asyncio
-pyperclip
 
 firebase-admin
 google-auth
 google-cloud-storage
 google-api-python-client
 google-generativeai
+
+ruff

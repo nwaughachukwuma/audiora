@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import Dict, List
 
 import streamlit as st
-from fastapi import HTTPException
 from pydantic import BaseModel
 from slugify import slugify
 
@@ -66,7 +65,7 @@ async def generate_audiocast(request: GenerateAudioCastRequest):
     summary = request.summary
     category = request.category
     if category not in content_categories:
-        raise HTTPException(status_code=400, detail="Invalid content category")
+        raise Exception("Invalid content category")
 
     container = st.empty()
 
@@ -78,9 +77,7 @@ async def generate_audiocast(request: GenerateAudioCastRequest):
         source_content = generate_source_content(category, summary)
         print(f"audiocast source content: {source_content}")
         if not source_content:
-            raise HTTPException(
-                status_code=500, detail="Failed to develop audiocast source content"
-            )
+            raise Exception("Failed to develop audiocast source content")
 
     # STEP 2: Generate audio script
     with container.container():
@@ -90,9 +87,7 @@ async def generate_audiocast(request: GenerateAudioCastRequest):
         audio_script = audio_script_maker.create(provider="anthropic")
         print(f"streamlined audio_script: {audio_script}")
         if not audio_script:
-            raise HTTPException(
-                status_code=500, detail="Error while generating audio script"
-            )
+            raise Exception("Error while generating audio script")
 
     # TODO: Ingest audio file to a storage service (e.g., GCS, S3) using a background service
     # STEP 3: Generate audio from the audio script
