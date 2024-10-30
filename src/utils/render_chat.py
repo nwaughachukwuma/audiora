@@ -25,7 +25,6 @@ def set_content_category():
                 key="selected_content_category",
                 on_change=on_value_change,
             )
-        
 
 
 def render_chat_history():
