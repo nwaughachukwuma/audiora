@@ -15,18 +15,17 @@ def set_content_category():
             st.session_state.messages.append({"role": "human", "content": content})
             st.session_state.content_category = content_category
 
-            st.rerun()
-
     with st.container():
         col1, _ = st.columns(2)
         with col1:
             st.selectbox(
-                "Select Content Type",
+                "Select Content Category",
                 content_categories,
                 format_func=lambda x: x.title(),
                 key="selected_content_category",
                 on_change=on_value_change,
             )
+        
 
 
 def render_chat_history():

@@ -6,7 +6,7 @@ def render_footer():
         """
         <style>
         .footer {
-            position: fixed;
+            position: absolute;
             bottom: 0;
             text-align: center;
             padding: 1rem;

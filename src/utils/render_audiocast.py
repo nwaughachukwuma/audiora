@@ -20,7 +20,7 @@ def render_audiocast():
     Render the audiocast based on the user's preferences
     - Display current audiocast if available
     """
-    st.header("Your Audiocast")
+    st.markdown("#### Your Audiocast")
     current_audiocast: GenerateAudiocastDict = st.session_state.current_audiocast
 
     # Audio player
@@ -53,4 +53,5 @@ def render_audiocast():
             st.rerun()
 
     if st.session_state.get("show_copy_success", False):
+        st.session_state.show_copy_succes = False
         st.success("Share link copied successfully!", icon="✅")
