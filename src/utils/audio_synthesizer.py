@@ -52,10 +52,6 @@ class AudioEnhancer:
 
 
 class AudioSynthesizer(AudioEnhancer):
-    def __init__(self, output_dir: str = "/tmp/audio_files"):
-        self.output_dir = Path(output_dir)
-        self.output_dir.mkdir(parents=True, exist_ok=True)
-
     def merge_audio_files(self, input_dir: str, output_file: str) -> None:
         """
         Merge all audio files in the input directory sequentially and save the result.

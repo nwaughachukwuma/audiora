@@ -83,26 +83,28 @@ class AudioManager(AudioManagerSpeechGenerator, ContentSplitter):
         except Exception as e:
             raise Exception(f"Error converting text to speech with OpenAI: {str(e)}")
 
-    async def __finalize(self, audio_files: List[str], output_file: str) -> None:
+    async def __finalize(
+        self, audio_files: List[str], output_file: str, enhance_audio=False
+    ) -> None:
         """
         Merge and enhance audio files and save the final output.
+        - Run audio processing in thread pool to avoid blocking
         Args:
             audio_files (List[str]): List of audio files to merge.
             output_file (str): Path to save the final audio output.
         """
         try:
-            synthesizer = AudioSynthesizer(output_dir=self.config.outdir_base)
-            # Run audio processing in thread pool to avoid blocking
+            synthesizer = AudioSynthesizer()
             await asyncio.get_event_loop().run_in_executor(
                 self.executor,
                 lambda: synthesizer.merge_audio_files(
                     self.config.temp_audio_dir, output_file
                 ),
             )
-
-            await asyncio.get_event_loop().run_in_executor(
-                self.executor, lambda: synthesizer.enhance_audio(Path(output_file))
-            )
+            if enhance_audio:
+                await asyncio.get_event_loop().run_in_executor(
+                    self.executor, lambda: synthesizer.enhance_audio(Path(output_file))
+                )
         finally:
             for file in audio_files:
                 if os.path.exists(file):

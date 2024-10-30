@@ -1,4 +1,5 @@
 import uuid
+from pathlib import Path
 from typing import Dict, List
 
 import streamlit as st
@@ -7,6 +8,7 @@ from pydantic import BaseModel
 from slugify import slugify
 
 from src.utils.audio_manager import AudioManager
+from src.utils.audio_synthesizer import AudioSynthesizer
 from src.utils.audiocast_request import create_audio_script, generate_source_content
 from src.utils.chat_request import chat_request
 from src.utils.chat_utils import (
@@ -96,6 +98,9 @@ async def generate_audiocast(request: GenerateAudioCastRequest):
     with container.container():
         container.info("Generating audio...")
         outputfile = await AudioManager().generate_speech(audio_script)
+
+        container.info("Enhancing audio quality...")
+        AudioSynthesizer().enhance_audio(Path(outputfile))
         print(f"outputfile: {outputfile}")
 
     # Generate slug from the query
