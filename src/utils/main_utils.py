@@ -120,9 +120,10 @@ async def generate_audiocast(request: GenerateAudioCastRequest):
     return response.model_dump()
 
 
-async def get_audiocast_uri(uuid: str):
+def get_audiocast_uri(uuid: str):
     """
     Get the URI for the audiocast
     """
     storage_manager = StorageManager()
-    return storage_manager.download_from_gcs(uuid)
+    filepath = storage_manager.download_from_gcs(uuid)
+    return filepath
