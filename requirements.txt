@@ -18,6 +18,7 @@ pydub
 
 ruff
 asyncio
+pyperclip
 
 firebase-admin
 google-auth

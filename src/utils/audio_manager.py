@@ -103,7 +103,8 @@ class AudioManager(AudioManagerSpeechGenerator, ContentSplitter):
             )
             if enhance_audio:
                 await asyncio.get_event_loop().run_in_executor(
-                    self.executor, lambda: synthesizer.enhance_audio(Path(output_file))
+                    self.executor,
+                    lambda: synthesizer.enhance_audio_minimal(Path(output_file)),
                 )
         finally:
             for file in audio_files:

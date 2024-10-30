@@ -64,7 +64,7 @@ class TTSPromptMaker:
             c. Apply speaker interactions, respectful disagreements and challenges
 
         4. Content Flow:
-        - Content name: Use the source title or "Audiocast", and nothing else. Some content won't require a title
+        - Content qualifier: Use "{self.category}" or "Audiocast", but not "deep dive" or anything else. E.g., Welcome to our Commentary on [source title or topic].
         - Structure: Opening greeting → Topic introduction → Main points/discussion → Conclusion
         - Natural transitions between points
         - Maintain consistent pacing

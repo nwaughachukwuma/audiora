@@ -1,12 +1,9 @@
-import logging
 import os
 import re
 from pathlib import Path
 from typing import List, Union
 
 from pydub import AudioSegment
-
-logger = logging.getLogger(__name__)
 
 
 class AudioEnhancer:
@@ -45,17 +42,43 @@ class AudioEnhancer:
                 format=file_path.suffix.lstrip("."),
                 parameters=["-q:a", "2"],  # High quality encoding
             )
-            logger.info(f"Successfully enhanced audio: {file_path}")
+            print(f"Successfully enhanced audio: {file_path}")
         except Exception as e:
-            logger.warning(f"Audio enhancement failed: {str(e)}")
-            logger.warning("Continuing with original audio")
+            print(f"Audio enhancement failed: {str(e)}")
+            print("Continuing with original audio")
+
+    def enhance_audio_minimal(
+        self, file_path: Path, speed_factor: float = 1.15
+    ) -> None:
+        """
+        Minimal processing for multi-speaker content
+        Args:
+            file_path (Path): Path to the audio file
+            speed_factor (float): Playback speed factor (default 1.15) (original 1.0)
+        """
+        try:
+            audio = AudioSegment.from_file(str(file_path))
+            # Adjust speed without changing pitch
+            audio = audio.speedup(playback_speed=speed_factor)
+            # Only normalize if significant volume differences
+            if abs(audio.dBFS + 18.0) > 3.0:  # +/- 3dB tolerance
+                audio = audio.normalize(target_level=-18.0)
+
+            # Export with high quality
+            audio.export(
+                str(file_path),
+                format=file_path.suffix.lstrip("."),
+                parameters=["-q:a", "2"],
+            )
+        except Exception as e:
+            print(f"Normalization failed: {str(e)}")
+            print("Continuing with original audio")
 
 
 class AudioSynthesizer(AudioEnhancer):
     def merge_audio_files(self, input_dir: str, output_file: str) -> None:
         """
         Merge all audio files in the input directory sequentially and save the result.
-
         Args:
             input_dir (str): Path to the directory containing audio files.
             output_file (str): Path to save the merged audio file.

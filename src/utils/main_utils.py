@@ -101,7 +101,7 @@ async def generate_audiocast(request: GenerateAudioCastRequest):
         outputfile = await AudioManager().generate_speech(audio_script)
 
         container.info("Enhancing audio quality...")
-        AudioSynthesizer().enhance_audio(Path(outputfile))
+        AudioSynthesizer().enhance_audio_minimal(Path(outputfile))
         print(f"outputfile: {outputfile}")
 
     # Generate slug from the query
