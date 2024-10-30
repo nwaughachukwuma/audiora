@@ -12,15 +12,7 @@ async def main():
 
     st.title("🎧 Audiora")
     st.subheader("Listen to anything, anytime, leveraging AI")
-
-    st.sidebar.markdown(
-        """
-        <p> 
-            A <a href="https://veedo.ai">VeedoAI</a> project. (c) 2024 
-        </p>
-        """,
-        unsafe_allow_html=True,
-    )
+    st.sidebar.info('A VeedoAI project. (c) 2024 ')
 
     # Sidebar for content type selection
     st.sidebar.title("Audiocast Info")
