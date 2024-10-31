@@ -1,12 +1,12 @@
 from datetime import datetime
-from pathlib import Path
 
 import streamlit as st
 from pydantic import BaseModel
 
 from src.services.storage import StorageManager
 from src.utils.audio_manager import AudioManager
-from src.utils.audio_synthesizer import AudioSynthesizer
+
+# from src.utils.audio_synthesizer import AudioSynthesizer
 from src.utils.audiocast_request import AudioScriptMaker, generate_source_content
 from src.utils.chat_request import chat_request
 from src.utils.chat_utils import (
@@ -83,8 +83,8 @@ async def generate_audiocast(request: GenerateAudioCastRequest):
         container.info("Generating audio...")
         output_file = await AudioManager().generate_speech(audio_script)
 
-        container.info("Enhancing audio quality...")
-        AudioSynthesizer().enhance_audio_minimal(Path(output_file))
+        # container.info("Enhancing audio quality...")
+        # AudioSynthesizer().enhance_audio_minimal(Path(output_file))
         print(f"output_file: {output_file}")
 
     # TODO: Use a background service
