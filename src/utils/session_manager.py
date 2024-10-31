@@ -70,9 +70,9 @@ class SessionManager(DBManager):
 
         return [chat for chat in doc.get("chats") if chat.id == chat_id][0]
 
-    def _get_chats(self) -> List[SessionChatMessage] | None:
+    def _get_chats(self) -> List[SessionChatMessage]:
         doc = self._get_document(self.collection, self.doc_id)
         if not doc.exists:
-            return None
+            return []
 
         return doc.get("chats")

@@ -15,6 +15,7 @@ from src.utils.chat_utils import (
     SessionChatRequest,
     content_categories,
 )
+from src.utils.session_manager import SessionManager
 
 
 class GenerateAudioCastRequest(BaseModel):
@@ -36,21 +37,16 @@ chat_sessions: Dict[str, List[SessionChatMessage]] = {}
 def chat(session_id: str, request: SessionChatRequest):
     message = request.message
     content_category = request.content_category
+    db = SessionManager(session_id)
 
-    if session_id not in chat_sessions:
-        chat_sessions[session_id] = []
-
-    chat_sessions[session_id].append(message)
+    db._add_chat(message)
 
     def on_finish(text: str):
-        chat_sessions[session_id].append(
-            SessionChatMessage(role="assistant", content=text)
-        )
-        # log text and other metadata to database
+        db._add_chat(SessionChatMessage(role="assistant", content=text))
 
     generator = chat_request(
         content_category=content_category,
-        previous_messages=chat_sessions[session_id],
+        previous_messages=db._get_chats(),
         on_finish=on_finish,
     )
 
