@@ -4,6 +4,7 @@ asyncio
 
 openai
 anthropic
+elevenlabs
 
 pyperclip
 python-multipart
