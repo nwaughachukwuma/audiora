@@ -1,6 +1,4 @@
-import uuid
 from pathlib import Path
-from typing import Dict, List
 
 import streamlit as st
 from pydantic import BaseModel
@@ -19,19 +17,15 @@ from src.utils.session_manager import SessionManager
 
 
 class GenerateAudioCastRequest(BaseModel):
+    sessionId: str
     summary: str
     category: str
 
 
 class GenerateAudioCastResponse(BaseModel):
-    uuid: str
     url: str
     script: str
     source_content: str
-
-
-# Store chat sessions (in-memory for now, should be moved to a database in production)
-chat_sessions: Dict[str, List[SessionChatMessage]] = {}
 
 
 def chat(session_id: str, request: SessionChatRequest):
@@ -57,8 +51,10 @@ async def generate_audiocast(request: GenerateAudioCastRequest):
     """
     Generate an audiocast based on a summary of user's request
     """
+    session_id = request.sessionId
     summary = request.summary
     category = request.category
+
     if category not in content_categories:
         raise Exception("Invalid content category")
 
@@ -93,21 +89,21 @@ async def generate_audiocast(request: GenerateAudioCastRequest):
         AudioSynthesizer().enhance_audio_minimal(Path(output_file))
         print(f"output_file: {output_file}")
 
-    # unique ID for the audiocast
-    uniq_id = str(uuid.uuid4())
-
     # TODO: Use a background service
     # STEP 4: Ingest audio file to a storage service (e.g., GCS, S3)
     with container.container():
         try:
             container.info("Storing a copy of your audiocast...")
             storage_manager = StorageManager()
-            storage_manager.upload_audio_to_gcs(output_file, uniq_id)
+            storage_manager.upload_audio_to_gcs(output_file, session_id)
         except Exception as e:
             print(f"Error while storing audiocast: {str(e)}")
 
+    db = SessionManager(session_id)
+    db._update_source(source_content)
+    db._update_transcript(audio_script)
+
     response = GenerateAudioCastResponse(
-        uuid=uniq_id,
         url=output_file,
         script=audio_script,
         source_content=source_content,
@@ -116,10 +112,10 @@ async def generate_audiocast(request: GenerateAudioCastRequest):
     return response.model_dump()
 
 
-def get_audiocast_uri(uuid: str):
+def get_audiocast_uri(session_id: str):
     """
     Get the URI for the audiocast
     """
     storage_manager = StorageManager()
-    filepath = storage_manager.download_from_gcs(uuid)
+    filepath = storage_manager.download_from_gcs(session_id)
     return filepath

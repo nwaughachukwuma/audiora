@@ -10,7 +10,7 @@ from src.utils.chat_utils import display_example_cards
 from src.utils.render_chat import render_chat_history
 
 
-async def chatui(uichat: DeltaGenerator):
+async def chatui(session_id: str, uichat: DeltaGenerator):
     """
     Chat interface
     """
@@ -27,12 +27,13 @@ async def chatui(uichat: DeltaGenerator):
         content_category = st.session_state.content_category
 
         if st.session_state.example_prompt:
-            handle_example_prompt(content_category)
+            prompt = st.session_state.example_prompt
+            handle_example_prompt(session_id, prompt, content_category)
 
         if st.session_state.prompt:
             prompt = st.session_state.prompt
             st.session_state.prompt = None
-            ai_message = handle_user_prompt(prompt, content_category)
+            ai_message = handle_user_prompt(session_id, prompt, content_category)
 
             if isinstance(ai_message, str):
                 await evaluate_final_response(ai_message, content_category)

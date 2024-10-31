@@ -14,7 +14,7 @@ def navigate_to_home():
 async def render_audiocast_page():
     st.set_page_config(page_title="Audiora | Share Page", page_icon="🎧")
 
-    audiocast_id = st.query_params.get("uuid")
+    audiocast_id = st.query_params.get("session_id")
 
     if audiocast_id:
         # Display audiocast content
@@ -34,7 +34,7 @@ async def render_audiocast_page():
             st.error(f"Error loading audiocast: {str(e)}")
     else:
         st.warning(
-            "Audiocast ID is missing in the URL. Expected URL format: ?uuid=your-audiocast-id"
+            "Audiocast ID is missing in the URL. Expected URL format: ?session_id=your-audiocast-id"
         )
 
         st.markdown("---")

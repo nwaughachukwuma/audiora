@@ -8,13 +8,12 @@ from src.utils.session_state import reset_session
 
 
 class GenerateAudiocastDict(TypedDict):
-    uuid: str
     url: str
     script: str
     source_content: str
 
 
-def render_audiocast():
+def render_audiocast(session_id: str):
     """
     Render the audiocast based on the user's preferences
     - Display current audiocast if available
@@ -33,7 +32,7 @@ def render_audiocast():
     st.sidebar.subheader("Audiocast Source")
     st.sidebar.markdown(current_audiocast["source_content"])
 
-    share_url = f"{APP_URL}/audiocast?uuid={current_audiocast['uuid']}"
+    share_url = f"{APP_URL}/audiocast?session_id={session_id}"
     st.text_input("Share this audiocast:", share_url)
 
     share_col, restart_row = st.columns(2, vertical_alignment="bottom")
