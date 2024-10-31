@@ -6,26 +6,14 @@ from dataclasses import dataclass, field
 from functools import partial
 from itertools import cycle, islice
 from pathlib import Path
-from typing import Any, List, Literal, Optional, Tuple
+from typing import Any, List, Optional, Tuple
 
-from src.services.openai_client import get_openai
-
-OpenaiVoice = Literal["onyx", "shimmer", "echo", "nova", "alloy"]
-openai_voices: List[OpenaiVoice] = ["onyx", "shimmer", "echo", "nova", "alloy"]
-
-
-@dataclass
-class SpeechJob:
-    content: str
-    voice: OpenaiVoice
-    output_file: str
-    tag: str
-    index: int
+from src.utils.generate_speech_utils import GenerateSpeech, SpeechJob, TTSProvider
 
 
 @dataclass
 class AudioManagerConfig:
-    tts_provider: Optional[Literal["openai"]] = "openai"
+    tts_provider: Optional[TTSProvider] = "openai"
     temp_audio_dir: str = field(default_factory=lambda: "/tmp/audiocast")
     outdir_base: str = field(default_factory=lambda: "/tmp/audiocast/output")
 
@@ -73,27 +61,14 @@ class AudioManagerSpeechGenerator:
 
         return jobs
 
-    def _generate_speech(self, job: SpeechJob) -> str:
-        try:
-            response = get_openai().audio.speech.create(
-                input=job.content,
-                model="tts-1-hd",
-                voice=job.voice,
-            )
-
-            with open(job.output_file, "wb") as file:
-                file.write(response.content)
-
-            print(f"Generated speech for tag {job.tag} at index {job.index}")
-            return job.output_file
-        except Exception as e:
-            print(f"Failed to generate speech for tag {job.tag}: {str(e)}")
-            return ""
-
-    async def _process_speech_jobs(self, jobs: List[SpeechJob]) -> List[str]:
+    async def _process_speech_jobs(
+        self, jobs: List[SpeechJob], provider: TTSProvider
+    ) -> List[str]:
         loop = asyncio.get_event_loop()
         tasks = [
-            loop.run_in_executor(self.executor, partial(self._generate_speech, job))
+            loop.run_in_executor(
+                self.executor, partial(GenerateSpeech(provider).run, job)
+            )
             for job in jobs
         ]
 
