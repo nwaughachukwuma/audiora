@@ -1,3 +1,4 @@
+from datetime import datetime
 from pathlib import Path
 
 import streamlit as st
@@ -26,6 +27,7 @@ class GenerateAudioCastResponse(BaseModel):
     url: str
     script: str
     source_content: str
+    created_at: str | None
 
 
 def chat(session_id: str, request: SessionChatRequest):
@@ -103,15 +105,38 @@ async def generate_audiocast(request: GenerateAudioCastRequest):
         url=output_file,
         script=audio_script,
         source_content=source_content,
+        created_at=datetime.now().strftime("%Y-%m-%d %H:%M"),
     )
 
     return response.model_dump()
 
 
-def get_audiocast_uri(session_id: str):
+def get_audiocast(session_id: str):
     """
     Get the URI for the audiocast
     """
     storage_manager = StorageManager()
     filepath = storage_manager.download_from_gcs(session_id)
-    return filepath
+
+    session_data = SessionManager(session_id).data()
+    if not session_data:
+        raise Exception(f"Audiocast not found for session_id: {session_id}")
+
+    metadata = session_data.metadata
+    source = metadata.source if metadata else ""
+    transcript = metadata.transcript if metadata else ""
+
+    created_at: str | None = None
+    if session_data.created_at:
+        created_at = datetime.fromisoformat(session_data.created_at).strftime(
+            "%Y-%m-%d %H:%M"
+        )
+
+    response = GenerateAudioCastResponse(
+        url=filepath,
+        script=transcript,
+        source_content=source,
+        created_at=created_at,
+    )
+
+    return response.model_dump()

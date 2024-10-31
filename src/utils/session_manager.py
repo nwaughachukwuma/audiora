@@ -22,6 +22,7 @@ class SessionModel:
     id: str
     chats: List[SessionChatMessage]
     metadata: Optional[ChatMetadata]
+    created_at: Optional[str] = None
 
 
 class SessionManager(DBManager):
@@ -39,6 +40,25 @@ class SessionManager(DBManager):
 
     def _update(self, data: Dict):
         return self._update_document(self.collection, self.doc_id, data)
+
+    def data(self) -> SessionModel | None:
+        doc = self._get_document(self.collection, self.doc_id)
+
+        data = doc.to_dict()
+        if not doc.exists or not data:
+            return None
+
+        metadata = data["metadata"] or {}
+
+        return SessionModel(
+            id=data["id"],
+            chats=data["chats"],
+            metadata=ChatMetadata(
+                source=metadata.get("source", ""),
+                transcript=metadata.get("transcript", ""),
+            ),
+            created_at=str(data["created_at"]),
+        )
 
     def _update_source(self, source: str):
         return self._update({"metadata.source": source})

@@ -1,9 +1,11 @@
 import asyncio
 from pathlib import Path
 
+import pyperclip
 import streamlit as st
 
-from src.utils.main_utils import get_audiocast_uri
+from src.env_var import APP_URL
+from src.utils.main_utils import get_audiocast
 
 
 def navigate_to_home():
@@ -14,21 +16,46 @@ def navigate_to_home():
 async def render_audiocast_page():
     st.set_page_config(page_title="Audiora | Share Page", page_icon="🎧")
 
-    audiocast_id = st.query_params.get("session_id")
+    session_id = st.query_params.get("session_id")
 
-    if audiocast_id:
+    if session_id:
         # Display audiocast content
-        st.title("🎧 Audiocast Player")
-        st.write(f"Playing audiocast: {audiocast_id}")
+        st.title("🎧 Audiora")
+        st.subheader("Share Page ")
+
+        st.markdown(f"#### Viewing audiocast: {session_id}")
 
         try:
             with st.spinner("Loading audiocast..."):
-                audio_path = get_audiocast_uri(audiocast_id)
-                st.audio(audio_path)
+                audiocast = get_audiocast(session_id)
 
-                # TODO: Fetch audiocast metadata from the database
-                st.subheader("Audiocast Details")
-                st.write("Created: 2024-03-20")
+                # Audio player
+                st.audio(audiocast["url"])
+
+                # Transcript
+                with st.expander("Show Transcript"):
+                    st.write(audiocast["script"])
+
+                # Metadata
+                st.sidebar.subheader("Audiocast Source")
+                st.sidebar.markdown(audiocast["source_content"])
+
+                share_url = f"{APP_URL}/audiocast?session_id={session_id}"
+                st.text_input("Share this audiocast:", share_url)
+
+                share_col, restart_row = st.columns(2, vertical_alignment="bottom")
+
+                with share_col:
+                    if st.button("Copy Share link", use_container_width=True):
+                        pyperclip.copy(share_url)
+                        st.session_state.show_copy_success = True
+
+                with restart_row:
+                    if st.button("Create your Audiocast", use_container_width=True):
+                        navigate_to_home()
+
+                if audiocast["created_at"]:
+                    st.markdown(f"> Created: {audiocast["created_at"]}")
 
         except Exception as e:
             st.error(f"Error loading audiocast: {str(e)}")

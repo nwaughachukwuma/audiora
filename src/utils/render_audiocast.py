@@ -11,6 +11,7 @@ class GenerateAudiocastDict(TypedDict):
     url: str
     script: str
     source_content: str
+    created_at: str | None
 
 
 def render_audiocast(session_id: str):
