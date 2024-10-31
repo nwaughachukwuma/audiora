@@ -55,8 +55,8 @@ class AudioManager(AudioManagerSpeechGenerator, ContentSplitter):
         """
         tags = self._get_tags(audio_script)
         audio_script = clean_tss_markup(audio_script, tags)
-
         nway_content = self.split_content(audio_script, tags)
+
         print(f"nway_content: {nway_content}")
 
         if self.config.tts_provider == "openai":

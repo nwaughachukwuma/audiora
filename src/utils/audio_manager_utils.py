@@ -8,7 +8,13 @@ from itertools import cycle, islice
 from pathlib import Path
 from typing import Any, List, Optional, Tuple
 
-from src.utils.generate_speech_utils import GenerateSpeech, SpeechJob, TTSProvider
+from src.utils.generate_speech_utils import (
+    ElevenLabsVoice,
+    GenerateSpeech,
+    OpenaiVoice,
+    SpeechJob,
+    TTSProvider,
+)
 
 
 @dataclass
@@ -36,7 +42,7 @@ class AudioManagerSpeechGenerator:
         self,
         nway_content: List[Tuple[str, str]],
         tags: List[str],
-        voices: List[Any],
+        voices: List[OpenaiVoice] | List[ElevenLabsVoice],
         temp_audio_dir: str,
     ):
         jobs: List[SpeechJob] = []
