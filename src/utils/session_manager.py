@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, cast
 
 from src.services.firestore_sdk import (
     Collection,
@@ -48,7 +48,7 @@ class SessionManager(DBManager):
 
     def _add_chat(self, chat: SessionChatMessage):
         return self._update_document(
-            self.collection, self.doc_id, {"chats": arrayUnion(chat)}
+            self.collection, self.doc_id, {"chats": arrayUnion([chat.__dict__])}
         )
 
     def _delete_chat(self, chat_id: str):
@@ -60,7 +60,7 @@ class SessionManager(DBManager):
         self._update_document(
             self.collection,
             self.doc_id,
-            {"chats": arrayRemove(chat_to_remove)},
+            {"chats": arrayRemove([chat_to_remove.__dict__])},
         )
 
     def _get_chat(self, chat_id: str) -> SessionChatMessage | None:
@@ -68,11 +68,25 @@ class SessionManager(DBManager):
         if not doc.exists:
             return None
 
-        return [chat for chat in doc.get("chats") if chat.id == chat_id][0]
+        item = [chat for chat in doc.get("chats") if chat.id == chat_id][0]
+        if item:
+            return SessionChatMessage(
+                content=item["content"],
+                id=item["id"],
+                role=item["role"],
+            )
 
     def _get_chats(self) -> List[SessionChatMessage]:
         doc = self._get_document(self.collection, self.doc_id)
         if not doc.exists:
             return []
 
-        return doc.get("chats")
+        chats = cast(Dict, doc.get("chats"))
+        return [
+            SessionChatMessage(
+                content=chat["content"],
+                id=chat["id"],
+                role=chat["role"],
+            )
+            for chat in chats
+        ]

@@ -29,22 +29,18 @@ class GenerateAudioCastResponse(BaseModel):
 
 
 def chat(session_id: str, request: SessionChatRequest):
-    message = request.message
     content_category = request.content_category
     db = SessionManager(session_id)
-
-    db._add_chat(message)
+    db._add_chat(request.message)
 
     def on_finish(text: str):
         db._add_chat(SessionChatMessage(role="assistant", content=text))
 
-    generator = chat_request(
+    return chat_request(
         content_category=content_category,
         previous_messages=db._get_chats(),
         on_finish=on_finish,
     )
-
-    return generator
 
 
 async def generate_audiocast(request: GenerateAudioCastRequest):
