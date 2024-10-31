@@ -1,7 +1,8 @@
+import uuid
 from typing import Dict, List, Literal
 
 import streamlit as st
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 ContentCategory = Literal[
     "podcast",
@@ -49,8 +50,9 @@ category_qualifiers: Dict[ContentCategory, str] = {
 
 
 class SessionChatMessage(BaseModel):
-    role: Literal["user", "assistant"]
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     content: str
+    role: Literal["user", "assistant"]
 
 
 class SessionChatRequest(BaseModel):

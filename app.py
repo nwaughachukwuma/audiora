@@ -17,7 +17,7 @@ async def main():
     # Sidebar for content type selection
     st.sidebar.title("Audiocast Info")
 
-    init_session_state()
+    session_id = init_session_state()
 
     if st.session_state.content_category:
         st.sidebar.subheader(
@@ -32,9 +32,9 @@ async def main():
     uichat = st.empty()
     if not st.session_state.user_specification:
         with uichat.container():
-            await chatui(uichat)
+            await chatui(session_id, uichat)
     else:
-        await audioui(uichat)
+        await audioui(session_id, uichat)
 
 
 if __name__ == "__main__":

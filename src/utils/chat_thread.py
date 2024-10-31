@@ -14,10 +14,14 @@ termination_prefix = "Ok, thanks for clarifying!"
 termination_suffix = "Please click the button below to start generating the audiocast."
 
 
-def generate_stream_response(prompt: str, content_category: ContentCategory):
+def generate_stream_response(
+    session_id: str,
+    prompt: str,
+    content_category: ContentCategory,
+):
     with st.spinner("Generating response..."):
         response_generator = chat(
-            st.session_state.chat_session_id,
+            session_id,
             SessionChatRequest(
                 message=SessionChatMessage(role="user", content=prompt),
                 content_category=content_category,
@@ -27,12 +31,17 @@ def generate_stream_response(prompt: str, content_category: ContentCategory):
     return response_generator
 
 
-def handle_example_prompt(content_category: ContentCategory):
+def handle_example_prompt(
+    session_id: str,
+    prompt: str,
+    content_category: ContentCategory,
+):
     """Handle selected example prompt"""
-    prompt = st.session_state.example_prompt
 
     with st.chat_message("assistant"):
-        response_generator = generate_stream_response(prompt, content_category)
+        response_generator = generate_stream_response(
+            session_id, prompt, content_category
+        )
         ai_message = st.write_stream(response_generator)
         st.session_state.example_prompt = None
 
@@ -45,12 +54,20 @@ def handle_example_prompt(content_category: ContentCategory):
             st.error("Failed to generate AI response. Please try again.")
 
 
-def handle_user_prompt(prompt: str, content_category: ContentCategory):
+def handle_user_prompt(
+    session_id: str,
+    prompt: str,
+    content_category: ContentCategory,
+):
     """
     Handle user input prompt
     """
     with st.chat_message("assistant"):
-        response_generator = generate_stream_response(prompt, content_category)
+        response_generator = generate_stream_response(
+            session_id,
+            prompt,
+            content_category,
+        )
         ai_message = st.write_stream(response_generator)
 
         if ai_message:
@@ -110,7 +127,11 @@ async def evaluate_final_response(ai_message: str, content_category: ContentCate
             st.rerun()
 
 
-async def use_audiocast_request(summary: str, content_category: ContentCategory):
+async def use_audiocast_request(
+    session_id: str,
+    summary: str,
+    content_category: ContentCategory,
+):
     """
     Call audiocast creating workflow
 
@@ -121,7 +142,11 @@ async def use_audiocast_request(summary: str, content_category: ContentCategory)
     try:
         with st.spinner("Generating your audiocast..."):
             audiocast_response = await generate_audiocast(
-                GenerateAudioCastRequest(summary=summary, category=content_category)
+                GenerateAudioCastRequest(
+                    sessionId=session_id,
+                    summary=summary,
+                    category=content_category,
+                )
             )
             print(f"Generate AudioCast Response: {audiocast_response}")
 

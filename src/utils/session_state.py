@@ -33,6 +33,8 @@ def init_session_state():
     if "current_audiocast" not in st.session_state:
         st.session_state.current_audiocast = None
 
+    return cast(str, st.session_state.chat_session_id)
+
 
 def reset_session():
     """

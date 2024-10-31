@@ -20,7 +20,7 @@ def set_content_category():
         with col1:
             st.selectbox(
                 "Select Content Category",
-                content_categories,
+                ["", *content_categories],
                 format_func=lambda x: x.title(),
                 key="selected_content_category",
                 on_change=on_value_change,

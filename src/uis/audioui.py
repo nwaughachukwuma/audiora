@@ -5,7 +5,7 @@ from src.utils.chat_thread import use_audiocast_request
 from src.utils.render_audiocast import render_audiocast
 
 
-async def audioui(uichat: DeltaGenerator):
+async def audioui(session_id: str, uichat: DeltaGenerator):
     """
     Audiocast interface
     """
@@ -17,7 +17,7 @@ async def audioui(uichat: DeltaGenerator):
 
         summary = st.session_state.user_specification
         content_category = st.session_state.content_category
-        await use_audiocast_request(summary, content_category)
+        await use_audiocast_request(session_id, summary, content_category)
     else:
         st.info("Audiocast generation completed!")
-        render_audiocast()
+        render_audiocast(session_id)

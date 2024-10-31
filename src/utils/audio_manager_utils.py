@@ -41,9 +41,7 @@ class AudioManagerSpeechGenerator:
 
     def _create_voice_mapping(self, tags: List[str], voices: List[Any]):
         """Create mapping of tags to voices"""
-        available_voices = voices[: len(tags)]
-        if len(available_voices) < len(tags):
-            available_voices = list(islice(cycle(voices), len(tags)))
+        available_voices = list(islice(cycle(voices), len(tags)))
         return dict(zip(tags, available_voices))
 
     def _prepare_speech_jobs(
@@ -120,8 +118,8 @@ class ContentSplitter:
         # Regular expression pattern to match Tag0, Tag1, ..., TagN speaker dialogues
         matches = re.findall(r"<(Speaker\d+)>(.*?)</Speaker\d+>", content, re.DOTALL)
         return [
-            (str(person), " ".join(content.split()).strip())
-            for person, content in matches
+            (str(speaker), " ".join(content_part.split()).strip())
+            for speaker, content_part in matches
         ]
 
     @staticmethod
