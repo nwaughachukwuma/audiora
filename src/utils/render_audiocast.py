@@ -1,3 +1,4 @@
+import re
 from typing import TypedDict
 
 import pyperclip
@@ -14,6 +15,11 @@ class GenerateAudiocastDict(TypedDict):
     created_at: str | None
 
 
+def parse_ai_script(ai_script: str):
+    matches = re.findall(r"<(Speaker\d+)>(.*?)</Speaker\d+>", ai_script, re.DOTALL)
+    return "\n\n".join([f"**{speaker}**: {content}" for speaker, content in matches])
+
+
 def render_audiocast(session_id: str):
     """
     Render the audiocast based on the user's preferences
@@ -27,7 +33,7 @@ def render_audiocast(session_id: str):
 
     # Transcript
     with st.expander("Show Transcript"):
-        st.write(current_audiocast["script"])
+        st.markdown(parse_ai_script(current_audiocast["script"]))
 
     # Metadata
     st.sidebar.subheader("Audiocast Source")

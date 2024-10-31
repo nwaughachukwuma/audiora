@@ -6,6 +6,7 @@ import streamlit as st
 
 from src.env_var import APP_URL
 from src.utils.main_utils import get_audiocast
+from src.utils.render_audiocast import parse_ai_script
 
 
 def navigate_to_home():
@@ -34,7 +35,7 @@ async def render_audiocast_page():
 
                 # Transcript
                 with st.expander("Show Transcript"):
-                    st.write(audiocast["script"])
+                    st.markdown(parse_ai_script(audiocast["script"]))
 
                 # Metadata
                 st.sidebar.subheader("Audiocast Source")
