@@ -48,8 +48,9 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-      - id: setup-python
-        uses: actions/setup-python@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
           cache: "pip" # caching pip dependencies
@@ -69,6 +70,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -104,9 +107,9 @@ jobs:
       - run: curl -f "${{ steps.deploy.outputs.url }}"
       - uses: marocchino/sticky-pull-request-comment@v2
         with:
-          header: app
+          header: audiora
           message: |
-            app: ${{ steps.deploy.outputs.url }} (${{ github.event.pull_request.head.sha }})
+            audiora: ${{ steps.deploy.outputs.url }} (${{ github.event.pull_request.head.sha }})
 
   promote:
     runs-on: ubuntu-latest
