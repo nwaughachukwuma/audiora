@@ -42,7 +42,6 @@ class AudioManager(AudioManagerSpeechGenerator, ContentSplitter):
         """
         output_file = f"{self.config.outdir_base}/{str(uuid.uuid4())}.mp3"
         await self.text_to_speech(audio_script, output_file)
-
         return output_file
 
     async def text_to_speech(self, audio_script: str, output_file: str):
@@ -61,50 +60,38 @@ class AudioManager(AudioManagerSpeechGenerator, ContentSplitter):
         print(f"nway_content: {nway_content}")
 
         if self.config.tts_provider == "openai":
-            return await self.__text_to_speech_openai(nway_content, output_file, tags)
+            audio_files = await self.__text_to_speech_openai(nway_content, tags)
         elif self.config.tts_provider == "elevenlabs":
-            return await self.__text_to_speech_elevenlabs(
-                nway_content, output_file, tags
-            )
+            audio_files = await self.__text_to_speech_elevenlabs(nway_content, tags)
         else:
             raise Exception("Invalid TTS model specified")
 
+        if not audio_files:
+            raise Exception("No audio files were generated")
+
+        await self.__finalize(audio_files, output_file)
+        logger.info(f"Audio saved to {output_file}")
+
     async def __text_to_speech_openai(
-        self,
-        nway_content: List[Tuple[str, str]],
-        output_file: str,
-        tags: List[str],
-    ):
+        self, nway_content: List[Tuple[str, str]], tags: List[str]
+    ) -> List[str]:
         try:
             jobs = self._prepare_speech_jobs(
                 nway_content, tags, openai_voices, self.config.temp_audio_dir
             )
 
-            audio_files = await self._process_speech_jobs(jobs, provider="openai")
-            if not audio_files:
-                raise Exception("No audio files were generated")
-
-            await self.__finalize(audio_files, output_file)
-            logger.info(f"Audio saved to {output_file}")
-
+            return await self._process_speech_jobs(jobs, provider="openai")
         except Exception as e:
             raise Exception(f"Error converting text to speech with OpenAI: {str(e)}")
 
     async def __text_to_speech_elevenlabs(
-        self, nway_content: List[Tuple[str, str]], output_file: str, tags: List[str]
-    ):
+        self, nway_content: List[Tuple[str, str]], tags: List[str]
+    ) -> List[str]:
         try:
             jobs = self._prepare_speech_jobs(
                 nway_content, tags, elevenlabs_voices, self.config.temp_audio_dir
             )
-
-            audio_files = await self._process_speech_jobs(jobs, provider="elevenlabs")
-            if not audio_files:
-                raise Exception("No audio files were generated")
-
-            await self.__finalize(audio_files, output_file)
-            logger.info(f"Audio saved to {output_file}")
-
+            return await self._process_speech_jobs(jobs, provider="elevenlabs")
         except Exception as e:
             raise Exception(
                 f"Error converting text to speech with Elevenlabs: {str(e)}"
