@@ -68,6 +68,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: [prepare, lint]
     timeout-minutes: 10
+    permissions: 
+      pull-requests: write 
     steps:
       - uses: actions/checkout@v4
         with:
