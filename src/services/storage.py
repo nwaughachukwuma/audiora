@@ -1,3 +1,4 @@
+import os
 from dataclasses import dataclass
 from io import BytesIO
 from pathlib import Path
@@ -5,6 +6,7 @@ from typing import Any, Dict
 from uuid import uuid4
 
 from google.cloud import storage
+from pydub import AudioSegment
 
 from src.env_var import BUCKET_NAME
 
@@ -70,8 +72,15 @@ class StorageManager:
         """
         blobname = f"{BLOB_BASE_URI}/{filename}"
         blob = bucket.blob(blobname)
-        tmp_file_path = f"/tmp/{str(uuid4())}"
+
+        tmp_file_path = f"/tmp/{filename}"
+        if os.path.exists(tmp_file_path):
+            try:
+                audio = AudioSegment.from_file(tmp_file_path)
+                if audio.duration_seconds > 0:
+                    return tmp_file_path
+            except Exception:
+                os.remove(tmp_file_path)
 
         blob.download_to_filename(tmp_file_path)
-
         return tmp_file_path
