@@ -6,6 +6,7 @@ import streamlit as st
 
 from src.env_var import APP_URL
 from src.utils.session_state import reset_session
+from src.utils.waveform_utils import download_waveform_video, render_waveform
 
 
 class GenerateAudiocastDict(TypedDict):
@@ -30,6 +31,18 @@ def render_audiocast(session_id: str):
 
     # Audio player
     st.audio(current_audiocast["url"])
+
+    # Create placeholder for visualization
+    with st.expander("Show Waveform Visualization"):
+        viz = st.empty()
+        with viz.container():
+            try:
+                video_path = render_waveform(session_id, current_audiocast["url"])
+                if video_path:
+                    # Download video
+                    download_waveform_video(str(video_path))
+            except Exception as e:
+                st.error(f"Error rendering waveform: {str(e)}")
 
     # Transcript
     with st.expander("Show Transcript"):

@@ -30,8 +30,11 @@ async def render_audiocast_page():
             with st.spinner("Loading audiocast..."):
                 audiocast = get_audiocast(session_id)
 
+                # Audio player
+                st.audio(audiocast["url"])
+
                 # Create placeholder for visualization
-                if audiocast["url"]:
+                with st.expander("Show Waveform Visualization"):
                     viz = st.empty()
                     with viz.container():
                         try:
@@ -41,9 +44,6 @@ async def render_audiocast_page():
                                 download_waveform_video(str(video_path))
                         except Exception as e:
                             st.error(f"Error rendering waveform: {str(e)}")
-
-                # Audio player
-                st.audio(audiocast["url"])
 
                 # Transcript
                 with st.expander("Show Transcript"):
@@ -66,6 +66,10 @@ async def render_audiocast_page():
                 with restart_row:
                     if st.button("Create your Audiocast", use_container_width=True):
                         navigate_to_home()
+
+                if st.session_state.get("show_copy_success", False):
+                    st.session_state.show_copy_succes = False
+                    st.success("Share link copied successfully!", icon="✅")
 
                 if audiocast["created_at"]:
                     st.markdown(f"> Created: {audiocast["created_at"]}")
