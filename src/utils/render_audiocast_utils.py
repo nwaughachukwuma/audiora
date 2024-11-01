@@ -5,7 +5,7 @@ from typing import TypedDict
 import streamlit as st
 
 from src.env_var import APP_URL
-from src.utils.waveform_utils import download_waveform_video, render_waveform
+from src.utils.waveform_utils import render_waveform
 
 
 def navigate_to_home():
@@ -31,15 +31,11 @@ def render_audiocast_handler(session_id: str, audiocast: GenerateAudiocastDict):
 
     # Create placeholder for visualization
     with st.expander("Show Waveform Visualization"):
-        viz = st.empty()
-        with viz.container():
-            try:
-                video_path = render_waveform(session_id, audiocast["url"])
-                if video_path:
-                    # Download video
-                    download_waveform_video(str(video_path))
-            except Exception as e:
-                st.error(f"Error rendering waveform: {str(e)}")
+        # with st.container():
+        try:
+            render_waveform(session_id, audiocast["url"])
+        except Exception as e:
+            st.error(f"Error rendering waveform: {str(e)}")
 
     # Transcript
     with st.expander("Show Transcript"):

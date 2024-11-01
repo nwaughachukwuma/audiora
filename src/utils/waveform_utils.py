@@ -45,12 +45,36 @@ def render_waveform(session_id: str, audio_path: str):
             with st.spinner("Generating waveform visualization..."):
                 video_path = generate_waveform_video(tmp_vid_path, audio_path)
 
+        # st.video(str(video_path), autoplay=True)
         with open(video_path, "rb") as video_file:
             video_bytes = video_file.read()
-            st.video(video_bytes, autoplay=True)
-            # st.video(str(video_path), autoplay=True)
+            # st.video(video_bytes, autoplay=True)
+        st.markdown(
+            f"""
+            <style>
+            .video-container {{
+                position: relative;
+                width: 100%;
+                max-width: 640px; /* 16:9 aspect ratio for width */
+                height: 240px; /* Fixed height */
+            }}
+            .video-container video {{
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                background-color: transparent; /* Set background to transparent */
+            }}
+            </style>
+            <div class="video-container">
+                <video autoplay loop muted playsinline style="border:none;">
+                    <source src="data:video/mp4;base64,{video_bytes.hex()}" type="video/mp4">
+                </video>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
-        return video_path
+        download_waveform_video(str(video_path))
     except Exception as e:
         st.error(f"Error generating visualization: {str(e)}")
 
@@ -65,5 +89,5 @@ def download_waveform_video(video_path: str):
                 data=f,
                 file_name="audio_visualization.mp4",
                 mime="video/mp4",
-                use_container_width=True
+                use_container_width=True,
             )
