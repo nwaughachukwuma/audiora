@@ -1,18 +1,15 @@
 import asyncio
-from pathlib import Path
+from typing import cast
 
 import pyperclip
 import streamlit as st
 
-from src.env_var import APP_URL
 from src.utils.main_utils import get_audiocast
-from src.utils.render_audiocast import parse_ai_script
-from src.utils.waveform_utils import download_waveform_video, render_waveform
-
-
-def navigate_to_home():
-    main_script = str(Path(__file__).parent.parent / "app.py")
-    st.switch_page(main_script)
+from src.utils.render_audiocast_utils import (
+    GenerateAudiocastDict,
+    navigate_to_home,
+    render_audiocast_handler,
+)
 
 
 async def render_audiocast_page():
@@ -28,33 +25,9 @@ async def render_audiocast_page():
 
         try:
             with st.spinner("Loading audiocast..."):
-                audiocast = get_audiocast(session_id)
+                audiocast = cast(GenerateAudiocastDict, get_audiocast(session_id))
 
-                # Audio player
-                st.audio(audiocast["url"])
-
-                # Create placeholder for visualization
-                with st.expander("Show Waveform Visualization"):
-                    viz = st.empty()
-                    with viz.container():
-                        try:
-                            video_path = render_waveform(session_id, audiocast["url"])
-                            if video_path:
-                                # Download video
-                                download_waveform_video(str(video_path))
-                        except Exception as e:
-                            st.error(f"Error rendering waveform: {str(e)}")
-
-                # Transcript
-                with st.expander("Show Transcript"):
-                    st.markdown(parse_ai_script(audiocast["script"]))
-
-                # Metadata
-                st.sidebar.subheader("Audiocast Source")
-                st.sidebar.markdown(audiocast["source_content"])
-
-                share_url = f"{APP_URL}/audiocast?session_id={session_id}"
-                st.text_input("Share this audiocast:", share_url)
+                share_url = render_audiocast_handler(session_id, audiocast)
 
                 share_col, restart_row = st.columns(2, vertical_alignment="bottom")
 
@@ -83,8 +56,8 @@ async def render_audiocast_page():
 
         st.markdown("---")
 
-        cola, _ = st.columns([3, 5])
-        with cola:
+        col1, _ = st.columns([3, 5])
+        with col1:
             if st.button("← Back to Home", use_container_width=True):
                 navigate_to_home()
 
