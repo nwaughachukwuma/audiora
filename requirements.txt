@@ -1,3 +1,5 @@
+pydantic
+
 streamlit
 httpx
 asyncio
@@ -6,12 +8,15 @@ openai
 anthropic
 elevenlabs
 
-pyperclip
 python-multipart
 python-slugify
 python-dotenv
-pydub
+ffmpeg-python
 
+pydub
+pyperclip
+seewav
+pycairo
 
 firebase-admin
 google-auth
@@ -19,4 +24,5 @@ google-cloud-storage
 google-api-python-client
 google-generativeai
 
+watchdog
 ruff

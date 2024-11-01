@@ -20,13 +20,6 @@ def listBlobs(prefix):
     return [blob for blob in blobs]
 
 
-def check_file_exists(root_path: str, filename: str):
-    """check if a file exists in the bucket"""
-    blobname = f"{root_path}/{filename}"
-    blobs = listBlobs(prefix=root_path)
-    return any(blob.name == blobname for blob in blobs)
-
-
 @dataclass
 class UploadItemParams:
     content_type: str
@@ -35,6 +28,12 @@ class UploadItemParams:
 
 
 class StorageManager:
+    def check_blob_exists(self, root_path: str, filename: str):
+        """check if a file exists in the bucket"""
+        blobname = f"{root_path}/{filename}"
+        blobs = listBlobs(prefix=root_path)
+        return any(blob.name == blobname for blob in blobs)
+
     def upload_to_gcs(
         self, item: str | Path | BytesIO, blobname: str, params: UploadItemParams
     ):
@@ -62,6 +61,17 @@ class StorageManager:
             Path(tmp_audio_path),
             blobname,
             UploadItemParams(content_type="audio/mpeg"),
+        )
+
+        return f"gs://{BUCKET_NAME}/{blobname}"
+
+    def upload_video_to_gcs(self, tmp_video_path: str, filename=str(uuid4())):
+        """upload audio file to GCS"""
+        blobname = f"{BLOB_BASE_URI}/{filename}"
+        self.upload_to_gcs(
+            Path(tmp_video_path),
+            blobname,
+            UploadItemParams(content_type="video/mp4"),
         )
 
         return f"gs://{BUCKET_NAME}/{blobname}"

@@ -1,23 +1,11 @@
-import re
-from typing import TypedDict
-
 import pyperclip
 import streamlit as st
 
-from src.env_var import APP_URL
+from src.utils.render_audiocast_utils import (
+    GenerateAudiocastDict,
+    render_audiocast_handler,
+)
 from src.utils.session_state import reset_session
-
-
-class GenerateAudiocastDict(TypedDict):
-    url: str
-    script: str
-    source_content: str
-    created_at: str | None
-
-
-def parse_ai_script(ai_script: str):
-    matches = re.findall(r"<(Speaker\d+)>(.*?)</Speaker\d+>", ai_script, re.DOTALL)
-    return "\n\n".join([f"**{speaker}**: {content}" for speaker, content in matches])
 
 
 def render_audiocast(session_id: str):
@@ -28,19 +16,7 @@ def render_audiocast(session_id: str):
     st.markdown("#### Your Audiocast")
     current_audiocast: GenerateAudiocastDict = st.session_state.current_audiocast
 
-    # Audio player
-    st.audio(current_audiocast["url"])
-
-    # Transcript
-    with st.expander("Show Transcript"):
-        st.markdown(parse_ai_script(current_audiocast["script"]))
-
-    # Metadata
-    st.sidebar.subheader("Audiocast Source")
-    st.sidebar.markdown(current_audiocast["source_content"])
-
-    share_url = f"{APP_URL}/audiocast?session_id={session_id}"
-    st.text_input("Share this audiocast:", share_url)
+    share_url = render_audiocast_handler(session_id, current_audiocast)
 
     share_col, restart_row = st.columns(2, vertical_alignment="bottom")
 
