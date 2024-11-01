@@ -6,6 +6,14 @@ import streamlit as st
 from pydub import AudioSegment
 from seewav import visualize
 
+from src.services.storage import BLOB_BASE_URI, StorageManager
+
+
+def save_waveform_video_to_gcs(session_id: str, video_path: str):
+    """Ingest waveform visualization to GCS."""
+    full_path = StorageManager().upload_video_to_gcs(video_path, f"{session_id}.mp4")
+    return full_path
+
 
 def generate_waveform_video(output_path: Path, audio_path: str) -> Path:
     """Generate waveform video from audio file using SeeWav."""
@@ -39,11 +47,17 @@ def render_waveform(session_id: str, audio_path: str):
                 video_path = tmp_vid_path
         except Exception:
             os.remove(tmp_vid_path)
+    else:
+        blobname = f"{session_id}.mp4"
+        exists = StorageManager().check_blob_exists(BLOB_BASE_URI, blobname)
+        if exists:
+            video_path = StorageManager().download_from_gcs(blobname)
 
     try:
         if not video_path:
             with st.spinner("Generating waveform visualization..."):
                 video_path = generate_waveform_video(tmp_vid_path, audio_path)
+                save_waveform_video_to_gcs(session_id, str(video_path))
 
         # st.video(str(video_path), autoplay=True)
         with open(video_path, "rb") as video_file:
