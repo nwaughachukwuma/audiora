@@ -11,12 +11,16 @@ python-multipart
 python-slugify
 python-dotenv
 pydub
-
+pydantic
 
 firebase-admin
 google-auth
 google-cloud-storage
 google-api-python-client
 google-generativeai
+
+ffmpeg-python
+seewav
+watchdog
 
 ruff

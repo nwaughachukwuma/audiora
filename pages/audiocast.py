@@ -7,6 +7,7 @@ import streamlit as st
 from src.env_var import APP_URL
 from src.utils.main_utils import get_audiocast
 from src.utils.render_audiocast import parse_ai_script
+from src.utils.waveform_utils import download_waveform_video, render_waveform
 
 
 def navigate_to_home():
@@ -23,12 +24,23 @@ async def render_audiocast_page():
         # Display audiocast content
         st.title("🎧 Audiora")
         st.subheader("Share Page ")
-
         st.markdown(f"#### Viewing audiocast: {session_id}")
 
         try:
             with st.spinner("Loading audiocast..."):
                 audiocast = get_audiocast(session_id)
+
+                # Create placeholder for visualization
+                if audiocast["url"]:
+                    viz = st.empty()
+                    with viz.container():
+                        try:
+                            video_path = render_waveform(session_id, audiocast["url"])
+                            if video_path:
+                                # Download video
+                                download_waveform_video(str(video_path))
+                        except Exception as e:
+                            st.error(f"Error rendering waveform: {str(e)}")
 
                 # Audio player
                 st.audio(audiocast["url"])
