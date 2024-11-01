@@ -21,4 +21,4 @@ ENV HOST '0.0.0.0'
 EXPOSE $PORT
 HEALTHCHECK CMD curl --fail http://$HOST:$PORT/_stcore/health
 
-CMD exec streamlit run app.py --server.port=$PORT --server.address=$HOST
+CMD exec streamlit run index.py --server.port=$PORT --server.address=$HOST
