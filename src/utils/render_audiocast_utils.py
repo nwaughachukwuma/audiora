@@ -29,17 +29,39 @@ def render_audiocast_handler(session_id: str, audiocast: GenerateAudiocastDict):
     # Audio player
     st.audio(audiocast["url"])
 
-    # Create placeholder for visualization
-    with st.expander("Show Waveform Visualization"):
-        # with st.container():
-        try:
-            render_waveform(session_id, audiocast["url"])
-        except Exception as e:
-            st.error(f"Error rendering waveform: {str(e)}")
+    st.markdown("---")
+
+    col1, _ = st.columns([4, 1])
+    with col1:
+
+        def toggle_show_waveform():
+            st.session_state.show_waveform = not st.session_state.get("show_waveform")
+
+        button_label = (
+            "Hide Waveform Visualization"
+            if st.session_state.get("show_waveform")
+            else "Show Waveform Visualization"
+        )
+
+        st.button(
+            button_label,
+            on_click=toggle_show_waveform,
+            use_container_width=True,
+        )
+
+        if st.session_state.get("show_waveform"):
+            try:
+                render_waveform(session_id, audiocast["url"])
+            except Exception as e:
+                st.error(f"Error rendering waveform: {str(e)}")
+
+    st.markdown("---")
 
     # Transcript
     with st.expander("Show Transcript"):
         st.markdown(parse_ai_script(audiocast["script"]))
+
+    st.markdown("---")
 
     # Metadata
     st.sidebar.subheader("Audiocast Source")

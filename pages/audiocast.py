@@ -21,31 +21,31 @@ async def render_audiocast_page():
         # Display audiocast content
         st.title("🎧 Audiora")
         st.subheader("Share Page ")
-        st.markdown(f"#### Viewing audiocast: {session_id}")
+        st.markdown(f"##### Viewing audiocast: _{session_id}_")
 
         try:
             with st.spinner("Loading audiocast..."):
                 audiocast = cast(GenerateAudiocastDict, get_audiocast(session_id))
 
-                share_url = render_audiocast_handler(session_id, audiocast)
+            share_url = render_audiocast_handler(session_id, audiocast)
 
-                share_col, restart_row = st.columns(2, vertical_alignment="bottom")
+            share_col, restart_row = st.columns(2, vertical_alignment="bottom")
 
-                with share_col:
-                    if st.button("Copy Share link", use_container_width=True):
-                        pyperclip.copy(share_url)
-                        st.session_state.show_copy_success = True
+            with share_col:
+                if st.button("Copy Share link", use_container_width=True):
+                    pyperclip.copy(share_url)
+                    st.session_state.show_copy_success = True
 
-                with restart_row:
-                    if st.button("Create your Audiocast", use_container_width=True):
-                        navigate_to_home()
+            with restart_row:
+                if st.button("Create your Audiocast", use_container_width=True):
+                    navigate_to_home()
 
-                if st.session_state.get("show_copy_success", False):
-                    st.session_state.show_copy_succes = False
-                    st.success("Share link copied successfully!", icon="✅")
+            if st.session_state.get("show_copy_success", False):
+                st.session_state.show_copy_succes = False
+                st.success("Share link copied successfully!", icon="✅")
 
-                if audiocast["created_at"]:
-                    st.markdown(f"> Created: {audiocast["created_at"]}")
+            if audiocast["created_at"]:
+                st.markdown(f"> Created: {audiocast["created_at"]}")
 
         except Exception as e:
             st.error(f"Error loading audiocast: {str(e)}")
