@@ -16,6 +16,7 @@ ffmpeg-python
 pydub
 pyperclip
 seewav
+pycairo
 
 firebase-admin
 google-auth
