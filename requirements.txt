@@ -1,4 +1,8 @@
+fastapi
 pydantic
+fastapi-utilities
+uvicorn
+gunicorn
 
 streamlit
 httpx
