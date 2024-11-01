@@ -8,9 +8,14 @@ ENV PYTHONDONTWRITEBYTECODE 1
 
 WORKDIR /app
 
-# Install FFmpeg and any other required dependencies
-RUN apt-get -yqq update && apt-get -yqq install build-essential ffmpeg && \
-    rm -rf /var/lib/apt/lists/*
+# Install FFmpeg, Cairo, and any other required dependencies
+RUN apt-get -yqq update && apt-get -yqq install \
+    build-essential \
+    ffmpeg \
+    libcairo2-dev \
+    pkg-config \
+    python3-dev \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY . ./
 
