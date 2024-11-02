@@ -10,7 +10,7 @@ from src.utils.render_audiocast_utils import (
 
 
 async def render_audiocast_page():
-    st.set_page_config(page_title="Audiora | Share Page", page_icon="🎧")
+    st.set_page_config(page_title="Audiora | Share Page", page_icon="🎧", layout="wide")
 
     session_id = st.query_params.get("session_id")
 

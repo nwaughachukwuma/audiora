@@ -22,7 +22,7 @@ def parse_ai_script(ai_script: str):
 
 
 def get_audiocast(session_id: str):
-    response = httpx.post(f"{SERVER_URL}/audiocast/{session_id}", timeout=None)
+    response = httpx.get(f"{SERVER_URL}/audiocast/{session_id}", timeout=None)
     response.raise_for_status()
     return cast(GenerateAudiocastDict, response.json())
 

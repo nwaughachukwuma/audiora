@@ -35,7 +35,7 @@ async def chatui(session_id: str, uichat: DeltaGenerator):
             ai_message = handle_user_prompt(session_id, prompt, content_category)
 
             if isinstance(ai_message, str):
-                await evaluate_final_response(ai_message, content_category)
+                await evaluate_final_response(ai_message)
 
     # Chat input for custom prompts
     if prompt := uichat.chat_input("What would you like to listen to?"):
