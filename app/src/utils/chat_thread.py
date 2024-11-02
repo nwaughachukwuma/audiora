@@ -1,14 +1,17 @@
 import re
+from typing import Any, Generator
 
+import httpx
 import streamlit as st
+from src.utils.main_utils import GenerateAudioCastRequest, generate_audiocast
 from src.utils.session_state import reset_session
 
-from app.src.utils.chat_utils import (
+from env_var import SERVER_URL
+from utils_pkg.chat_utils import (
     ContentCategory,
     SessionChatMessage,
     SessionChatRequest,
 )
-from app.src.utils.main_utils import GenerateAudioCastRequest, chat, generate_audiocast
 
 termination_prefix = "Ok, thanks for clarifying!"
 termination_suffix = "Please click the button below to start generating the audiocast."
@@ -18,17 +21,20 @@ def generate_stream_response(
     session_id: str,
     prompt: str,
     content_category: ContentCategory,
-):
+) -> Generator[str, Any, None]:
     with st.spinner("Generating response..."):
-        response_generator = chat(
-            session_id,
-            SessionChatRequest(
-                message=SessionChatMessage(role="user", content=prompt),
-                content_category=content_category,
-            ),
+        session_chat = SessionChatRequest(
+            message=SessionChatMessage(role="user", content=prompt),
+            content_category=content_category,
         )
 
-    return response_generator
+        response = httpx.post(
+            f"{SERVER_URL}/chat/{session_id}",
+            json={**session_chat.model_dump()},
+            timeout=None,
+        )
+        response.raise_for_status()
+        return response.json()
 
 
 def handle_example_prompt(
