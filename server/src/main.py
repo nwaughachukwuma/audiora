@@ -1,17 +1,16 @@
-from datetime import datetime
 from time import time
 from typing import Any, Callable, Generator
 
-from fastapi import BackgroundTasks, FastAPI, HTTPException, Request
+from fastapi import BackgroundTasks, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_utilities import add_timer_middleware
 
-from services.storage import StorageManager
 from src.utils.generate_audiocast import (
     GenerateAudioCastRequest,
     GenerateAudioCastResponse,
     generate_audiocast,
 )
+from src.utils.get_audiocast import get_audiocast
 from utils_pkg.chat_request import chat_request
 from utils_pkg.chat_utils import (
     SessionChatMessage,
@@ -82,39 +81,11 @@ async def generate_audiocast_endpoint(
     request: GenerateAudioCastRequest,
     background_tasks: BackgroundTasks,
 ):
-    return await generate_audiocast(request, background_tasks)
+    result = await generate_audiocast(request, background_tasks)
+    return result
 
 
 @app.get("/audiocast/{session_id}", response_model=GenerateAudioCastResponse)
 async def get_audiocast_endpoint(session_id: str):
-    try:
-        storage_manager = StorageManager()
-        filepath = storage_manager.download_from_gcs(session_id)
-
-        session_data = SessionManager(session_id).data()
-        if not session_data:
-            raise HTTPException(
-                status_code=404,
-                detail=f"Audiocast not found for session_id: {session_id}",
-            )
-
-        metadata = session_data.metadata
-        source = metadata.source if metadata else ""
-        transcript = metadata.transcript if metadata else ""
-
-        created_at = None
-        if session_data.created_at:
-            created_at = datetime.fromisoformat(session_data.created_at).strftime(
-                "%Y-%m-%d %H:%M"
-            )
-
-        return GenerateAudioCastResponse(
-            url=filepath,
-            script=transcript,
-            source_content=source,
-            created_at=created_at,
-        )
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    result = get_audiocast(session_id)
+    return result
