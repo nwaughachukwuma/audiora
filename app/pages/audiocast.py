@@ -4,8 +4,8 @@ from typing import cast
 import pyperclip
 import streamlit as st
 
-from src.utils.main_utils import get_audiocast
-from src.utils.render_audiocast_utils import (
+from utils.main_utils import get_audiocast
+from utils.render_audiocast_utils import (
     GenerateAudiocastDict,
     navigate_to_home,
     render_audiocast_handler,

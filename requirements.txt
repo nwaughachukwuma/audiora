@@ -1,8 +1,10 @@
 fastapi
 pydantic
 fastapi-utilities
+
 uvicorn
 gunicorn
+uvloop
 
 streamlit
 httpx

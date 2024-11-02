@@ -1,13 +1,13 @@
 import streamlit as st
 from streamlit.delta_generator import DeltaGenerator
 
-from src.utils.chat_thread import (
+from utils.chat_thread import (
     evaluate_final_response,
     handle_example_prompt,
     handle_user_prompt,
 )
-from src.utils.chat_utils import display_example_cards
-from src.utils.render_chat import render_chat_history
+from utils.chat_utils import display_example_cards
+from utils.render_chat import render_chat_history
 
 
 async def chatui(session_id: str, uichat: DeltaGenerator):

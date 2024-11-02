@@ -6,7 +6,7 @@ import streamlit as st
 from pydub import AudioSegment
 from seewav import visualize
 
-from src.services.storage import BLOB_BASE_URI, StorageManager
+from services.storage import BLOB_BASE_URI, StorageManager
 
 
 def save_waveform_video_to_gcs(session_id: str, video_path: str):

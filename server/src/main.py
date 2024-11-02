@@ -1,10 +1,23 @@
 from contextlib import asynccontextmanager
+from datetime import datetime
 from time import time
-from typing import Callable
+from typing import Callable, Optional
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_utilities import add_timer_middleware
+from pydantic import BaseModel
+
+from services.storage import StorageManager
+from utils.audio_manager import AudioManager, AudioManagerConfig
+from utils.audiocast_request import AudioScriptMaker, generate_source_content
+from utils.chat_request import chat_request
+from utils.chat_utils import (
+    SessionChatMessage,
+    SessionChatRequest,
+    content_categories,
+)
+from utils.session_manager import SessionManager
 
 
 @asynccontextmanager
@@ -52,3 +65,121 @@ async def log_request_headers(request: Request, call_next: Callable):
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
+
+
+class GenerateAudioCastRequest(BaseModel):
+    sessionId: str
+    summary: str
+    category: str
+
+
+class GenerateAudioCastResponse(BaseModel):
+    url: str
+    script: str
+    source_content: str
+    created_at: Optional[str]
+
+
+@app.post("/chat/{session_id}", response_model=str)
+async def chat_endpoint(session_id: str, request: SessionChatRequest):
+    try:
+        content_category = request.content_category
+        db = SessionManager(session_id)
+        db._add_chat(request.message)
+
+        def on_finish(text: str):
+            db._add_chat(SessionChatMessage(role="assistant", content=text))
+
+        response = chat_request(
+            content_category=content_category,
+            previous_messages=db._get_chats(),
+            on_finish=on_finish,
+        )
+        return response
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.post("/audiocast/generate", response_model=GenerateAudioCastResponse)
+async def generate_audiocast_endpoint(request: GenerateAudioCastRequest):
+    try:
+        if request.category not in content_categories:
+            raise HTTPException(status_code=400, detail="Invalid content category")
+
+        # Generate source content
+        source_content = generate_source_content(request.category, request.summary)
+        if not source_content:
+            raise HTTPException(
+                status_code=500, detail="Failed to generate source content"
+            )
+
+        # Generate audio script
+        audio_script_maker = AudioScriptMaker(request.category, source_content)
+        audio_script = audio_script_maker.create(provider="anthropic")
+        if not audio_script:
+            raise HTTPException(
+                status_code=500, detail="Failed to generate audio script"
+            )
+
+        # Generate audio
+        output_file = await AudioManager(
+            custom_config=AudioManagerConfig(tts_provider="elevenlabs")
+        ).generate_speech(audio_script)
+
+        # Store audio
+        try:
+            storage_manager = StorageManager()
+            storage_manager.upload_audio_to_gcs(output_file, request.sessionId)
+        except Exception as e:
+            print(f"Storage warning: {str(e)}")
+
+        # Update session
+        db = SessionManager(request.sessionId)
+        db._update_source(source_content)
+        db._update_transcript(audio_script)
+
+        return GenerateAudioCastResponse(
+            url=output_file,
+            script=audio_script,
+            source_content=source_content,
+            created_at=datetime.now().strftime("%Y-%m-%d %H:%M"),
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/audiocast/{session_id}", response_model=GenerateAudioCastResponse)
+async def get_audiocast_endpoint(session_id: str):
+    try:
+        storage_manager = StorageManager()
+        filepath = storage_manager.download_from_gcs(session_id)
+
+        session_data = SessionManager(session_id).data()
+        if not session_data:
+            raise HTTPException(
+                status_code=404,
+                detail=f"Audiocast not found for session_id: {session_id}",
+            )
+
+        metadata = session_data.metadata
+        source = metadata.source if metadata else ""
+        transcript = metadata.transcript if metadata else ""
+
+        created_at = None
+        if session_data.created_at:
+            created_at = datetime.fromisoformat(session_data.created_at).strftime(
+                "%Y-%m-%d %H:%M"
+            )
+
+        return GenerateAudioCastResponse(
+            url=filepath,
+            script=transcript,
+            source_content=source,
+            created_at=created_at,
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

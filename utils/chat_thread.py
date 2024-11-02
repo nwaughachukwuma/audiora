@@ -2,13 +2,13 @@ import re
 
 import streamlit as st
 
-from src.utils.chat_utils import (
+from utils.chat_utils import (
     ContentCategory,
     SessionChatMessage,
     SessionChatRequest,
 )
-from src.utils.main_utils import GenerateAudioCastRequest, chat, generate_audiocast
-from src.utils.session_state import reset_session
+from utils.main_utils import GenerateAudioCastRequest, chat, generate_audiocast
+from utils.session_state import reset_session
 
 termination_prefix = "Ok, thanks for clarifying!"
 termination_suffix = "Please click the button below to start generating the audiocast."

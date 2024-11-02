@@ -1,7 +1,7 @@
 from typing import Any, Callable, List, Optional
 
-from src.services.openai_client import get_openai
-from src.utils.chat_utils import ContentCategory, SessionChatMessage
+from services.openai_client import get_openai
+from utils.chat_utils import ContentCategory, SessionChatMessage
 
 
 def get_system_message(content_category: ContentCategory):
