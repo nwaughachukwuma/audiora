@@ -20,8 +20,8 @@ from utils_pkg.generate_speech_utils import (
 @dataclass
 class AudioManagerConfig:
     tts_provider: Optional[TTSProvider] = "openai"
-    temp_audio_dir: str = field(default_factory=lambda: "/tmp/audiocast")
-    outdir_base: str = field(default_factory=lambda: "/tmp/audiocast/output")
+    temp_audio_dir: str = field(default_factory=lambda: "/tmp/audiora")
+    outdir_base: str = field(default_factory=lambda: "/tmp/audiora/output")
 
     def ensure_directories(self) -> None:
         """Ensure all required directories exist"""
