@@ -3,21 +3,21 @@ from datetime import datetime
 from time import time
 from typing import Callable, Optional
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import BackgroundTasks, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_utilities import add_timer_middleware
 from pydantic import BaseModel
 
 from services.storage import StorageManager
-from utils.audio_manager import AudioManager, AudioManagerConfig
-from utils.audiocast_request import AudioScriptMaker, generate_source_content
-from utils.chat_request import chat_request
-from utils.chat_utils import (
+from utils_pkg.audio_manager import AudioManager, AudioManagerConfig
+from utils_pkg.audiocast_request import AudioScriptMaker, generate_source_content
+from utils_pkg.chat_request import chat_request
+from app.src.utils.chat_utils import (
     SessionChatMessage,
     SessionChatRequest,
     content_categories,
 )
-from utils.session_manager import SessionManager
+from app.src.utils.session_manager import SessionManager
 
 
 @asynccontextmanager
@@ -81,14 +81,19 @@ class GenerateAudioCastResponse(BaseModel):
 
 
 @app.post("/chat/{session_id}", response_model=str)
-async def chat_endpoint(session_id: str, request: SessionChatRequest):
+async def chat_endpoint(
+    session_id: str, request: SessionChatRequest, background_tasks: BackgroundTasks
+):
     try:
         content_category = request.content_category
         db = SessionManager(session_id)
         db._add_chat(request.message)
 
         def on_finish(text: str):
-            db._add_chat(SessionChatMessage(role="assistant", content=text))
+            background_tasks.add_task(
+                db._add_chat,
+                SessionChatMessage(role="assistant", content=text),
+            )
 
         response = chat_request(
             content_category=content_category,

@@ -1,24 +1,42 @@
 import asyncio
+import os
 import sys
 from pathlib import Path
 
 import uvloop
 from dotenv import load_dotenv
 
-from services.admin_sdk import init_admin_sdk
-
-### Begin: Add the project root to sys.path
-# Calculate the path to the root of the project, assuming the script is in the 'streamlit' directory
+## Begin: Add the project root to sys.path
 project_root = Path(__file__).parent.parent.resolve()
-# Add the project root to sys.path
 sys.path.append(str(project_root))
-### End: Add the project root to sys.path
-
 
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
-
-print("running uvloop as the event loop policy for asyncio")
+print("running uvloop as event loop policy for asyncio")
 
 load_dotenv()
-# init firebase admin sdk
-init_admin_sdk()
+
+
+def init_shared_packages(paths: list[str]):
+    # Add the shared module directory to the Python path
+    for path in paths:
+        pkg_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", path))
+        sys.path.append(pkg_path)
+
+
+def initialize():
+    from services.admin_sdk import init_admin_sdk
+
+    init_admin_sdk()
+
+
+def print_project_meta():
+    print(f"Project root: {project_root}")
+    print(f"Python version: {sys.version}")
+    print(f"Current working directory: {os.getcwd()}")
+
+
+init_shared_packages(["services", "utils"])
+
+initialize()
+
+print_project_meta()

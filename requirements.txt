@@ -30,5 +30,6 @@ google-cloud-storage
 google-api-python-client
 google-generativeai
 
-watchdog
 ruff
+watchdog
+setuptools
