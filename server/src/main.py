@@ -1,20 +1,21 @@
 from datetime import datetime
 from time import time
-from typing import Any, Callable, Generator, Optional
+from typing import Any, Callable, Generator
 
 from fastapi import BackgroundTasks, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_utilities import add_timer_middleware
-from pydantic import BaseModel
 
 from services.storage import StorageManager
-from utils_pkg.audio_manager import AudioManager, AudioManagerConfig
-from utils_pkg.audiocast_request import AudioScriptMaker, generate_source_content
+from src.utils.generate_audiocast import (
+    GenerateAudioCastRequest,
+    GenerateAudioCastResponse,
+    generate_audiocast,
+)
 from utils_pkg.chat_request import chat_request
 from utils_pkg.chat_utils import (
     SessionChatMessage,
     SessionChatRequest,
-    content_categories,
 )
 from utils_pkg.session_manager import SessionManager
 
@@ -53,19 +54,6 @@ async def root():
     return {"message": "Hello World"}
 
 
-class GenerateAudioCastRequest(BaseModel):
-    sessionId: str
-    summary: str
-    category: str
-
-
-class GenerateAudioCastResponse(BaseModel):
-    url: str
-    script: str
-    source_content: str
-    created_at: Optional[str]
-
-
 @app.post("/chat/{session_id}", response_model=Generator[str, Any, None])
 async def chat_endpoint(
     session_id: str, request: SessionChatRequest, background_tasks: BackgroundTasks
@@ -90,53 +78,11 @@ async def chat_endpoint(
 
 
 @app.post("/audiocast/generate", response_model=GenerateAudioCastResponse)
-async def generate_audiocast_endpoint(request: GenerateAudioCastRequest):
-    try:
-        if request.category not in content_categories:
-            raise HTTPException(status_code=400, detail="Invalid content category")
-
-        # Generate source content
-        source_content = generate_source_content(request.category, request.summary)
-        if not source_content:
-            raise HTTPException(
-                status_code=500, detail="Failed to generate source content"
-            )
-
-        # Generate audio script
-        audio_script_maker = AudioScriptMaker(request.category, source_content)
-        audio_script = audio_script_maker.create(provider="anthropic")
-        if not audio_script:
-            raise HTTPException(
-                status_code=500, detail="Failed to generate audio script"
-            )
-
-        # Generate audio
-        output_file = await AudioManager(
-            custom_config=AudioManagerConfig(tts_provider="elevenlabs")
-        ).generate_speech(audio_script)
-
-        # Store audio
-        try:
-            storage_manager = StorageManager()
-            storage_manager.upload_audio_to_gcs(output_file, request.sessionId)
-        except Exception as e:
-            print(f"Storage warning: {str(e)}")
-
-        # Update session
-        db = SessionManager(request.sessionId)
-        db._update_source(source_content)
-        db._update_transcript(audio_script)
-
-        return GenerateAudioCastResponse(
-            url=output_file,
-            script=audio_script,
-            source_content=source_content,
-            created_at=datetime.now().strftime("%Y-%m-%d %H:%M"),
-        )
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+async def generate_audiocast_endpoint(
+    request: GenerateAudioCastRequest,
+    background_tasks: BackgroundTasks,
+):
+    return await generate_audiocast(request, background_tasks)
 
 
 @app.get("/audiocast/{session_id}", response_model=GenerateAudioCastResponse)
