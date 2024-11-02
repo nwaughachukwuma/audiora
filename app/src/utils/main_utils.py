@@ -12,7 +12,7 @@ from app.src.utils.chat_utils import (
     SessionChatRequest,
     content_categories,
 )
-from utils_pkg.session_manager import SessionManager
+from app.src.utils.session_manager import SessionManager
 
 
 class GenerateAudioCastRequest(BaseModel):
