@@ -14,3 +14,4 @@ ELEVENLABS_API_KEY = environ["ELEVENLABS_API_KEY"]
 
 BUCKET_NAME = environ.get("BUCKET_NAME")
 APP_URL = environ.get("APP_URL", "http://localhost:8501")
+SERVER_URL = environ.get("SERVER_URL", "http://localhost:8585")

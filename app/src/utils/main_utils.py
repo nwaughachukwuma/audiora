@@ -2,17 +2,17 @@ from datetime import datetime
 
 import streamlit as st
 from pydantic import BaseModel
+from utils_pkg.chat_utils import (
+    SessionChatMessage,
+    SessionChatRequest,
+    content_categories,
+)
+from utils_pkg.session_manager import SessionManager
 
 from services.storage import StorageManager
 from utils_pkg.audio_manager import AudioManager, AudioManagerConfig
 from utils_pkg.audiocast_request import AudioScriptMaker, generate_source_content
 from utils_pkg.chat_request import chat_request
-from app.src.utils.chat_utils import (
-    SessionChatMessage,
-    SessionChatRequest,
-    content_categories,
-)
-from app.src.utils.session_manager import SessionManager
 
 
 class GenerateAudioCastRequest(BaseModel):
