@@ -1,34 +1,14 @@
 import re
 from pathlib import Path
-from typing import TypedDict, cast
+from typing import cast
 
 import httpx
 import streamlit as st
-from pydantic import BaseModel
 from src.utils.render_waveform import render_waveform
 
 from env_var import APP_URL, SERVER_URL
+from utils_pkg.audiocast_utils import GenerateAudiocastDict, GenerateAudioCastRequest
 from utils_pkg.chat_utils import ContentCategory
-
-
-class GenerateAudioCastRequest(BaseModel):
-    sessionId: str
-    summary: str
-    category: str
-
-
-class GenerateAudioCastResponse(BaseModel):
-    url: str
-    script: str
-    source_content: str
-    created_at: str | None
-
-
-class GenerateAudiocastDict(TypedDict):
-    url: str
-    script: str
-    source_content: str
-    created_at: str | None
 
 
 def navigate_to_home():

@@ -1,28 +1,16 @@
 from datetime import datetime
-from typing import Optional
 
 from fastapi import BackgroundTasks, HTTPException
-from pydantic import BaseModel
 
 from services.storage import StorageManager
 from utils_pkg.audio_manager import AudioManager, AudioManagerConfig
 from utils_pkg.audiocast_request import AudioScriptMaker, generate_source_content
-from utils_pkg.chat_utils import ContentCategory
+from utils_pkg.audiocast_utils import (
+    GenerateAudioCastRequest,
+    GenerateAudioCastResponse,
+)
 from utils_pkg.session_manager import SessionManager
 from utils_pkg.waveform_utils import WaveformUtils
-
-
-class GenerateAudioCastRequest(BaseModel):
-    sessionId: str
-    summary: str
-    category: ContentCategory
-
-
-class GenerateAudioCastResponse(BaseModel):
-    url: str
-    script: str
-    source_content: str
-    created_at: Optional[str]
 
 
 async def generate_audiocast(
