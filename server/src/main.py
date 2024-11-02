@@ -1,7 +1,6 @@
-from contextlib import asynccontextmanager
 from datetime import datetime
 from time import time
-from typing import Callable, Optional
+from typing import Any, Callable, Generator, Optional
 
 from fastapi import BackgroundTasks, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,27 +11,14 @@ from services.storage import StorageManager
 from utils_pkg.audio_manager import AudioManager, AudioManagerConfig
 from utils_pkg.audiocast_request import AudioScriptMaker, generate_source_content
 from utils_pkg.chat_request import chat_request
-from app.src.utils.chat_utils import (
+from utils_pkg.chat_utils import (
     SessionChatMessage,
     SessionChatRequest,
     content_categories,
 )
-from app.src.utils.session_manager import SessionManager
+from utils_pkg.session_manager import SessionManager
 
-
-@asynccontextmanager
-async def lifespan(_app: FastAPI):
-    # ---
-    yield
-    # ---
-
-
-app = FastAPI(
-    title="Audiora API",
-    description="Listen to anything, anytime, leveraging AI-generated audio.",
-    version="1.0.0",
-    lifespan=lifespan,
-)
+app = FastAPI(title="Audiora", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -80,29 +66,27 @@ class GenerateAudioCastResponse(BaseModel):
     created_at: Optional[str]
 
 
-@app.post("/chat/{session_id}", response_model=str)
+@app.post("/chat/{session_id}", response_model=Generator[str, Any, None])
 async def chat_endpoint(
     session_id: str, request: SessionChatRequest, background_tasks: BackgroundTasks
 ):
-    try:
-        content_category = request.content_category
-        db = SessionManager(session_id)
-        db._add_chat(request.message)
+    content_category = request.content_category
+    db = SessionManager(session_id)
+    db._add_chat(request.message)
 
-        def on_finish(text: str):
-            background_tasks.add_task(
-                db._add_chat,
-                SessionChatMessage(role="assistant", content=text),
-            )
-
-        response = chat_request(
-            content_category=content_category,
-            previous_messages=db._get_chats(),
-            on_finish=on_finish,
+    def on_finish(text: str):
+        background_tasks.add_task(
+            db._add_chat,
+            SessionChatMessage(role="assistant", content=text),
         )
-        return response
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+
+    response = chat_request(
+        content_category=content_category,
+        previous_messages=db._get_chats(),
+        on_finish=on_finish,
+    )
+
+    return response
 
 
 @app.post("/audiocast/generate", response_model=GenerateAudioCastResponse)

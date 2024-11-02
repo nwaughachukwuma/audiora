@@ -1,4 +1,3 @@
-import logging
 from typing import Dict, Literal
 
 from firebase_admin.firestore import client, firestore
@@ -19,9 +18,6 @@ collections: Dict[Collection, Collection] = {
 
 
 class DBManager:
-    def __init__(self, scope: str):
-        self.logger = logging.getLogger(scope)
-
     @property
     def timestamp(self):
         return server_timestamp

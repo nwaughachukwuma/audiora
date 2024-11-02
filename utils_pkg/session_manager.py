@@ -29,7 +29,7 @@ class SessionManager(DBManager):
     collection: Collection = collections["audiora_sessions"]
 
     def __init__(self, session_id: str):
-        super().__init__(scope="ChatManager")
+        super().__init__()
 
         self.doc_id = session_id
         session_doc = self._get_document(self.collection, self.doc_id)
