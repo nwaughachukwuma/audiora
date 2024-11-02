@@ -3,7 +3,7 @@ from typing import Any, Generator
 
 import httpx
 import streamlit as st
-from src.utils.main_utils import GenerateAudioCastRequest, generate_audiocast
+from src.utils.render_audiocast_utils import generate_audiocast
 from src.utils.session_state import reset_session
 
 from env_var import SERVER_URL
@@ -84,7 +84,7 @@ def handle_user_prompt(
         return ai_message
 
 
-async def evaluate_final_response(ai_message: str, content_category: ContentCategory):
+async def evaluate_final_response(ai_message: str):
     """
     Evaluate if the ai_message is the final response from the ai model
     """
@@ -103,6 +103,7 @@ async def evaluate_final_response(ai_message: str, content_category: ContentCate
         unsafe_allow_html=True,
     )
 
+    # Check if the chat session should end
     end_chat_session = termination_suffix.lower() in ai_message.lower()
     if not end_chat_session:
         return st.rerun()
@@ -147,13 +148,12 @@ async def use_audiocast_request(
     """
     try:
         with st.spinner("Generating your audiocast..."):
-            audiocast_response = await generate_audiocast(
-                GenerateAudioCastRequest(
-                    sessionId=session_id,
-                    summary=summary,
-                    category=content_category,
-                )
+            audiocast_response = generate_audiocast(
+                session_id,
+                summary,
+                content_category,
             )
+
             print(f"Generate AudioCast Response: {audiocast_response}")
 
             st.session_state.current_audiocast = audiocast_response

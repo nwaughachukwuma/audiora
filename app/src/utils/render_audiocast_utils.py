@@ -1,11 +1,34 @@
 import re
 from pathlib import Path
-from typing import TypedDict
+from typing import TypedDict, cast
 
+import httpx
 import streamlit as st
-from app.src.utils.render_waveform import render_waveform
+from pydantic import BaseModel
+from src.utils.render_waveform import render_waveform
 
-from env_var import APP_URL
+from env_var import APP_URL, SERVER_URL
+from utils_pkg.chat_utils import ContentCategory
+
+
+class GenerateAudioCastRequest(BaseModel):
+    sessionId: str
+    summary: str
+    category: str
+
+
+class GenerateAudioCastResponse(BaseModel):
+    url: str
+    script: str
+    source_content: str
+    created_at: str | None
+
+
+class GenerateAudiocastDict(TypedDict):
+    url: str
+    script: str
+    source_content: str
+    created_at: str | None
 
 
 def navigate_to_home():
@@ -18,11 +41,30 @@ def parse_ai_script(ai_script: str):
     return "\n\n".join([f"**{speaker}**: {content}" for speaker, content in matches])
 
 
-class GenerateAudiocastDict(TypedDict):
-    url: str
-    script: str
-    source_content: str
-    created_at: str | None
+def get_audiocast(session_id: str):
+    response = httpx.post(f"{SERVER_URL}/audiocast/{session_id}", timeout=None)
+    response.raise_for_status()
+    return cast(GenerateAudiocastDict, response.json())
+
+
+def generate_audiocast(
+    session_id: str,
+    summary: str,
+    content_category: ContentCategory,
+):
+    audiocast_req = GenerateAudioCastRequest(
+        sessionId=session_id,
+        summary=summary,
+        category=content_category,
+    )
+    response = httpx.post(
+        f"{SERVER_URL}/audiocast/generate",
+        json=audiocast_req.model_dump(),
+        timeout=None,
+    )
+    response.raise_for_status()
+
+    return cast(GenerateAudiocastDict, response.json())
 
 
 def render_audiocast_handler(session_id: str, audiocast: GenerateAudiocastDict):
