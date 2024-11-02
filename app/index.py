@@ -1,10 +1,13 @@
 import asyncio
 
 import streamlit as st
-from src.uis.audioui import audioui
-from src.uis.chatui import chatui
+from _init_project import print_project_meta
+from uis.audioui import audioui
+from uis.chatui import chatui
 
 from utils.session_state import init_session_state
+
+print_project_meta()
 
 
 async def main():
