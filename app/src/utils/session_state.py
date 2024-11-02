@@ -3,7 +3,7 @@ from typing import List, Literal, TypedDict, cast
 
 import streamlit as st
 
-from utils.chat_utils import ContentCategory
+from app.src.utils.chat_utils import ContentCategory
 
 MessageRole = Literal["user", "assistant", "ai", "human"]
 

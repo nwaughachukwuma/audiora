@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from utils.chat_utils import ContentCategory, category_qualifiers
+from app.src.utils.chat_utils import ContentCategory, category_qualifiers
 
 
 @dataclass

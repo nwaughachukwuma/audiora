@@ -4,15 +4,15 @@ import streamlit as st
 from pydantic import BaseModel
 
 from services.storage import StorageManager
-from utils.audio_manager import AudioManager, AudioManagerConfig
-from utils.audiocast_request import AudioScriptMaker, generate_source_content
-from utils.chat_request import chat_request
-from utils.chat_utils import (
+from utils_pkg.audio_manager import AudioManager, AudioManagerConfig
+from utils_pkg.audiocast_request import AudioScriptMaker, generate_source_content
+from utils_pkg.chat_request import chat_request
+from app.src.utils.chat_utils import (
     SessionChatMessage,
     SessionChatRequest,
     content_categories,
 )
-from utils.session_manager import SessionManager
+from utils_pkg.session_manager import SessionManager
 
 
 class GenerateAudioCastRequest(BaseModel):

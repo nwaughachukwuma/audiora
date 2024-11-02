@@ -8,7 +8,7 @@ from itertools import cycle, islice
 from pathlib import Path
 from typing import Any, List, Optional, Tuple
 
-from utils.generate_speech_utils import (
+from utils_pkg.generate_speech_utils import (
     ElevenLabsVoice,
     GenerateSpeech,
     OpenaiVoice,

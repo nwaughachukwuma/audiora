@@ -6,14 +6,14 @@ import uuid
 from pathlib import Path
 from typing import List, Optional, Tuple
 
-from utils.audio_manager_utils import (
+from utils_pkg.audio_manager_utils import (
     AudioManagerConfig,
     AudioManagerSpeechGenerator,
     ContentSplitter,
 )
-from utils.audio_synthesizer import AudioSynthesizer
-from utils.clean_tss_markup import clean_tss_markup
-from utils.generate_speech_utils import elevenlabs_voices, openai_voices
+from utils_pkg.audio_synthesizer import AudioSynthesizer
+from utils_pkg.clean_tss_markup import clean_tss_markup
+from utils_pkg.generate_speech_utils import elevenlabs_voices, openai_voices
 
 logger = logging.getLogger(__name__)
 

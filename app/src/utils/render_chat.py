@@ -1,6 +1,6 @@
 import streamlit as st
 
-from utils.chat_utils import content_categories
+from app.src.utils.chat_utils import content_categories
 
 
 def set_content_category():

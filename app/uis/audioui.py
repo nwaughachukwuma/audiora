@@ -1,8 +1,8 @@
 import streamlit as st
+from src.utils.render_audiocast import render_audiocast
 from streamlit.delta_generator import DeltaGenerator
 
-from utils.chat_thread import use_audiocast_request
-from utils.render_audiocast import render_audiocast
+from app.src.utils.chat_thread import use_audiocast_request
 
 
 async def audioui(session_id: str, uichat: DeltaGenerator):
