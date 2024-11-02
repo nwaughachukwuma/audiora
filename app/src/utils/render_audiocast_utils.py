@@ -3,9 +3,9 @@ from pathlib import Path
 from typing import TypedDict
 
 import streamlit as st
+from src.utils.waveform_utils import render_waveform
 
 from env_var import APP_URL
-from utils.waveform_utils import render_waveform
 
 
 def navigate_to_home():
