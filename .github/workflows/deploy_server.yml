@@ -1,4 +1,4 @@
-name: Deploy Makr to cloud-run
+name: Deploy Server to cloud-run
 on:
   pull_request:
     paths:
