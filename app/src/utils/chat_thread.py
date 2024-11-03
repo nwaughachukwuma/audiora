@@ -148,7 +148,7 @@ async def use_audiocast_request(
     """
     try:
         with st.spinner("Generating your audiocast..."):
-            audiocast_response = generate_audiocast(
+            audiocast_response = await generate_audiocast(
                 session_id,
                 summary,
                 content_category,
@@ -160,7 +160,7 @@ async def use_audiocast_request(
             st.session_state.messages = []  # Clear messages
             st.rerun()
     except Exception as e:
-        st.info("Error while generating your audiocast. Please start afresh!")
+        st.warning("Error while generating your audiocast. Please start afresh!")
         st.error(f"Error generating audiocast: {str(e)}")
 
         st.session_state.user_specification = None

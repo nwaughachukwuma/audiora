@@ -2,15 +2,19 @@ import asyncio
 
 import pyperclip
 import streamlit as st
+from _init_project import print_project_meta
 from src.utils.render_audiocast_utils import (
     get_audiocast,
     navigate_to_home,
     render_audiocast_handler,
 )
 
+print_project_meta()
+
 
 async def render_audiocast_page():
     st.set_page_config(page_title="Audiora | Share Page", page_icon="🎧", layout="wide")
+    st.sidebar.info("A VeedoAI project. (c) 2024")
 
     session_id = st.query_params.get("session_id")
 

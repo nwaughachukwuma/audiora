@@ -27,7 +27,7 @@ def get_audiocast(session_id: str):
     return cast(GenerateAudiocastDict, response.json())
 
 
-def generate_audiocast(
+async def generate_audiocast(
     session_id: str,
     summary: str,
     content_category: ContentCategory,

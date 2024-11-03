@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Dict, List, Optional, cast
+from typing import Callable, Dict, List, Optional, cast
 
 from services.firestore_sdk import (
     Collection,
@@ -15,6 +15,8 @@ from utils_pkg.chat_utils import SessionChatMessage
 class ChatMetadata:
     source: str
     transcript: str
+    info: Optional[str] = None
+    title: Optional[str] = None
 
 
 @dataclass
@@ -66,6 +68,12 @@ class SessionManager(DBManager):
     def _update_transcript(self, transcript: str):
         return self._update({"metadata.transcript": transcript})
 
+    def _update_info(self, info: str):
+        return self._update({"metadata.info": info})
+
+    def _update_title(self, title: str):
+        return self._update({"metadata.title": title})
+
     def _add_chat(self, chat: SessionChatMessage):
         return self._update_document(
             self.collection, self.doc_id, {"chats": arrayUnion([chat.__dict__])}
@@ -110,3 +118,16 @@ class SessionManager(DBManager):
             )
             for chat in chats
         ]
+
+    def subscribe_to_metadata_info(self, callback: Callable):
+        doc_ref = self._get_collection(self.collection).document(self.doc_id)
+
+        def on_snapshot(doc_snapshot, _changes, _read_time):
+            for doc in doc_snapshot:
+                if doc.exists and doc.id == self.doc_id:
+                    data = doc.to_dict()
+                    info = data.get("metadata", {}).get("info")
+                    print(f"Document metadata info: {info}")
+                    callback(info)
+
+        return doc_ref.on_snapshot(on_snapshot)
