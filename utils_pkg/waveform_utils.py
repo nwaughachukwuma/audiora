@@ -32,9 +32,7 @@ class WaveformUtils:
 
     def save_waveform_video_to_gcs(self, video_path: str):
         """Ingest waveform visualization to GCS."""
-        full_path = StorageManager().upload_video_to_gcs(
-            video_path, f"{self.session_id}.mp4"
-        )
+        full_path = StorageManager().upload_video_to_gcs(video_path, f"{self.session_id}.mp4")
         return full_path
 
     def generate_waveform_video(self, output_path: Path) -> Path:
