@@ -44,6 +44,7 @@ class SessionManager(DBManager):
         return self._update_document(self.collection, self.doc_id, data)
 
     def data(self) -> SessionModel | None:
+        """Get session data"""
         doc = self._get_document(self.collection, self.doc_id)
 
         data = doc.to_dict()
@@ -75,9 +76,7 @@ class SessionManager(DBManager):
         return self._update({"metadata.title": title})
 
     def _add_chat(self, chat: SessionChatMessage):
-        return self._update_document(
-            self.collection, self.doc_id, {"chats": arrayUnion([chat.__dict__])}
-        )
+        return self._update_document(self.collection, self.doc_id, {"chats": arrayUnion([chat.__dict__])})
 
     def _delete_chat(self, chat_id: str):
         doc = self._get_document(self.collection, self.doc_id)
@@ -120,6 +119,7 @@ class SessionManager(DBManager):
         ]
 
     def subscribe_to_metadata_info(self, callback: Callable):
+        """Subscribe to metadata.info"""
         doc_ref = self._get_collection(self.collection).document(self.doc_id)
 
         def on_snapshot(doc_snapshot, _changes, _read_time):
