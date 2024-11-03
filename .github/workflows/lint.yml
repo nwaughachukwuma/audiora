@@ -20,6 +20,8 @@ jobs:
           cache: "pip" # caching pip dependencies
           check-latest: true
 
+      - run: python -m pip install --upgrade pip
+
       - run: pip install --force-reinstall -r requirements.txt
         if: ${{ steps.setup-python.outputs.cache-hit != 'true' }}
 
