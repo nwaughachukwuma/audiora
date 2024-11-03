@@ -1,0 +1,30 @@
+name: Pylint
+
+on: [push, pull_request]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip" # caching pip dependencies
+          check-latest: true
+
+      - run: pip install --force-reinstall -r requirements.txt
+        if: ${{ steps.setup-python.outputs.cache-hit != 'true' }}
+
+      - run: pip install -r requirements.txt
+        if: ${{ steps.setup-python.outputs.cache-hit == 'true' }}
+
+      - uses: chartboost/ruff-action@v1
+      - run: ruff check ./
