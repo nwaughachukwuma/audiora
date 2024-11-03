@@ -103,7 +103,6 @@ jobs:
       - uses: google-github-actions/auth@v2
         with:
           credentials_json: "${{ secrets.GCP_SA_KEY }}"
-
       - uses: google-github-actions/setup-gcloud@v2
       - run: gcloud run services update-traffic ${{ env.SERVICE }} --to-tags=${{ needs.prepare.outputs.VERSION }}=100 --project=${{ env.PROJECT_ID }} --region=us-central1
 
