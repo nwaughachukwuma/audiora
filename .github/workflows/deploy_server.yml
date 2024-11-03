@@ -55,29 +55,9 @@ jobs:
           TAG_BRANCH_NAME="${RAW##*/}"
           echo "TAG_BRANCH_NAME=$TAG_BRANCH_NAME" >> $GITHUB_OUTPUT
 
-  test:
-    runs-on: ubuntu-latest
-    needs: prepare
-    timeout-minutes: 5
-    env:
-      VERSION: ${{ needs.prepare.outputs.VERSION }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-          cache: "pip" # caching pip dependencies
-          check-latest: true
-
-      - run: pip install --force-reinstall -r requirements.txt
-        if: ${{ steps.setup-python.outputs.cache-hit != 'true' }}
-
-      - run: pip install -r requirements.txt
-        if: ${{ steps.setup-python.outputs.cache-hit == 'true' }}
-
   deploy:
     runs-on: ubuntu-latest
-    needs: [prepare, test]
+    needs: [prepare]
     timeout-minutes: 10
     env:
       VERSION: ${{ needs.prepare.outputs.VERSION }}
@@ -88,8 +68,6 @@ jobs:
           python-version: "3.12"
           cache: "pip" # caching pip dependencies
           check-latest: true
-
-      - run: pip install -r requirements.txt
 
       - uses: google-github-actions/auth@v2
         with:
@@ -131,7 +109,7 @@ jobs:
   promote:
     runs-on: ubuntu-latest
     if: (needs.prepare.outputs.MAIN == 'true')
-    needs: [prepare, deploy, test]
+    needs: [prepare, deploy]
     timeout-minutes: 2
     steps:
       - uses: google-github-actions/auth@v2

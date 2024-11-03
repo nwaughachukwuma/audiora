@@ -30,11 +30,6 @@ google-cloud-storage
 google-api-python-client
 google-generativeai
 
-<<<<<<< HEAD
 ruff
 watchdog
 setuptools
-=======
-watchdog
-ruff
->>>>>>> origin/main
