@@ -23,11 +23,9 @@ concurrency:
 
 env:
   CI: true
-  COMMIT_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
-  COMMIT_REF: ${{ github.ref }}
+  PROJECT_ID: ${{ secrets.PROJECT_ID }}
   MAIN: ${{ github.ref == 'refs/heads/main' }}
   SERVICE: audiora-api
-  PROJECT_ID: ${{ secrets.PROJECT_ID }}
   OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
   GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
   ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
