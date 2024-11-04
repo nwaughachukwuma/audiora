@@ -4,15 +4,15 @@ from typing import cast
 
 import httpx
 import streamlit as st
-from src.utils.render_waveform import render_waveform
 
 from env_var import APP_URL, SERVER_URL
-from utils_pkg.audiocast_utils import GenerateAudiocastDict, GenerateAudioCastRequest
+from src.utils.render_waveform import render_waveform
+from utils_pkg.audiocast_utils import GenerateAudioCastRequest, GenerateAudiocastDict
 from utils_pkg.chat_utils import ContentCategory
 
 
 def navigate_to_home():
-    main_script = str(Path(__file__).parent.parent / "app.py")
+    main_script = str(Path(__file__).parent.parent.parent / "index.py")
     st.switch_page(main_script)
 
 
@@ -51,33 +51,12 @@ def render_audiocast_handler(session_id: str, audiocast: GenerateAudiocastDict):
     # Audio player
     st.audio(audiocast["url"])
 
-    st.markdown("---")
-
-    col1, _ = st.columns([4, 1])
-    with col1:
-
-        def toggle_show_waveform():
-            st.session_state.show_waveform = not st.session_state.get("show_waveform")
-
-        button_label = (
-            "Hide Waveform Visualization"
-            if st.session_state.get("show_waveform")
-            else "Show Waveform Visualization"
-        )
-
-        st.button(
-            button_label,
-            on_click=toggle_show_waveform,
-            use_container_width=True,
-        )
-
-        if st.session_state.get("show_waveform"):
-            try:
-                render_waveform(session_id, audiocast["url"])
-            except Exception as e:
-                st.error(f"Error rendering waveform: {str(e)}")
-
-    st.markdown("---")
+    # Voice waveform
+    with st.expander("Show Audio Waveform"):
+        try:
+            render_waveform(session_id, audiocast["url"], False)
+        except Exception as e:
+            st.error(f"Error rendering waveform: {str(e)}")
 
     # Transcript
     with st.expander("Show Transcript"):

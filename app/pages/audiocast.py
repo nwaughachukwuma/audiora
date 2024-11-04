@@ -24,9 +24,14 @@ async def render_audiocast_page():
         st.subheader("Share Page ")
         st.markdown(f"##### Viewing audiocast: _{session_id}_")
 
+        st.sidebar.info("A VeedoAI project. (c) 2024")
+
         try:
             with st.spinner("Loading audiocast..."):
                 audiocast = get_audiocast(session_id)
+
+            if audiocast["created_at"]:
+                st.markdown(f"> Created: {audiocast["created_at"]}")
 
             share_url = render_audiocast_handler(session_id, audiocast)
 
@@ -44,15 +49,10 @@ async def render_audiocast_page():
                 st.session_state.show_copy_succes = False
                 st.success("Share link copied successfully!", icon="✅")
 
-            if audiocast["created_at"]:
-                st.markdown(f"> Created: {audiocast["created_at"]}")
-
         except Exception as e:
             st.error(f"Error loading audiocast: {str(e)}")
     else:
-        st.warning(
-            "Audiocast ID is missing in the URL. Expected URL format: ?session_id=your-audiocast-id"
-        )
+        st.warning("Audiocast ID is missing in the URL. Expected URL format: ?session_id=your-audiocast-id")
 
         st.markdown("---")
 

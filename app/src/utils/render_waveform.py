@@ -7,7 +7,7 @@ from services.storage import BLOB_BASE_URI, StorageManager
 from utils_pkg.waveform_utils import WaveformUtils
 
 
-def render_waveform(session_id: str, audio_path: str):
+def render_waveform(session_id: str, audio_path: str, autoplay=False):
     """Render waveform visualization from audio file."""
     waveform_utils = WaveformUtils(session_id, audio_path)
     tmp_vid_path = waveform_utils.get_tmp_video_path()
@@ -32,10 +32,9 @@ def render_waveform(session_id: str, audio_path: str):
                 video_path = waveform_utils.generate_waveform_video(tmp_vid_path)
                 waveform_utils.save_waveform_video_to_gcs(str(video_path))
 
-        # st.video(str(video_path), autoplay=True)
         with open(video_path, "rb") as video_file:
             video_bytes = video_file.read()
-            st.video(video_bytes, autoplay=True)
+            st.video(video_bytes, autoplay=autoplay)
 
         download_waveform_video(str(video_path))
     except Exception as e:
