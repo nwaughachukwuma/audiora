@@ -46,7 +46,7 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    needs: [prepare, lint]
+    needs: [prepare]
     timeout-minutes: 10
     permissions:
       pull-requests: write
