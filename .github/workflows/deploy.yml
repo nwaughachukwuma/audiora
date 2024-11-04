@@ -22,7 +22,6 @@ concurrency:
 env:
   CI: true
   PROJECT_ID: ${{ secrets.PROJECT_ID }}
-  MAIN: ${{ github.ref == 'refs/heads/main' }}
   SERVICE: audiora
   OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
   GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -117,8 +116,8 @@ jobs:
 
   promote:
     runs-on: ubuntu-latest
-    if: (needs.prepare.outputs.MAIN == 'true')
-    needs: [prepare, deploy, lint]
+    if: ${{ github.ref == 'refs/heads/main' }}
+    needs: [prepare, deploy]
     timeout-minutes: 3
     steps:
       - uses: google-github-actions/auth@v2
