@@ -77,6 +77,10 @@ jobs:
           cp ./server/.gcloudignore .gcloudignore
           cp ./server/Dockerfile Dockerfile
 
+          cat .dockerignore
+          cat .gcloudignore
+          cat Dockerfile
+
       - name: Deploy to Cloud Run
         id: deploy
         uses: google-github-actions/deploy-cloudrun@v2
@@ -84,7 +88,7 @@ jobs:
           service: ${{ env.SERVICE }}
           source: ./
           tag: ${{ env.VERSION }}
-          no_traffic: true
+          no_traffic: false
           timeout: "5m"
           gcloud_version: "482.0.0"
           flags: "--allow-unauthenticated --memory=32Gi --cpu=8 --execution-environment=gen2 --concurrency=80 --max-instances=10"

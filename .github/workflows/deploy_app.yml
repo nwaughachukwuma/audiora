@@ -74,6 +74,10 @@ jobs:
           cp ./app/.gcloudignore .gcloudignore
           cp ./app/Dockerfile Dockerfile
 
+          cat .dockerignore
+          cat .gcloudignore
+          cat Dockerfile
+
       - id: deploy
         uses: google-github-actions/deploy-cloudrun@v2
         with:
