@@ -2,6 +2,7 @@
 # https://hub.docker.com/_/python
 FROM python:3.12-slim
 
+# Allow statements and log messages to immediately appear in the Knative logs
 ENV PYTHONUNBUFFERED True
 ENV PYTHONDONTWRITEBYTECODE 1
 
@@ -17,6 +18,7 @@ RUN apt-get -yqq update && apt-get -yqq install \
     && rm -rf /var/lib/apt/lists/*
 
 COPY . ./
+# RUN rm -rf ./app
 
 # Install production dependencies.
 RUN pip install --no-cache-dir -r requirements.txt
@@ -28,4 +30,4 @@ ENV TIMEOUT 0
 
 EXPOSE 8080
 
-CMD exec gunicorn -k uvicorn.workers.UvicornWorker -b :$PORT -w $WORKER --threads $THREADS -t $TIMEOUT --preload src.main:app
+CMD exec gunicorn -k uvicorn.workers.UvicornWorker -b :$PORT -w $WORKER --threads $THREADS -t $TIMEOUT --preload server.src.main:app

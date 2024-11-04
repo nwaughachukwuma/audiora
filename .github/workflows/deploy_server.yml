@@ -77,6 +77,8 @@ jobs:
       - run: |
           touch .dockerignore
           echo "app/**" >> .dockerignore
+          touch .gcloudignore
+          echo "app/**" >> .gcloudignore
 
       - name: Deploy to Cloud Run
         id: deploy

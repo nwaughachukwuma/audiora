@@ -72,6 +72,8 @@ jobs:
       - run: |
           touch .dockerignore
           echo "server/**" >> .dockerignore
+          touch .gcloudignore
+          echo "server/**" >> .gcloudignore
 
       - id: deploy
         uses: google-github-actions/deploy-cloudrun@v2
