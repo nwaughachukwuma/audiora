@@ -1,0 +1,5 @@
+.streamlit/
+.vscode/
+app/
+tests/
+.env.*

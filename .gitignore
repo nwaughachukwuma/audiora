@@ -10,3 +10,4 @@ __pycache__
 reference_code
 
 keys/
+.ruff_cache/

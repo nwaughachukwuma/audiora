@@ -75,10 +75,8 @@ jobs:
       - run: gcloud config set app/cloud_build_timeout 300
 
       - run: |
-          touch .dockerignore
-          echo "app/**" >> .dockerignore
-          touch .gcloudignore
-          echo "app/**" >> .gcloudignore
+          cp ./server/.dockerignore .dockerignore
+          cp ./server/.gcloudignore .gcloudignore
 
       - name: Deploy to Cloud Run
         id: deploy
