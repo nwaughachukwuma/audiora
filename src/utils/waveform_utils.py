@@ -25,7 +25,7 @@ def generate_waveform_video(output_path: Path, audio_path: str) -> Path:
             bars=60,
             speed=4,
             time=0.4,
-            # rate=60,
+            rate=60,
             size=(120, 68),
             fg_color=(0.0, 1.0, 0.6),  # Bright green. Try 0.2 0.2 0.2 for dark green
             bg_color=(0.05, 0.05, 0.05),  # Near black

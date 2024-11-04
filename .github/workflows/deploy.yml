@@ -4,6 +4,7 @@ on:
     paths:
       - "src/**"
       - ".streamlit"
+      - "Dockerfile"
       - ".github/workflows/deploy.yml"
   push:
     branches:
@@ -11,6 +12,7 @@ on:
     paths:
       - "src/**"
       - ".streamlit"
+      - "Dockerfile"
       - ".github/workflows/deploy.yml"
     tags:
       - "release-*"
