@@ -17,7 +17,6 @@ RUN apt-get -yqq update && apt-get -yqq install \
     python3-dev \
     xclip \
     xsel \
-    gtk \
     && rm -rf /var/lib/apt/lists/*
     
 RUN xclip -version
@@ -27,6 +26,7 @@ COPY . ./
     
 # Install production dependencies.
 RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install gtk
 
 ENV DISPLAY=:0
 RUN python3 -c "import pyperclip; pyperclip.copy('test'); print(pyperclip.paste())"
