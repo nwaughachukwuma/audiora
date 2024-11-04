@@ -3,12 +3,14 @@ on:
   pull_request:
     paths:
       - "src/**"
+      - .streamlit
       - ".github/workflows/deploy.yml"
   push:
     branches:
       - main
     paths:
       - "src/**"
+       - .streamlit
       - ".github/workflows/deploy.yml"
     tags:
       - "release-*"
