@@ -17,12 +17,19 @@ RUN apt-get -yqq update && apt-get -yqq install \
     python3-dev \
     xclip \
     xsel \
+    gtk \
     && rm -rf /var/lib/apt/lists/*
-
+    
+RUN xclip -version
+RUN xsel --version
+    
 COPY . ./
-
+    
 # Install production dependencies.
 RUN pip install --no-cache-dir -r requirements.txt
+
+ENV DISPLAY=:0
+RUN python3 -c "import pyperclip; pyperclip.copy('test'); print(pyperclip.paste())"
 
 ENV HOST '0.0.0.0'
 EXPOSE $PORT
