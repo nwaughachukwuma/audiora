@@ -27,7 +27,7 @@ COPY . ./
 # Install production dependencies.
 RUN pip install --upgrade pip \
   && pip install --no-cache-dir -r requirements.txt \
-  && pip install gtk
+  && pip install PyQt5
 
 ENV DISPLAY=:0
 RUN python3 -c "import pyperclip; pyperclip.copy('test'); print(pyperclip.paste())"
