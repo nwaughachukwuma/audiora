@@ -31,4 +31,4 @@ ENV TIMEOUT 0
 
 EXPOSE 8080
 
-CMD exec gunicorn -k uvicorn.workers.UvicornWorker -b :$PORT -w $WORKER --threads $THREADS -t $TIMEOUT --preload server.src.main:app
+CMD exec gunicorn -k uvicorn.workers.UvicornWorker -b :$PORT -w $WORKER --threads $THREADS -t $TIMEOUT --preload api.src.main:app

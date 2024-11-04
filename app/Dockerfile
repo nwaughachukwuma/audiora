@@ -20,7 +20,7 @@ RUN apt-get -yqq update && apt-get -yqq install \
     && rm -rf /var/lib/apt/lists/*
 
 COPY . ./
-# RUN rm -rf ./server
+# RUN rm -rf ./api
 
 # Install production dependencies.
 RUN pip install --no-cache-dir -r requirements.txt

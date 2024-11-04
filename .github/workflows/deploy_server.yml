@@ -1,19 +1,19 @@
-name: Deploy Server to cloud-run
+name: Deploy API to cloud-run
 on:
   pull_request:
     paths:
-      - "server/**"
+      - "api/**"
       - "services/**"
       - "utils_pkg/**"
-      - ".github/workflows/server.yml"
+      - ".github/workflows/api.yml"
   push:
     branches:
       - main
     paths:
-      - "server/**"
+      - "api/**"
       - "services/**"
       - "utils_pkg/**"
-      - ".github/workflows/server.yml"
+      - ".github/workflows/api.yml"
     tags:
       - "release-*"
 
@@ -42,7 +42,7 @@ jobs:
           fetch-depth: 0
       - id: prepare_env
         run: |
-          echo "TAGGED=${{ startsWith(github.ref, 'refs/tags/server') }}" >> $GITHUB_OUTPUT
+          echo "TAGGED=${{ startsWith(github.ref, 'refs/tags/api') }}" >> $GITHUB_OUTPUT
 
           SHORT_SHA=$(git rev-parse --short HEAD)
           echo "SHORT_SHA=$SHORT_SHA" >> $GITHUB_OUTPUT
@@ -73,9 +73,9 @@ jobs:
       - run: gcloud config set app/cloud_build_timeout 300
 
       - run: |
-          cp ./server/.dockerignore .dockerignore
-          cp ./server/.gcloudignore .gcloudignore
-          cp ./server/Dockerfile Dockerfile
+          cp ./api/.dockerignore .dockerignore
+          cp ./api/.gcloudignore .gcloudignore
+          cp ./api/Dockerfile Dockerfile
 
           cat .dockerignore
           cat .gcloudignore
@@ -102,9 +102,9 @@ jobs:
       - run: curl -f "${{ steps.deploy.outputs.url }}"
       - uses: marocchino/sticky-pull-request-comment@v2
         with:
-          header: server
+          header: audiora-api
           message: |
-            server: ${{ steps.deploy.outputs.url }} (${{ github.event.pull_request.head.sha }})
+            audiora-api: ${{ steps.deploy.outputs.url }} (${{ github.event.pull_request.head.sha }})
 
             Docs:
             Swagger: ${{ steps.deploy.outputs.url }}/docs

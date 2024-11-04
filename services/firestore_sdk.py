@@ -19,7 +19,7 @@ collections: Dict[Collection, Collection] = {
 
 class DBManager:
     @property
-    def timestamp(self):
+    def _timestamp(self):
         return server_timestamp
 
     def _get_collection(self, collection: Collection):
@@ -27,22 +27,18 @@ class DBManager:
 
     def _create_document(self, collection: Collection, data: Dict):
         return self._get_collection(collection).add(
-            {**data, "created_at": self.timestamp, "updated_at": self.timestamp}
+            {**data, "created_at": self._timestamp, "updated_at": self._timestamp}
         )
 
     def _set_document(self, collection: Collection, doc_id: str, data: Dict):
         return (
             self._get_collection(collection)
             .document(doc_id)
-            .set({**data, "created_at": self.timestamp, "updated_at": self.timestamp})
+            .set({**data, "created_at": self._timestamp, "updated_at": self._timestamp})
         )
 
     def _update_document(self, collection: Collection, doc_id: str, data: Dict):
-        return (
-            self._get_collection(collection)
-            .document(doc_id)
-            .update({**data, "updated_at": self.timestamp})
-        )
+        return self._get_collection(collection).document(doc_id).update({**data, "updated_at": self._timestamp})
 
     def _delete_document(self, collection: Collection, doc_id: str):
         return self._get_collection(collection).document(doc_id).delete()
