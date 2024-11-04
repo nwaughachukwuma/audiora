@@ -74,12 +74,16 @@ jobs:
       - uses: google-github-actions/setup-gcloud@v2
       - run: gcloud config set app/cloud_build_timeout 300
 
+      - run: |
+          touch .dockerignore
+          echo "app/**" >> .dockerignore
+
       - name: Deploy to Cloud Run
         id: deploy
         uses: google-github-actions/deploy-cloudrun@v2
         with:
           service: ${{ env.SERVICE }}
-          source: ./server
+          source: ./
           tag: ${{ env.VERSION }}
           no_traffic: true
           timeout: "5m"
