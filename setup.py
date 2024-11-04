@@ -25,6 +25,9 @@ setup(
         "google-api-python-client",
         "google-generativeai",
         "ruff",
+        "seewav",
+        "pycairo",
+        "watchdog",
     ],
     classifiers=[
         "Development Status :: 3 - Alpha",
