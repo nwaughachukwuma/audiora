@@ -15,4 +15,4 @@ GEMINI_API_KEY = environ["GEMINI_API_KEY"]
 ELEVENLABS_API_KEY = environ["ELEVENLABS_API_KEY"]
 
 APP_URL = environ.get("APP_URL", "http://localhost:8501")
-SERVER_URL = environ["SERVER_URL"]
+API_URL = environ["API_URL"]

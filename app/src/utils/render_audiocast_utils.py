@@ -5,7 +5,7 @@ from typing import cast
 import httpx
 import streamlit as st
 
-from env_var import APP_URL, SERVER_URL
+from env_var import APP_URL, API_URL
 from src.utils.render_waveform import render_waveform
 from utils_pkg.audiocast_utils import GenerateAudioCastRequest, GenerateAudiocastDict
 from utils_pkg.chat_utils import ContentCategory
@@ -22,7 +22,7 @@ def parse_ai_script(ai_script: str):
 
 
 def get_audiocast(session_id: str):
-    response = httpx.get(f"{SERVER_URL}/audiocast/{session_id}", timeout=None)
+    response = httpx.get(f"{API_URL}/audiocast/{session_id}", timeout=None)
     response.raise_for_status()
     return cast(GenerateAudiocastDict, response.json())
 
@@ -38,7 +38,7 @@ async def generate_audiocast(
         category=content_category,
     )
     response = httpx.post(
-        f"{SERVER_URL}/audiocast/generate",
+        f"{API_URL}/audiocast/generate",
         json=audiocast_req.model_dump(),
         timeout=None,
     )

@@ -6,7 +6,7 @@ import streamlit as st
 from src.utils.render_audiocast_utils import generate_audiocast
 from src.utils.session_state import reset_session
 
-from env_var import SERVER_URL
+from env_var import API_URL
 from utils_pkg.chat_utils import (
     ContentCategory,
     SessionChatMessage,
@@ -29,7 +29,7 @@ def generate_stream_response(
         )
 
         response = httpx.post(
-            f"{SERVER_URL}/chat/{session_id}",
+            f"{API_URL}/chat/{session_id}",
             json={**session_chat.model_dump()},
             timeout=None,
         )
