@@ -16,7 +16,7 @@ RUN apt-get -yqq update && apt-get -yqq install \
     pkg-config \
     python3-dev \
     xclip \
-    xsel \
+    xselect \
     && rm -rf /var/lib/apt/lists/*
 
 COPY . ./
@@ -24,9 +24,10 @@ COPY . ./
 
 # Install production dependencies.
 RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install pycairo
 
 ENV HOST '0.0.0.0'
 EXPOSE $PORT
 HEALTHCHECK CMD curl --fail http://$HOST:$PORT/_stcore/health
 
-CMD exec streamlit run app/index.py --server.port=$PORT --server.address=$HOST
+CMD exec streamlit run app.py --server.port=$PORT --server.address=$HOST

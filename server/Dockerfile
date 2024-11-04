@@ -22,6 +22,7 @@ COPY . ./
 
 # Install production dependencies.
 RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install pycairo
 
 ENV HOST '0.0.0.0'
 ENV WORKER 4
