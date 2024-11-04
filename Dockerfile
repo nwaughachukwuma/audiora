@@ -25,8 +25,9 @@ RUN xsel --version
 COPY . ./
     
 # Install production dependencies.
-RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install gtk
+RUN pip install --upgrade pip \
+  && pip install --no-cache-dir -r requirements.txt \
+  && pip install gtk
 
 ENV DISPLAY=:0
 RUN python3 -c "import pyperclip; pyperclip.copy('test'); print(pyperclip.paste())"
