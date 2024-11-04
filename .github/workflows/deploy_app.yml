@@ -1,11 +1,10 @@
-name: Deploy app to Google Cloudrun
+name: Deploy app to cloudrun
 on:
   pull_request:
     paths:
       - "app/**"
       - "services/**"
       - "utils_pkg/**"
-      - ".streamlit"
       - ".github/workflows/deploy_app.yml"
   push:
     branches:
@@ -14,7 +13,6 @@ on:
       - "app/**"
       - "services/**"
       - "utils_pkg/**"
-      - ".streamlit"
       - ".github/workflows/deploy_app.yml"
     tags:
       - "release-*"
@@ -36,6 +34,7 @@ jobs:
   prepare:
     runs-on: ubuntu-latest
     outputs:
+      SHORT_SHA: ${{ steps.prepare_env.outputs.SHORT_SHA }}
       VERSION: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.number) || format('main-{0}', steps.prepare_env.outputs.SHORT_SHA) }}
     steps:
       - uses: actions/checkout@v4
@@ -44,7 +43,13 @@ jobs:
       - id: prepare_env
         run: |
           echo "TAGGED=${{ startsWith(github.ref, 'refs/tags/api') }}" >> $GITHUB_OUTPUT
-          echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          echo "SHORT_SHA=$SHORT_SHA" >> $GITHUB_OUTPUT
+
+          RAW=$(git branch -r --contains $SHORT_SHA)
+          TAG_BRANCH_NAME="${RAW##*/}"
+          echo "TAG_BRANCH_NAME=$TAG_BRANCH_NAME" >> $GITHUB_OUTPUT
 
   deploy:
     runs-on: ubuntu-latest
@@ -52,10 +57,10 @@ jobs:
     timeout-minutes: 10
     permissions:
       pull-requests: write
+    env:
+      VERSION: ${{ needs.prepare.outputs.VERSION }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -83,7 +88,7 @@ jobs:
         with:
           service: ${{ env.SERVICE }}
           source: ./
-          tag: ${{ needs.prepare.outputs.VERSION }}
+          tag: ${{ env.VERSION }}
           no_traffic: true
           timeout: "5m"
           gcloud_version: "482.0.0"
