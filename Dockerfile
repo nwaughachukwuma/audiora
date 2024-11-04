@@ -16,6 +16,7 @@ RUN apt-get -yqq update && apt-get -yqq install \
     pkg-config \
     python3-dev \
     xclip \
+    xsel \
     && rm -rf /var/lib/apt/lists/*
 
 COPY . ./

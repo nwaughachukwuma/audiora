@@ -33,7 +33,7 @@ def generate_waveform_video(output_path: Path, audio_path: str) -> Path:
         return output_path
 
 
-def render_waveform(session_id: str, audio_path: str):
+def render_waveform(session_id: str, audio_path: str, autoplay=False):
     """Render waveform visualization from audio file."""
     tmp_directory = Path("/tmp/audiora/waveforms")
     tmp_directory.mkdir(parents=True, exist_ok=True)
@@ -59,10 +59,9 @@ def render_waveform(session_id: str, audio_path: str):
                 video_path = generate_waveform_video(tmp_vid_path, audio_path)
                 save_waveform_video_to_gcs(session_id, str(video_path))
 
-        # st.video(str(video_path), autoplay=True)
         with open(video_path, "rb") as video_file:
             video_bytes = video_file.read()
-            st.video(video_bytes, autoplay=True)
+            st.video(video_bytes, autoplay=autoplay)
 
         download_waveform_video(str(video_path))
     except Exception as e:
