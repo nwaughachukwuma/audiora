@@ -5,6 +5,7 @@ on:
       - "app/**"
       - "services/**"
       - "utils_pkg/**"
+      - ".streamlit"
       - ".github/workflows/deploy_app.yml"
   push:
     branches:
@@ -13,6 +14,7 @@ on:
       - "app/**"
       - "services/**"
       - "utils_pkg/**"
+      - ".streamlit"
       - ".github/workflows/deploy_app.yml"
     tags:
       - "release-*"
@@ -70,10 +72,8 @@ jobs:
       - run: gcloud config set app/cloud_build_timeout 300
 
       - run: |
-          touch .dockerignore
-          echo "server/**" >> .dockerignore
-          touch .gcloudignore
-          echo "server/**" >> .gcloudignore
+          cp ./app/.dockerignore .dockerignore
+          cp ./app/.gcloudignore .gcloudignore
 
       - id: deploy
         uses: google-github-actions/deploy-cloudrun@v2
