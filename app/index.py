@@ -16,19 +16,15 @@ async def main():
     st.subheader("Listen to anything, anytime, leveraging AI")
     st.sidebar.info("A VeedoAI project. (c) 2024")
 
-    # Sidebar for content type selection
-    st.sidebar.title("Audiocast Info")
-
     session_id = init_session_state()
 
     if st.session_state.content_category:
-        st.sidebar.subheader(
-            f"Content Category: {st.session_state.content_category.capitalize()}"
-        )
+        # Sidebar for content type selection
+        st.sidebar.title("Audiocast Info")
+
+        st.sidebar.subheader(f"Content Category: {st.session_state.content_category.capitalize()}")
     else:
-        st.sidebar.markdown(
-            "> Your preferences and audiocast metadata will appear here"
-        )
+        st.sidebar.markdown("> Your preferences and audiocast metadata will appear here")
 
     # Declare chat interface container
     uichat = st.empty()

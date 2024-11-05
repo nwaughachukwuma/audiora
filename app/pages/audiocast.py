@@ -2,7 +2,6 @@ import asyncio
 
 import streamlit as st
 from _init_project import print_project_meta
-
 from src.utils.custom_components import copy_button
 from src.utils.render_audiocast_utils import (
     get_audiocast,
@@ -15,17 +14,16 @@ print_project_meta()
 
 async def render_audiocast_page():
     st.set_page_config(page_title="Audiora | Share Page", page_icon="🎧", layout="wide")
+
+    # Display audiocast content
+    st.title("🎧 Audiora")
+    st.subheader("Share Page ")
     st.sidebar.info("A VeedoAI project. (c) 2024")
 
     session_id = st.query_params.get("session_id")
 
     if session_id:
-        # Display audiocast content
-        st.title("🎧 Audiora")
-        st.subheader("Share Page ")
         st.markdown(f"##### Viewing audiocast: _{session_id}_")
-
-        st.sidebar.info("A VeedoAI project. (c) 2024")
 
         try:
             with st.spinner("Loading audiocast..."):

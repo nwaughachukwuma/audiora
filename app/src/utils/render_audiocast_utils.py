@@ -4,9 +4,10 @@ from typing import cast
 
 import httpx
 import streamlit as st
-
-from env_var import APP_URL, API_URL
+from src.utils.metadata_subscription import subscribe_to_audio_generation
 from src.utils.render_waveform import render_waveform
+
+from env_var import API_URL, APP_URL
 from shared_utils_pkg.audiocast_utils import GenerateAudioCastRequest, GenerateAudiocastDict
 from shared_utils_pkg.chat_utils import ContentCategory
 
@@ -32,6 +33,8 @@ async def generate_audiocast(
     summary: str,
     content_category: ContentCategory,
 ):
+    doc_watch = subscribe_to_audio_generation(session_id)
+
     audiocast_req = GenerateAudioCastRequest(
         sessionId=session_id,
         summary=summary,
@@ -43,6 +46,7 @@ async def generate_audiocast(
         timeout=None,
     )
     response.raise_for_status()
+    doc_watch.unsubscribe()
 
     return cast(GenerateAudiocastDict, response.json())
 

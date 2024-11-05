@@ -126,8 +126,7 @@ class SessionManager(DBManager):
             for doc in doc_snapshot:
                 if doc.exists and doc.id == self.doc_id:
                     data = doc.to_dict()
-                    info = data.get("metadata", {}).get("info")
-                    print(f"Document metadata info: {info}")
+                    info = (data.get("metadata", {}) or {}).get("info")
                     callback(info)
 
         return doc_ref.on_snapshot(on_snapshot)
