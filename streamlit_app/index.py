@@ -22,13 +22,9 @@ async def main():
     session_id = init_session_state()
 
     if st.session_state.content_category:
-        st.sidebar.subheader(
-            f"Content Category: {st.session_state.content_category.capitalize()}"
-        )
+        st.sidebar.subheader(f"Content Category: {st.session_state.content_category.capitalize()}")
     else:
-        st.sidebar.markdown(
-            "> Your preferences and audiocast metadata will appear here"
-        )
+        st.sidebar.markdown("> Your preferences and audiocast metadata will appear here")
 
     # Declare chat interface container
     uichat = st.empty()

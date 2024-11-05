@@ -13,9 +13,7 @@ async def chatui(session_id: str, uichat: DeltaGenerator):
     """
     Chat interface
     """
-    st.write(
-        "Tell me what you'd like to listen to, and I'll create an audiocast for you!"
-    )
+    st.write("Tell me what you'd like to listen to, and I'll create an audiocast for you!")
 
     if st.session_state.messages:
         render_chat_history()

@@ -29,12 +29,17 @@ def display_example_cards():
     # Display example content cards
     col1, col2 = st.columns(2)
     for content_category, example in content_examples.items():
-        with col1 if content_category in [
-            "podcast",
-            "soundbite",
-            "sermon",
-            "audiodrama",
-        ] else col2:
+        with (
+            col1
+            if content_category
+            in [
+                "podcast",
+                "soundbite",
+                "sermon",
+                "audiodrama",
+            ]
+            else col2
+        ):
             if st.button(example, use_container_width=True):
                 st.session_state.messages.append({"role": "user", "content": example})
                 st.session_state.example_prompt = example

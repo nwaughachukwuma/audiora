@@ -1,0 +1,167 @@
+@import 'Inter.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+	.heading {
+		@apply font-semibold text-4xl;
+	}
+	.scrollbar-none::-webkit-scrollbar {
+		display: none;
+		width: 0;
+		background: transparent;
+	}
+	.scrollbar-none {
+		-ms-overflow-style: none;
+		scrollbar-width: none;
+	}
+	.decoration-none {
+		text-decoration: none;
+		&:hover {
+			text-decoration: none;
+		}
+	}
+	span,
+	div,
+	.data-training-status {
+		&[data-training-status] {
+			@apply opacity-80;
+		}
+		&[data-training-status='queued'] {
+			@apply text-blue-500;
+		}
+		&[data-training-status='processing'] {
+			@apply text-yellow-500;
+		}
+		&[data-training-status='completed'] {
+			@apply text-green-500;
+		}
+		&[data-training-status='failed'] {
+			@apply text-red-500;
+		}
+	}
+	.gradient-gray-to-emerald {
+		@apply bg-gradient-to-r from-gray-400 to-emerald-200 bg-clip-text text-transparent;
+	}
+}
+
+@layer base {
+	:root {
+		font-size: 16px;
+		font-family: Inter, Arial, Helvetica, sans-serif;
+		font-weight: 400;
+		font-feature-settings: 'liga', 'ss02';
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+
+		--background: 0 0% 100%;
+		--foreground: 224 71.4% 4.1%;
+
+		--muted: 220 14.3% 95.9%;
+		--muted-foreground: 220 8.9% 46.1%;
+
+		--popover: 0 0% 100%;
+		--popover-foreground: 224 71.4% 4.1%;
+
+		--card: 0 0% 100%;
+		--card-foreground: 224 71.4% 4.1%;
+
+		--border: 220 13% 91%;
+		--input: 220 13% 91%;
+
+		--primary: 220.9 39.3% 11%;
+		--primary-foreground: 210 20% 98%;
+
+		--secondary: 220 14.3% 95.9%;
+		--secondary-foreground: 220.9 39.3% 11%;
+
+		--accent: 220 14.3% 95.9%;
+		--accent-foreground: 220.9 39.3% 11%;
+
+		--destructive: 0 72.2% 50.6%;
+		--destructive-foreground: 210 20% 98%;
+
+		--ring: 224 71.4% 4.1%;
+
+		--radius: 0.5rem;
+	}
+
+	.dark {
+		--background: 224 71.4% 4.1%;
+		--foreground: 210 20% 98%;
+
+		--muted: 215 27.9% 16.9%;
+		--muted-foreground: 217.9 10.6% 64.9%;
+
+		--popover: 224 71.4% 4.1%;
+		--popover-foreground: 210 20% 98%;
+
+		--card: 224 71.4% 4.1%;
+		--card-foreground: 210 20% 98%;
+
+		--border: 215 27.9% 16.9%;
+		--input: 215 27.9% 16.9%;
+
+		--primary: 210 20% 98%;
+		--primary-foreground: 220.9 39.3% 11%;
+
+		--secondary: 215 27.9% 16.9%;
+		--secondary-foreground: 210 20% 98%;
+
+		--accent: 215 27.9% 16.9%;
+		--accent-foreground: 210 20% 98%;
+
+		--destructive: 0 62.8% 30.6%;
+		--destructive-foreground: 210 20% 98%;
+
+		--ring: 216 12.2% 83.9%;
+	}
+
+	* {
+		box-sizing: border-box;
+	}
+
+	body {
+		@apply bg-background text-foreground;
+		margin: 0 auto;
+		max-width: 1600px;
+		box-sizing: border-box;
+	}
+
+	ol,
+	ul {
+		list-style: revert;
+		list-style-type: decimal;
+		list-style-position: inside;
+	}
+
+	a:hover {
+		text-decoration: underline;
+		text-underline-offset: 0.2em;
+		text-decoration-color: #fff;
+	}
+
+	h1 {
+		font-size: 2.5rem;
+	}
+	h2 {
+		font-size: 2rem;
+	}
+	h3 {
+		font-size: 1.75rem;
+	}
+	h4 {
+		font-size: 1.5rem;
+	}
+	h5 {
+		font-size: 1.25rem;
+	}
+	h6 {
+		font-size: 1rem;
+	}
+	p {
+		font-size: 1rem;
+	}
+}

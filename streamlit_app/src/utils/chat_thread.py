@@ -45,16 +45,12 @@ def handle_example_prompt(
     """Handle selected example prompt"""
 
     with st.chat_message("assistant"):
-        response_generator = generate_stream_response(
-            session_id, prompt, content_category
-        )
+        response_generator = generate_stream_response(session_id, prompt, content_category)
         ai_message = st.write_stream(response_generator)
         st.session_state.example_prompt = None
 
         if ai_message:
-            st.session_state.messages.append(
-                {"role": "assistant", "content": ai_message}
-            )
+            st.session_state.messages.append({"role": "assistant", "content": ai_message})
             st.rerun()
         else:
             st.error("Failed to generate AI response. Please try again.")
@@ -77,9 +73,7 @@ def handle_user_prompt(
         ai_message = st.write_stream(response_generator)
 
         if ai_message:
-            st.session_state.messages.append(
-                {"role": "assistant", "content": ai_message}
-            )
+            st.session_state.messages.append({"role": "assistant", "content": ai_message})
 
         return ai_message
 
