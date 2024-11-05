@@ -14,7 +14,6 @@ setup(
         "asyncio",
         "openai",
         "anthropic",
-        "pyperclip",
         "python-multipart",
         "python-slugify",
         "python-dotenv",
