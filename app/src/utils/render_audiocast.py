@@ -1,5 +1,6 @@
-import pyperclip
 import streamlit as st
+
+from src.utils.custom_components import copy_button
 from src.utils.render_audiocast_utils import (
     GenerateAudiocastDict,
     render_audiocast_handler,
@@ -17,19 +18,13 @@ def render_audiocast(session_id: str):
 
     share_url = render_audiocast_handler(session_id, current_audiocast)
 
-    share_col, restart_row = st.columns(2, vertical_alignment="bottom")
+    share_col, restart_row = st.columns(2, vertical_alignment="center")
 
     with share_col:
-        if st.button("Copy Share link", use_container_width=True):
-            pyperclip.copy(share_url)
-            st.session_state.show_copy_success = True
+        copy_button(share_url, "Copy Share Link")
 
     with restart_row:
         # New audiocast button
         if st.button("Generate New Audiocast", use_container_width=True):
             reset_session()
             st.rerun()
-
-    if st.session_state.get("show_copy_success", False):
-        st.session_state.show_copy_succes = False
-        st.success("Share link copied successfully!", icon="✅")

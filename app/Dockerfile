@@ -16,15 +16,14 @@ RUN apt-get -yqq update && apt-get -yqq install \
     pkg-config \
     python3-dev \
     xclip \
-    xsel \
     && rm -rf /var/lib/apt/lists/*
-
+    
 COPY . ./
 # RUN rm -rf ./api
-
+    
 # Install production dependencies.
-RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install pycairo
+RUN pip install --upgrade pip \
+  && pip install --no-cache-dir -r requirements.txt 
 
 ENV HOST '0.0.0.0'
 EXPOSE $PORT

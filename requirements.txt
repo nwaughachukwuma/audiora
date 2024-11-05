@@ -20,7 +20,6 @@ python-dotenv
 ffmpeg-python
 
 pydub
-pyperclip
 seewav
 pycairo
 
