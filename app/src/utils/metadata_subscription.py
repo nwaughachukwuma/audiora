@@ -2,7 +2,7 @@ from queue import Queue
 
 import streamlit as st
 
-from utils_pkg.session_manager import SessionManager
+from shared_utils_pkg.session_manager import SessionManager
 
 
 async def subscribe_to_audio_generation(session_id: str):

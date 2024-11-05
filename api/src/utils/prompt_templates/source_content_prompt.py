@@ -1,4 +1,4 @@
-from utils_pkg.chat_utils import ContentCategory, category_qualifiers
+from shared_utils_pkg.chat_utils import ContentCategory, category_qualifiers
 
 
 def get_content_source_prompt(category: ContentCategory, summary: str):

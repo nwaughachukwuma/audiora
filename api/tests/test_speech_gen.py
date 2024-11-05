@@ -3,8 +3,8 @@ import shutil
 import uuid
 from pathlib import Path
 
-from utils_pkg.audio_manager import AudioManager
-from utils_pkg.audio_synthesizer import AudioSynthesizer
+from src.utils.audio_manager import AudioManager
+from src.utils.audio_synthesizer import AudioSynthesizer
 
 content = """
 <Speaker1>Hello there! Today, we're diving into a personal reflection on justice as explored in Plato's <phoneme alphabet="ipa" ph="rɪˈpʌblɪk">Republic</phoneme>, and how it relates to today's political systems. <break time="0.2s"/> Exciting, right?</Speaker1> 

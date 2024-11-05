@@ -6,7 +6,7 @@ from services.storage import StorageManager
 from src.utils.generate_audiocast import (
     GenerateAudioCastResponse,
 )
-from utils_pkg.session_manager import SessionManager
+from shared_utils_pkg.session_manager import SessionManager
 
 
 def get_audiocast(session_id: str):

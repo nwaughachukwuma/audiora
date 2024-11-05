@@ -4,7 +4,7 @@ import streamlit as st
 from pydub import AudioSegment
 
 from services.storage import BLOB_BASE_URI, StorageManager
-from utils_pkg.waveform_utils import WaveformUtils
+from shared_utils_pkg.waveform_utils import WaveformUtils
 
 
 def render_waveform(session_id: str, audio_path: str, autoplay=False):

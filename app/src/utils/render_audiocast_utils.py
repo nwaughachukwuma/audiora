@@ -7,8 +7,8 @@ import streamlit as st
 
 from env_var import APP_URL, API_URL
 from src.utils.render_waveform import render_waveform
-from utils_pkg.audiocast_utils import GenerateAudioCastRequest, GenerateAudiocastDict
-from utils_pkg.chat_utils import ContentCategory
+from shared_utils_pkg.audiocast_utils import GenerateAudioCastRequest, GenerateAudiocastDict
+from shared_utils_pkg.chat_utils import ContentCategory
 
 
 def navigate_to_home():

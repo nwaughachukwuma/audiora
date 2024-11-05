@@ -2,7 +2,7 @@ import uuid
 from typing import List, Literal, TypedDict, cast
 
 import streamlit as st
-from utils_pkg.chat_utils import ContentCategory
+from shared_utils_pkg.chat_utils import ContentCategory
 
 MessageRole = Literal["user", "assistant", "ai", "human"]
 

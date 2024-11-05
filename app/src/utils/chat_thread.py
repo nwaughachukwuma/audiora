@@ -7,7 +7,7 @@ from src.utils.render_audiocast_utils import generate_audiocast
 from src.utils.session_state import reset_session
 
 from env_var import API_URL
-from utils_pkg.chat_utils import (
+from shared_utils_pkg.chat_utils import (
     ContentCategory,
     SessionChatMessage,
     SessionChatRequest,

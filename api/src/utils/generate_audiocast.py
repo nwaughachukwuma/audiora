@@ -3,19 +3,17 @@ from datetime import datetime
 from fastapi import BackgroundTasks, HTTPException
 
 from services.storage import StorageManager
-from src.utils.audiocast_request import AudioScriptMaker, generate_source_content
-from utils_pkg.audio_manager import AudioManager, AudioManagerConfig
-from utils_pkg.audiocast_utils import (
+from shared_utils_pkg.audiocast_utils import (
     GenerateAudioCastRequest,
     GenerateAudioCastResponse,
 )
-from utils_pkg.session_manager import SessionManager
-from utils_pkg.waveform_utils import WaveformUtils
+from shared_utils_pkg.session_manager import SessionManager
+from shared_utils_pkg.waveform_utils import WaveformUtils
+from src.utils.audio_manager import AudioManager, AudioManagerConfig
+from src.utils.audiocast_request import AudioScriptMaker, generate_source_content
 
 
-async def generate_audiocast(
-    request: GenerateAudioCastRequest, background_tasks: BackgroundTasks
-):
+async def generate_audiocast(request: GenerateAudioCastRequest, background_tasks: BackgroundTasks):
     """## Generate audiocast based on a summary of user's request
 
     ### Steps:
@@ -50,9 +48,9 @@ async def generate_audiocast(
 
     # Generate audio
     update_session_info("Generating audio...")
-    audio_path = await AudioManager(
-        custom_config=AudioManagerConfig(tts_provider="elevenlabs")
-    ).generate_speech(audio_script)
+    audio_path = await AudioManager(custom_config=AudioManagerConfig(tts_provider="elevenlabs")).generate_speech(
+        audio_script
+    )
 
     def _run_on_background():
         try:

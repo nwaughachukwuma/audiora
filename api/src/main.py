@@ -12,11 +12,11 @@ from src.utils.generate_audiocast import (
     generate_audiocast,
 )
 from src.utils.get_audiocast import get_audiocast
-from utils_pkg.chat_utils import (
+from shared_utils_pkg.chat_utils import (
     SessionChatMessage,
     SessionChatRequest,
 )
-from utils_pkg.session_manager import SessionManager
+from shared_utils_pkg.session_manager import SessionManager
 
 app = FastAPI(title="Audiora", version="1.0.0")
 

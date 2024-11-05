@@ -8,7 +8,7 @@ from services.firestore_sdk import (
     arrayUnion,
     collections,
 )
-from utils_pkg.chat_utils import SessionChatMessage
+from shared_utils_pkg.chat_utils import SessionChatMessage
 
 
 @dataclass

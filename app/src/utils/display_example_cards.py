@@ -1,6 +1,6 @@
 import streamlit as st
 
-from utils_pkg.chat_utils import content_examples
+from shared_utils_pkg.chat_utils import content_examples
 
 
 def display_example_cards():
