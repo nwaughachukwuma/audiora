@@ -1,6 +1,6 @@
 import streamlit as st
 
-from src.utils.copy_to_clipboard import copy_button
+from src.utils.custom_components import copy_button
 from src.utils.render_audiocast_utils import (
     GenerateAudiocastDict,
     render_audiocast_handler,

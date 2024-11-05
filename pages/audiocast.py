@@ -3,7 +3,7 @@ from typing import cast
 
 import streamlit as st
 
-from src.utils.copy_to_clipboard import copy_button
+from src.utils.custom_components import copy_button
 from src.utils.main_utils import get_audiocast
 from src.utils.render_audiocast_utils import (
     GenerateAudiocastDict,
@@ -37,7 +37,7 @@ async def render_audiocast_page():
             share_col, restart_row = st.columns(2, vertical_alignment="center")
             with share_col:
                 copy_button(share_url, "Copy Share Link")
-                
+
             with restart_row:
                 if st.button("Create your Audiocast", use_container_width=True):
                     navigate_to_home()
