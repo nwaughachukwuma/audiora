@@ -1,9 +1,9 @@
 import asyncio
 from typing import cast
 
-import pyperclip
 import streamlit as st
 
+from src.utils.custom_components import copy_button
 from src.utils.main_utils import get_audiocast
 from src.utils.render_audiocast_utils import (
     GenerateAudiocastDict,
@@ -34,20 +34,13 @@ async def render_audiocast_page():
 
             share_url = render_audiocast_handler(session_id, audiocast)
 
-            share_col, restart_row = st.columns(2, vertical_alignment="bottom")
-
+            share_col, restart_row = st.columns(2, vertical_alignment="center")
             with share_col:
-                if st.button("Copy Share link", use_container_width=True):
-                    pyperclip.copy(share_url)
-                    st.session_state.show_copy_success = True
+                copy_button(share_url, "Copy Share Link")
 
             with restart_row:
                 if st.button("Create your Audiocast", use_container_width=True):
                     navigate_to_home()
-
-            if st.session_state.get("show_copy_success", False):
-                st.session_state.show_copy_succes = False
-                st.success("Share link copied successfully!", icon="✅")
 
         except Exception as e:
             st.error(f"Error loading audiocast: {str(e)}")
