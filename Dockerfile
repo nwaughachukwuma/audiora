@@ -19,15 +19,13 @@ RUN apt-get -yqq update && apt-get -yqq install \
     xsel \
     && rm -rf /var/lib/apt/lists/*
     
-RUN xclip -version
-RUN xsel --version
-    
 COPY . ./
     
 # Install production dependencies.
 RUN pip install --upgrade pip \
-  && pip install --no-cache-dir -r requirements.txt \
-  && pip install PyQt5
+  && pip install --no-cache-dir -r requirements.txt 
+  
+# \ && pip install PyQt5
 
 ENV DISPLAY=:0
 RUN python3 -c "import pyperclip; pyperclip.copy('test'); print(pyperclip.paste())"
