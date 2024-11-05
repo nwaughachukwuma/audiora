@@ -11,9 +11,7 @@ TTSProvider = Literal["openai", "elevenlabs"]
 OpenaiVoice = Literal["onyx", "shimmer", "echo", "nova", "alloy"]
 openai_voices: List[OpenaiVoice] = ["onyx", "shimmer", "echo", "nova", "alloy"]
 
-ElevenLabsVoice = Literal[
-    "Adam", "Sarah", "Laura", "Charlie", "George", "Charlotte", "Liam"
-]
+ElevenLabsVoice = Literal["Adam", "Sarah", "Laura", "Charlie", "George", "Charlotte", "Liam"]
 elevenlabs_voices: List[ElevenLabsVoice] = [
     "Adam",
     "Sarah",
@@ -72,9 +70,7 @@ class GenerateSpeech:
         if job.voice not in openai_voices:
             raise ValueError("Wrong voice specification for openai tts")
 
-        response = get_openai().audio.speech.create(
-            input=job.content, model="tts-1-hd", voice=job.voice
-        )
+        response = get_openai().audio.speech.create(input=job.content, model="tts-1-hd", voice=job.voice)
         return response.content
 
     @process_time()

@@ -8,7 +8,7 @@ from itertools import cycle, islice
 from pathlib import Path
 from typing import Any, List, Optional, Tuple
 
-from utils_pkg.generate_speech_utils import (
+from src.utils.generate_speech_utils import (
     ElevenLabsVoice,
     GenerateSpeech,
     OpenaiVoice,
@@ -67,16 +67,9 @@ class AudioManagerSpeechGenerator:
 
         return jobs
 
-    async def _process_speech_jobs(
-        self, jobs: List[SpeechJob], provider: TTSProvider
-    ) -> List[str]:
+    async def _process_speech_jobs(self, jobs: List[SpeechJob], provider: TTSProvider) -> List[str]:
         loop = asyncio.get_event_loop()
-        tasks = [
-            loop.run_in_executor(
-                self.executor, partial(GenerateSpeech(provider).run, job)
-            )
-            for job in jobs
-        ]
+        tasks = [loop.run_in_executor(self.executor, partial(GenerateSpeech(provider).run, job)) for job in jobs]
 
         results = await asyncio.gather(*tasks)
         audio_files = [f for f in results if f and os.path.exists(f)]
@@ -98,10 +91,7 @@ class ContentSplitter:
 
         # Regular expression pattern to match Tag0, Tag1, ..., TagN speaker dialogues
         matches = re.findall(r"<(Speaker\d+)>(.*?)</Speaker\d+>", content, re.DOTALL)
-        return [
-            (str(speaker), " ".join(content_part.split()).strip())
-            for speaker, content_part in matches
-        ]
+        return [(str(speaker), " ".join(content_part.split()).strip()) for speaker, content_part in matches]
 
     @staticmethod
     def validate_content(content: str, tags: List[str]) -> bool:
@@ -118,10 +108,7 @@ class ContentSplitter:
             opening_count = content.count(f"<{tag}>")
             closing_count = content.count(f"</{tag}>")
             if opening_count != closing_count:
-                print(
-                    f"Mismatched tags for {tag}: "
-                    f"{opening_count} opening, {closing_count} closing"
-                )
+                print(f"Mismatched tags for {tag}: " f"{opening_count} opening, {closing_count} closing")
                 return False
 
             if opening_count == 0:

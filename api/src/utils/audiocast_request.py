@@ -4,10 +4,10 @@ from typing import Literal
 from services.anthropic_client import get_anthropic_sync
 from services.gemini_client import GeminiConfig, generate_content
 from services.openai_client import get_openai
+from src.utils.prompt_templates.source_content_prompt import get_content_source_prompt
+from src.utils.prompt_templates.streamline_audio import streamline_audio_script_prompt
+from src.utils.prompt_templates.tts_prompt import Metadata, TTSPromptMaker
 from utils_pkg.chat_utils import ContentCategory
-from utils_pkg.prompt_templates.source_content_prompt import get_content_source_prompt
-from utils_pkg.prompt_templates.streamline_audio import streamline_audio_script_prompt
-from utils_pkg.prompt_templates.tts_prompt import Metadata, TTSPromptMaker
 
 
 def generate_source_content(category: ContentCategory, summary: str):
@@ -20,9 +20,7 @@ def generate_source_content(category: ContentCategory, summary: str):
     Returns:
         str: The audiocast source content
     """
-    refined_summary = re.sub(
-        "You want", "a user who wants", summary, flags=re.IGNORECASE
-    )
+    refined_summary = re.sub("You want", "a user who wants", summary, flags=re.IGNORECASE)
     refined_summary = re.sub("You", "a user", refined_summary, flags=re.IGNORECASE)
 
     response = get_openai().chat.completions.create(
@@ -71,11 +69,7 @@ class AudioScriptMaker:
         prompt_maker = TTSPromptMaker(self.category, Metadata())
         system_prompt = prompt_maker.get_system_prompt(self.source_content)
 
-        audio_script = (
-            self.__use_openai(system_prompt)
-            if provider == "openai"
-            else self.__use_anthropic(system_prompt)
-        )
+        audio_script = self.__use_openai(system_prompt) if provider == "openai" else self.__use_anthropic(system_prompt)
 
         print(f"Audio script generated successfully: {audio_script}")
         if not audio_script:
@@ -83,9 +77,7 @@ class AudioScriptMaker:
 
         print("Streamlining the  audio script...")
 
-        streamlined_script = self.streamline_audio_script(
-            instruction=system_prompt, audio_script=audio_script
-        )
+        streamlined_script = self.streamline_audio_script(instruction=system_prompt, audio_script=audio_script)
 
         return str(streamlined_script)
 
@@ -132,9 +124,7 @@ class AudioScriptMaker:
             str: The streamlined audio script
         """
         response = generate_content(
-            prompt=[
-                "Now streamline the audio script to match the specified TTS requirements."
-            ],
+            prompt=["Now streamline the audio script to match the specified TTS requirements."],
             config=GeminiConfig(
                 model_name="gemini-1.5-flash-002",
                 system_prompt=streamline_audio_script_prompt(instruction, audio_script),

@@ -6,14 +6,14 @@ import uuid
 from pathlib import Path
 from typing import List, Optional, Tuple
 
-from utils_pkg.audio_manager_utils import (
+from src.utils.audio_manager_utils import (
     AudioManagerConfig,
     AudioManagerSpeechGenerator,
     ContentSplitter,
 )
-from utils_pkg.audio_synthesizer import AudioSynthesizer
-from utils_pkg.clean_tss_markup import clean_tss_markup
-from utils_pkg.generate_speech_utils import elevenlabs_voices, openai_voices
+from src.utils.audio_synthesizer import AudioSynthesizer
+from src.utils.clean_tss_markup import clean_tss_markup
+from src.utils.generate_speech_utils import elevenlabs_voices, openai_voices
 
 logger = logging.getLogger(__name__)
 
@@ -22,11 +22,7 @@ class AudioManager(AudioManagerSpeechGenerator, ContentSplitter):
     def __init__(self, custom_config: Optional[AudioManagerConfig] = None):
         super().__init__()
 
-        self.config = (
-            AudioManagerConfig(**custom_config.__dict__)
-            if custom_config
-            else AudioManagerConfig()
-        )
+        self.config = AudioManagerConfig(**custom_config.__dict__) if custom_config else AudioManagerConfig()
         self.config.ensure_directories()
 
     def _get_tags(self, audio_script: str) -> List[str]:
@@ -72,34 +68,22 @@ class AudioManager(AudioManagerSpeechGenerator, ContentSplitter):
         await self.__finalize(audio_files, output_file)
         logger.info(f"Audio saved to {output_file}")
 
-    async def __text_to_speech_openai(
-        self, nway_content: List[Tuple[str, str]], tags: List[str]
-    ) -> List[str]:
+    async def __text_to_speech_openai(self, nway_content: List[Tuple[str, str]], tags: List[str]) -> List[str]:
         try:
-            jobs = self._prepare_speech_jobs(
-                nway_content, tags, openai_voices, self.config.temp_audio_dir
-            )
+            jobs = self._prepare_speech_jobs(nway_content, tags, openai_voices, self.config.temp_audio_dir)
 
             return await self._process_speech_jobs(jobs, provider="openai")
         except Exception as e:
             raise Exception(f"Error converting text to speech with OpenAI: {str(e)}")
 
-    async def __text_to_speech_elevenlabs(
-        self, nway_content: List[Tuple[str, str]], tags: List[str]
-    ) -> List[str]:
+    async def __text_to_speech_elevenlabs(self, nway_content: List[Tuple[str, str]], tags: List[str]) -> List[str]:
         try:
-            jobs = self._prepare_speech_jobs(
-                nway_content, tags, elevenlabs_voices, self.config.temp_audio_dir
-            )
+            jobs = self._prepare_speech_jobs(nway_content, tags, elevenlabs_voices, self.config.temp_audio_dir)
             return await self._process_speech_jobs(jobs, provider="elevenlabs")
         except Exception as e:
-            raise Exception(
-                f"Error converting text to speech with Elevenlabs: {str(e)}"
-            )
+            raise Exception(f"Error converting text to speech with Elevenlabs: {str(e)}")
 
-    async def __finalize(
-        self, audio_files: List[str], output_file: str, enhance_audio=False
-    ) -> None:
+    async def __finalize(self, audio_files: List[str], output_file: str, enhance_audio=False) -> None:
         """
         Merge and enhance audio files and save the final output.
         - Run audio processing in thread pool to avoid blocking
@@ -111,9 +95,7 @@ class AudioManager(AudioManagerSpeechGenerator, ContentSplitter):
             synthesizer = AudioSynthesizer()
             await asyncio.get_event_loop().run_in_executor(
                 self.executor,
-                lambda: synthesizer.merge_audio_files(
-                    self.config.temp_audio_dir, output_file
-                ),
+                lambda: synthesizer.merge_audio_files(self.config.temp_audio_dir, output_file),
             )
             if enhance_audio:
                 await asyncio.get_event_loop().run_in_executor(
