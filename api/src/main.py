@@ -5,13 +5,13 @@ from fastapi import BackgroundTasks, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_utilities import add_timer_middleware
 
+from src.utils.chat_request import chat_request
 from src.utils.generate_audiocast import (
     GenerateAudioCastRequest,
     GenerateAudioCastResponse,
     generate_audiocast,
 )
 from src.utils.get_audiocast import get_audiocast
-from utils_pkg.chat_request import chat_request
 from utils_pkg.chat_utils import (
     SessionChatMessage,
     SessionChatRequest,
@@ -54,9 +54,7 @@ async def root():
 
 
 @app.post("/chat/{session_id}", response_model=Generator[str, Any, None])
-async def chat_endpoint(
-    session_id: str, request: SessionChatRequest, background_tasks: BackgroundTasks
-):
+async def chat_endpoint(session_id: str, request: SessionChatRequest, background_tasks: BackgroundTasks):
     content_category = request.content_category
     db = SessionManager(session_id)
     db._add_chat(request.message)

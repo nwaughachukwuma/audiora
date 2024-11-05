@@ -57,3 +57,4 @@ def chat_request(
             on_finish(text)
 
     return generator()
+
