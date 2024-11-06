@@ -28,5 +28,3 @@ init_shared_packages(["services", "utils_pkg"])
 
 def print_project_meta():
     print(f"Project root: {project_root}")
-    print(f"Python version: {sys.version}")
-    print(f"Current working directory: {os.getcwd()}")
