@@ -10,3 +10,7 @@ __pycache__
 reference_code
 
 keys/
+
+node_modules/
+
+.DS_Store
