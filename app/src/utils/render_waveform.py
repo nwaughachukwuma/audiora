@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 import streamlit as st
 from pydub import AudioSegment
@@ -7,8 +8,8 @@ from services.storage import BLOB_BASE_URI, StorageManager
 from shared_utils_pkg.waveform_utils import WaveformUtils
 
 
-def render_waveform(session_id: str, audio_path: str, autoplay=False):
-    """Render waveform visualization from audio file."""
+def load_waveform_video(session_id: str, audio_path: str):
+    """Load waveform visualization from audio file."""
     waveform_utils = WaveformUtils(session_id, audio_path)
     tmp_vid_path = waveform_utils.get_tmp_video_path()
 
@@ -32,13 +33,20 @@ def render_waveform(session_id: str, audio_path: str, autoplay=False):
                 video_path = waveform_utils.generate_waveform_video(tmp_vid_path)
                 waveform_utils.save_waveform_video_to_gcs(str(video_path))
 
-        with open(video_path, "rb") as video_file:
-            video_bytes = video_file.read()
-            st.video(video_bytes, autoplay=autoplay)
-
-        download_waveform_video(str(video_path))
+        if not st.session_state.get("waveform_video_path"):
+            st.session_state.waveform_video_path = video_path
+            st.rerun()
     except Exception as e:
         st.error(f"Error generating visualization: {str(e)}")
+
+
+def render_waveform(video_path: Path | str, autoplay=False):
+    """Render waveform visualization from path"""
+    with open(video_path, "rb") as video_file:
+        video_bytes = video_file.read()
+        st.video(video_bytes, autoplay=autoplay)
+
+    download_waveform_video(str(video_path))
 
 
 def download_waveform_video(video_path: str):

@@ -19,4 +19,4 @@ async def audioui(session_id: str, uichat: DeltaGenerator):
         await use_audiocast_request(session_id, summary, content_category)
     else:
         st.info("Audiocast generation completed!")
-        render_audiocast(session_id)
+        await render_audiocast(session_id)
