@@ -57,8 +57,8 @@ def render_audiocast_handler(session_id: str, audiocast: GenerateAudiocastDict):
     st.audio(audiocast["url"])
 
     # Voice waveform
-    waveform_video_path: Path | str = st.session_state.get("waveform_video_path", False)
     with st.expander("Show Audio Waveform"):
+        waveform_video_path: Path | str = st.session_state.get("waveform_video_path", False)
         if waveform_video_path:
             render_waveform(waveform_video_path)
         else:
