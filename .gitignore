@@ -7,8 +7,6 @@ __pycache__
 .env.*
 !.env.example
 
-reference_code
-
 keys/
 .ruff_cache/
 
