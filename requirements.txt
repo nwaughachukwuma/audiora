@@ -1,4 +1,10 @@
+fastapi
 pydantic
+fastapi-utilities
+
+uvicorn
+gunicorn
+uvloop
 
 streamlit
 httpx
@@ -23,5 +29,6 @@ google-cloud-storage
 google-api-python-client
 google-generativeai
 
-watchdog
 ruff
+watchdog
+setuptools

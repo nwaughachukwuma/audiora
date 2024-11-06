@@ -44,6 +44,7 @@ ANTHROPIC_API_KEY="your-anthropic-api-key"
 GEMINI_API_KEY="your-gemini-api-key"
 ELEVENLABS_API_KEY="your-elevenlabs-api-key"
 APP_URL="http://localhost:8080"
+API_URL="http://localhost:8585"
 ```
 
 4. Launch the application:
