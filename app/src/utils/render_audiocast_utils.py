@@ -5,7 +5,6 @@ from typing import cast
 
 import httpx
 import streamlit as st
-from src.utils.metadata_subscription import subscribe_to_audio_generation
 from src.utils.render_waveform import load_waveform_video, render_waveform
 
 from env_var import API_URL, APP_URL
@@ -34,8 +33,6 @@ async def generate_audiocast(
     summary: str,
     content_category: ContentCategory,
 ):
-    doc_watch = subscribe_to_audio_generation(session_id)
-
     audiocast_req = GenerateAudioCastRequest(
         sessionId=session_id,
         summary=summary,
@@ -47,8 +44,6 @@ async def generate_audiocast(
         timeout=None,
     )
     response.raise_for_status()
-    doc_watch.unsubscribe()
-
     return cast(GenerateAudiocastDict, response.json())
 
 

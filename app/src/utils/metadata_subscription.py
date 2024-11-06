@@ -1,29 +1,34 @@
-from queue import Queue
+import asyncio
 
 import streamlit as st
 
 from shared_utils_pkg.session_manager import SessionManager
 
 
-def subscribe_to_audio_generation(session_id: str):
-    """Subscribe to audio generation metadata"""
-    q = Queue()
+class SubscribeToAudioGeneration:
+    def __init__(self, session_id: str):
+        self.session_id = session_id
+        self.info: str | None = None
 
-    def handler(info: str | None):
-        if info:
-            q.put(info, block=False)
+    def create(self):
+        """Subscribe to audio generation metadata"""
 
-    db = SessionManager(session_id)
-    doc_watch = db.subscribe_to_metadata_info(handler)
+        def __handler(info: str):
+            self.info = info
 
-    with st.empty():
-        while True:
-            try:
-                info = q.get(timeout=2)
-                if not info:
-                    break
-                st.info(info)
-            except Exception:
-                break
+        db = SessionManager(self.session_id)
+        return db.subscribe_to_metadata_info(__handler)
 
-    return doc_watch
+    async def _update_ui(self, read_timeout=10):
+        """Update the UI with the current info attribute value."""
+        timeout = 0
+        container = st.empty()
+
+        with container:
+            while read_timeout > timeout:
+                if self.info:
+                    container.info(self.info)
+                await asyncio.sleep(1)
+                timeout += 1
+
+        container.empty()
