@@ -9,7 +9,5 @@ __pycache__
 
 keys/
 .ruff_cache/
-
 node_modules/
-
 .DS_Store
