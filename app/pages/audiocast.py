@@ -32,7 +32,7 @@ async def render_audiocast_page():
             if audiocast["created_at"]:
                 st.markdown(f"> Created: {audiocast["created_at"]}")
 
-            share_url = render_audiocast_handler(session_id, audiocast)
+            share_url, finalize_task = render_audiocast_handler(session_id, audiocast)
 
             share_col, restart_row = st.columns(2, vertical_alignment="center")
             with share_col:
@@ -42,6 +42,7 @@ async def render_audiocast_page():
                 if st.button("Create your Audiocast", use_container_width=True):
                     navigate_to_home()
 
+            await finalize_task
         except Exception as e:
             st.error(f"Error loading audiocast: {str(e)}")
     else:

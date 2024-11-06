@@ -1,11 +1,11 @@
+import asyncio
 import re
 from pathlib import Path
 from typing import cast
 
 import httpx
 import streamlit as st
-from src.utils.metadata_subscription import subscribe_to_audio_generation
-from src.utils.render_waveform import render_waveform
+from src.utils.render_waveform import load_waveform_video, render_waveform
 
 from env_var import API_URL, APP_URL
 from shared_utils_pkg.audiocast_utils import GenerateAudioCastRequest, GenerateAudiocastDict
@@ -33,8 +33,6 @@ async def generate_audiocast(
     summary: str,
     content_category: ContentCategory,
 ):
-    doc_watch = subscribe_to_audio_generation(session_id)
-
     audiocast_req = GenerateAudioCastRequest(
         sessionId=session_id,
         summary=summary,
@@ -46,8 +44,6 @@ async def generate_audiocast(
         timeout=None,
     )
     response.raise_for_status()
-    doc_watch.unsubscribe()
-
     return cast(GenerateAudiocastDict, response.json())
 
 
@@ -57,10 +53,11 @@ def render_audiocast_handler(session_id: str, audiocast: GenerateAudiocastDict):
 
     # Voice waveform
     with st.expander("Show Audio Waveform"):
-        try:
-            render_waveform(session_id, audiocast["url"], False)
-        except Exception as e:
-            st.error(f"Error rendering waveform: {str(e)}")
+        waveform_video_path: Path | str = st.session_state.get("waveform_video_path", False)
+        if waveform_video_path:
+            render_waveform(waveform_video_path)
+        else:
+            st.info("Loading waveform video...")
 
     # Transcript
     with st.expander("Show Transcript"):
@@ -75,4 +72,11 @@ def render_audiocast_handler(session_id: str, audiocast: GenerateAudiocastDict):
     share_url = f"{APP_URL}/audiocast?session_id={session_id}"
     st.text_input("Share this audiocast:", share_url)
 
-    return share_url
+    async def finalize():
+        try:
+            load_waveform_video(session_id, audiocast["url"])
+        except Exception as e:
+            st.error(f"Error rendering waveform: {str(e)}")
+
+    finalize_task = asyncio.create_task(finalize())
+    return share_url, finalize_task
