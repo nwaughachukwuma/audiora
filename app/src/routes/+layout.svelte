@@ -1,13 +1,12 @@
 <script lang="ts" context="module">
 	import '../app.css';
-	import { page } from '$app/stores';
-	// import { browser } from '$app/environment';
-	// import { goto } from '$app/navigation';
-	// import { sessionStore } from '$lib/stores/session';
-	// import ChatInterface from '$lib/components/ChatInterface.svelte';
-	// import AudioInterface from '$lib/components/AudioInterface.svelte';
+</script>
 
-	// $: userSpecification = $sessionStore.userSpecification;
+<script>
+	import { page } from '$app/stores';
+	import { setChatSession } from '$lib/stores/chatStore.svelte';
+	export let data;
+	$: setChatSession(data.sessionId);
 </script>
 
 <svelte:head>
@@ -21,9 +20,10 @@
 		</div>
 
 		<div class="pt-2">
-			{#if $page.data.contentCategory}
-				<h3 class="mt-4 text-lg font-semibold">Content Category:</h3>
-				<p class="capitalize">{$page.data.contentCategory}</p>
+			{#if $page.data.category}
+				<h3 class="mt-4 text-lg font-medium capitalize">
+					Content Category: {$page.data.category}
+				</h3>
 			{:else}
 				<p class="mt-4 text-muted-foreground">
 					Your preferences and audiocast metadata will appear here

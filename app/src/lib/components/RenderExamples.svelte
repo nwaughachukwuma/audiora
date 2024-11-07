@@ -1,13 +1,5 @@
 <script lang="ts" context="module">
-	export type ContentCategory =
-		| 'podcast'
-		| 'sermon'
-		| 'audiodrama'
-		| 'lecture'
-		| 'commentary'
-		| 'voicenote'
-		| 'interview'
-		| 'soundbite';
+	import type { ContentCategory } from '@/utils/types';
 
 	export const content_examples: Record<ContentCategory, string> = {
 		podcast:
