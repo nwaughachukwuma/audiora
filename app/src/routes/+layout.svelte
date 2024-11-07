@@ -15,7 +15,7 @@
 </svelte:head>
 
 <div class="min-h-screen bg-background flex gap-x-2">
-	<aside class="shrink-0 h-screen pt-10 w-64 bg-gray-900 p-4">
+	<aside class="shrink-0 h-screen pt-10 w-96 bg-gray-900 p-4 px-8">
 		<div class="text-sm text-muted-foreground p-3 rounded-lg bg-gray-700">
 			A VeedoAI project. (c) 2024
 		</div>
@@ -32,7 +32,7 @@
 		</div>
 	</aside>
 
-	<main class="container mx-auto px-6 pt-10 md:px-10">
+	<main class="container p-0 pt-10">
 		<slot />
 	</main>
 </div>
