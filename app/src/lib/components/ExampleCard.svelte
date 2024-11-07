@@ -5,10 +5,9 @@
 
 <a
 	{href}
-	class="border no-underline hover:no-underline rounded-md group border-gray-600 p-6 bg-gray-900 hover:bg-gray-800"
-	style="height: 125px;"
+	class="border no-underline hover:no-underline rounded-md group border-gray-600 p-4 bg-gray-900 hover:bg-gray-800"
 >
-	<span class="text-lg">
+	<span class="text-sm">
 		{content}
 	</span>
 </a>

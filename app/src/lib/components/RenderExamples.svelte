@@ -22,15 +22,18 @@
 	};
 </script>
 
-<script>
+<script lang="ts">
 	import ExampleCard from './ExampleCard.svelte';
+	export let sessionId: string;
 </script>
 
-<div class="w-full h-full block">
-	<p class="font-medium text-xl mb-3">You can start with one of the following</p>
-	<div class="grid grid-cols-2 gap-4 pb-4">
+<div class="w-full h-full block mt-16">
+	<div class="w-4/5 mb-10">
+		<h3 class="text-3xl">You can start with one of the following</h3>
+	</div>
+	<div class="grid grid-cols-3 gap-4 pb-4">
 		{#each Object.entries(content_examples) as [category, content]}
-			<ExampleCard {content} href="/" />
+			<ExampleCard {content} href="/{sessionId}?category={category}" />
 		{/each}
 	</div>
 </div>

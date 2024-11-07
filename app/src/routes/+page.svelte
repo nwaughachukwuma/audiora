@@ -7,6 +7,10 @@
 	// import AudioInterface from '$lib/components/AudioInterface.svelte';
 	// $: userSpecification = $sessionStore.userSpecification;
 	import RenderExamples from '@/components/RenderExamples.svelte';
+
+	export let data;
+
+	$: sessionId = data.sessionId;
 </script>
 
 <svelte:head>
@@ -14,22 +18,16 @@
 </svelte:head>
 
 <div class="relative overflow-hidden w-full flex flex-col h-full">
-	<div class="overflow-auto px-10 w-full block h-[calc(80%-2.5rem)]">
-		<div class="flex flex-col gap-y-4">
+	<div class="overflow-auto px-10 w-full block h-[calc(85%-2.5rem)]">
+		<div class="flex flex-col gap-y-2">
 			<h1 class="text-5xl font-bold">🎧 Audiora</h1>
-			<h2 class="text-3xl">Listen to anything, anytime, leveraging AI</h2>
+			<h2 class="text-lg">Listen to anything, anytime.</h2>
 		</div>
 
-		<h3 class="text-lg mt-6">
-			Tell me what you'd like to listen to, and I'll create an audiocast for you!
-		</h3>
-
-		<RenderExamples />
+		<RenderExamples {sessionId} />
 	</div>
 
-	<div class="h-[calc(16%)] fixed w-[calc(100%-24.5rem)] bottom-0 shrink-0 border">
-		Chat Input Section
-	</div>
+	<div class="h-[16%] fixed w-[calc(100%-24.5rem)] bottom-0 shrink-0">Chat Input Section</div>
 	<!-- {#if !userSpecification}
 	  <ChatInterface />
 	{:else}
