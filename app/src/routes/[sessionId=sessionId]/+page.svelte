@@ -7,14 +7,16 @@
 	$: sessionId = data.sessionId;
 
 	let searchTerm = '';
+
+	function handleSearch() {
+		if (searchTerm) {
+			console.log(searchTerm);
+		}
+	}
 </script>
 
-<ChatContainer>
+<ChatContainer on:click={handleSearch} on:keypress={handleSearch}>
 	<div slot="content">
 		{sessionId}: {category}
-	</div>
-
-	<div slot="chat_box">
-		<ChatBox bind:searchTerm placeholder="What would you like to listen to?" />
 	</div>
 </ChatContainer>
