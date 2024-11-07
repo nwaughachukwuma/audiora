@@ -1,7 +1,7 @@
 <script lang="ts">
-	import { browser } from '$app/environment';
-	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
+	// import { browser } from '$app/environment';
+	// import { goto } from '$app/navigation';
+	// import { page } from '$app/stores';
 	// import { sessionStore } from '$lib/stores/session';
 	// import ChatInterface from '$lib/components/ChatInterface.svelte';
 	// import AudioInterface from '$lib/components/AudioInterface.svelte';
