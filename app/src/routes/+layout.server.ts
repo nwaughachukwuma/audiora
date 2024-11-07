@@ -1,10 +1,9 @@
-import { uuid } from '$lib/utils/uuid';
 import type { LayoutServerLoad } from './$types';
 
 export const ssr = true;
 export const prerender = false;
-export const load: LayoutServerLoad = () => {
+export const load: LayoutServerLoad = ({ locals }) => {
 	return {
-		sessionId: uuid()
+		sessionId: locals.sessionId
 	};
 };
