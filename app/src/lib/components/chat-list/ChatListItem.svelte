@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { UserIcon, BotIcon } from 'lucide-svelte';
-	import Spinner from '../Spinner.svelte';
 	import cs from 'clsx';
+	import { parse } from 'marked';
 
 	export let type: 'user' | 'assistant';
 	export let content: string;
@@ -27,11 +27,13 @@
 		{/if}
 	</div>
 
-	<div class="max-w-full items-center break-words text-gray-200 flex text-base">
+	<div class="max-w-full justify-center break-words text-gray-200 flex flex-col text-base">
 		{#if loading}
 			<span class="animate-pulse">Generating response...</span>
 		{:else}
-			{content}
+			{#await parse(content) then parsedContent}
+				{@html parsedContent}
+			{/await}
 		{/if}
 	</div>
 </div>

@@ -7,7 +7,9 @@
 	export let showIcon = false;
 </script>
 
-<div class="fixed bg-background bottom-0 block w-full max-w-full py-4 sm:max-w-xl lg:max-w-3xl">
+<div
+	class="fixed bg-background bottom-0 block w-full max-w-full max-sm:px-2 py-4 sm:max-w-xl lg:max-w-3xl"
+>
 	<div class="block w-full items-center">
 		<ChatBox {showIcon} disabled={loading} bind:searchTerm on:keypress>
 			<svelte:fragment slot="icon-right" let:disabled>

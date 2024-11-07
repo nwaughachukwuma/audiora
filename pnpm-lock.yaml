@@ -40,6 +40,9 @@ importers:
       lucide-svelte:
         specifier: ^0.424.0
         version: 0.424.0(svelte@4.2.19)
+      marked:
+        specifier: ^14.1.4
+        version: 14.1.4
       mode-watcher:
         specifier: ^0.4.1
         version: 0.4.1(svelte@4.2.19)
@@ -1817,6 +1820,11 @@ packages:
 
   magic-string@0.30.12:
     resolution: {integrity: sha512-Ea8I3sQMVXr8JhN4z+H/d8zwo+tYDgHE9+5G4Wnrwhs0gaK9fXTKx0Tw5Xwsd/bCPTTZNRAdpyzvoeORe9LYpw==}
+
+  marked@14.1.4:
+    resolution: {integrity: sha512-vkVZ8ONmUdPnjCKc5uTRvmkRbx4EAi2OkTOXmfTDhZz3OFqMNBM1oTTWwTr4HY4uAEojhzPf+Fy8F1DWa3Sndg==}
+    engines: {node: '>= 18'}
+    hasBin: true
 
   mdn-data@2.0.30:
     resolution: {integrity: sha512-GaqWWShW4kv/G9IEucWScBx9G1/vsFZZJUO+tD26M8J8z3Kw5RDQjaoZe03YAClgeS/SWPOcb4nkFBTEi5DUEA==}
@@ -4536,6 +4544,8 @@ snapshots:
   magic-string@0.30.12:
     dependencies:
       '@jridgewell/sourcemap-codec': 1.5.0
+
+  marked@14.1.4: {}
 
   mdn-data@2.0.30: {}
 
