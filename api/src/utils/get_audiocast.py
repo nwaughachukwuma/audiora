@@ -1,12 +1,12 @@
 from datetime import datetime
 
 from fastapi import HTTPException
-
 from services.storage import StorageManager
+from utils.session_manager import SessionManager
+
 from src.utils.generate_audiocast import (
     GenerateAudioCastResponse,
 )
-from shared_utils_pkg.session_manager import SessionManager
 
 
 def get_audiocast(session_id: str):
@@ -29,9 +29,7 @@ def get_audiocast(session_id: str):
 
     created_at = None
     if session_data.created_at:
-        created_at = datetime.fromisoformat(session_data.created_at).strftime(
-            "%Y-%m-%d %H:%M"
-        )
+        created_at = datetime.fromisoformat(session_data.created_at).strftime("%Y-%m-%d %H:%M")
 
     return GenerateAudioCastResponse(
         url=filepath,

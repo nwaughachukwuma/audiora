@@ -11,9 +11,7 @@ def get_gemini():
     return genai
 
 
-ModelName = Literal[
-    "gemini-1.5-flash-002", "gemini-1.5-pro-002", "gemini-1.5-pro-latest"
-]
+ModelName = Literal["gemini-1.5-flash-002", "gemini-1.5-pro-002", "gemini-1.5-pro-latest"]
 
 
 @dataclass

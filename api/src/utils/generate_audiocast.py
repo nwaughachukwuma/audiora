@@ -1,14 +1,14 @@
 from datetime import datetime
 
 from fastapi import BackgroundTasks, HTTPException
-
 from services.storage import StorageManager
-from shared_utils_pkg.audiocast_utils import (
+from utils.audiocast_utils import (
     GenerateAudioCastRequest,
     GenerateAudioCastResponse,
 )
-from shared_utils_pkg.session_manager import SessionManager
-from shared_utils_pkg.waveform_utils import WaveformUtils
+from utils.session_manager import SessionManager
+from utils.waveform_utils import WaveformUtils
+
 from src.utils.audio_manager import AudioManager, AudioManagerConfig
 from src.utils.audiocast_request import AudioScriptMaker, generate_source_content
 

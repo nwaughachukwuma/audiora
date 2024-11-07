@@ -34,9 +34,7 @@ class StorageManager:
         blobs = listBlobs(prefix=root_path)
         return any(blob.name == blobname for blob in blobs)
 
-    def upload_to_gcs(
-        self, item: str | Path | BytesIO, blobname: str, params: UploadItemParams
-    ):
+    def upload_to_gcs(self, item: str | Path | BytesIO, blobname: str, params: UploadItemParams):
         """upload item to GCS"""
         blob = bucket.blob(blobname)
         blob.content_type = params.content_type
