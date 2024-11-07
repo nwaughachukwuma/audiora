@@ -4,19 +4,19 @@ from typing import Any, Callable, Generator
 from fastapi import BackgroundTasks, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_utilities import add_timer_middleware
-from utils.chat_utils import (
+
+from src.utils.chat_request import chat_request
+from src.utils.chat_utils import (
     SessionChatMessage,
     SessionChatRequest,
 )
-from utils.session_manager import SessionManager
-
-from src.utils.chat_request import chat_request
 from src.utils.generate_audiocast import (
     GenerateAudioCastRequest,
     GenerateAudioCastResponse,
     generate_audiocast,
 )
 from src.utils.get_audiocast import get_audiocast
+from src.utils.session_manager import SessionManager
 
 app = FastAPI(title="Audiora", version="1.0.0")
 

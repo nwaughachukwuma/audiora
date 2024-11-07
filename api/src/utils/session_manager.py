@@ -1,14 +1,14 @@
 from dataclasses import dataclass
 from typing import Callable, Dict, List, Optional, cast
 
-from services.firestore_sdk import (
+from src.services.firestore_sdk import (
     Collection,
     DBManager,
     arrayRemove,
     arrayUnion,
     collections,
 )
-from utils.chat_utils import SessionChatMessage
+from src.utils.chat_utils import SessionChatMessage
 
 
 @dataclass

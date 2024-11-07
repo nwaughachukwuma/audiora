@@ -1,7 +1,8 @@
 from typing import TypedDict
 
 from pydantic import BaseModel
-from utils.chat_utils import ContentCategory
+
+from src.utils.chat_utils import ContentCategory
 
 
 class GenerateAudioCastRequest(BaseModel):

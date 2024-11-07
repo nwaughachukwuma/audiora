@@ -8,7 +8,7 @@ from uuid import uuid4
 from google.cloud import storage
 from pydub import AudioSegment
 
-from env_var import BUCKET_NAME
+from api.src.env_var import BUCKET_NAME
 
 storage_client = storage.Client()
 bucket = storage_client.bucket(BUCKET_NAME)

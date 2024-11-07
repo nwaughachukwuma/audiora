@@ -3,7 +3,7 @@ from typing import Literal
 
 import google.generativeai as genai
 
-from env_var import GEMINI_API_KEY
+from api.src.env_var import GEMINI_API_KEY
 
 
 def get_gemini():

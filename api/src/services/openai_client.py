@@ -1,6 +1,6 @@
 from openai import Client
 
-from env_var import OPENAI_API_KEY
+from api.src.env_var import OPENAI_API_KEY
 
 
 def get_openai():

@@ -2,9 +2,9 @@ from dataclasses import dataclass
 from io import BytesIO
 from typing import Dict, List, Literal
 
-from services.elevenlabs_client import get_elevenlabs_client
-from services.openai_client import get_openai
-from utils.decorators import process_time
+from src.services.elevenlabs_client import get_elevenlabs_client
+from src.services.openai_client import get_openai
+from src.utils.decorators import process_time
 
 TTSProvider = Literal["openai", "elevenlabs"]
 

@@ -1,6 +1,6 @@
 from anthropic import Anthropic, AsyncAnthropic
 
-from env_var import ANTHROPIC_API_KEY
+from api.src.env_var import ANTHROPIC_API_KEY
 
 
 def get_anthropic():
