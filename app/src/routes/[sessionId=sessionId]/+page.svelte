@@ -1,9 +1,12 @@
 <script>
 	import ChatContainer from '@/components/ChatContainer.svelte';
-	export let data;
+	import ChatBox from '@/components/ChatBox.svelte';
 
+	export let data;
 	$: category = data.category;
 	$: sessionId = data.sessionId;
+
+	let searchTerm = '';
 </script>
 
 <ChatContainer>
@@ -11,7 +14,7 @@
 		{sessionId}: {category}
 	</div>
 
-	<div slot="chat_input" class="h-[16%] fixed w-[calc(100%-24.5rem)] bottom-0 shrink-0">
-		Chat Input Section
+	<div slot="chat_box">
+		<ChatBox bind:searchTerm placeholder="What would you like to listen to?" />
 	</div>
 </ChatContainer>
