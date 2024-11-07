@@ -8,6 +8,7 @@ export type ChatItem = {
 	id: string;
 	content: string;
 	role: 'user' | 'assistant';
+	loading?: boolean;
 };
 
 export function setChatSession(sessionId: string) {
