@@ -3,6 +3,7 @@ from typing import Any, Callable, Generator
 
 from fastapi import BackgroundTasks, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from fastapi_utilities import add_timer_middleware
 
 from src.utils.chat_request import chat_request
@@ -71,7 +72,7 @@ async def chat_endpoint(session_id: str, request: SessionChatRequest, background
         on_finish=on_finish,
     )
 
-    return response
+    return StreamingResponse(response, media_type="text/event-stream")
 
 
 @app.post("/audiocast/generate", response_model=GenerateAudioCastResponse)
