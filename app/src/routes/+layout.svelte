@@ -16,7 +16,7 @@
 
 <div class="min-h-screen bg-background flex gap-x-2">
 	<aside class="shrink-0 h-screen pt-10 w-96 bg-gray-900 p-4 px-8">
-		<div class="text-sm text-muted-foreground p-3 rounded-lg bg-gray-700">
+		<div class="text-muted-foreground px-3 py-4 rounded-lg bg-gray-700">
 			A VeedoAI project. (c) 2024
 		</div>
 
@@ -25,7 +25,7 @@
 				<h3 class="mt-4 text-lg font-semibold">Content Category:</h3>
 				<p class="capitalize">{$page.data.contentCategory}</p>
 			{:else}
-				<p class="mt-4 text-sm text-muted-foreground">
+				<p class="mt-4 text-muted-foreground">
 					Your preferences and audiocast metadata will appear here
 				</p>
 			{/if}
