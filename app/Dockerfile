@@ -20,7 +20,11 @@ RUN apt-get -yqq update && apt-get -yqq install \
 
 COPY . ./
 # RUN rm -rf ./api
+<<<<<<<< HEAD:streamlit_app/Dockerfile
 
+========
+
+>>>>>>>> origin/main:app/Dockerfile
 # Install production dependencies.
 RUN pip install --upgrade pip \
   && pip install --no-cache-dir -r requirements.txt

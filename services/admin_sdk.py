@@ -4,7 +4,7 @@ import firebase_admin
 def init_admin_sdk():
     try:
         app = firebase_admin.get_app()
-        print(f"Firebase Admin SDK already initialized ~> {app.name}")
+        print(f"Firebase Admin SDK already initialized ~> {app.project_id}")
     except ValueError:
-        firebase_admin.initialize_app()
-        print("Firebase Admin SDK initialized")
+        app = firebase_admin.initialize_app()
+        print(f"Firebase Admin SDK initialized ~> {app.project_id}")

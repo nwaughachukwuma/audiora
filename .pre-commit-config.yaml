@@ -18,3 +18,4 @@ repos:
         types: [python]
       - id: ruff-format
         types: [python]
+      - id: ruff-format
