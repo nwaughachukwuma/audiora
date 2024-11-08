@@ -37,6 +37,9 @@ importers:
       github-slugger:
         specifier: ^2.0.0
         version: 2.0.0
+      lucide-svelte:
+        specifier: ^0.456.0
+        version: 0.456.0(svelte@4.2.19)
       marked:
         specifier: ^14.1.4
         version: 14.1.4
@@ -122,9 +125,6 @@ importers:
       globals:
         specifier: ^15.0.0
         version: 15.12.0
-      lucide-svelte:
-        specifier: ^0.424.0
-        version: 0.424.0(svelte@4.2.19)
       mode-watcher:
         specifier: ^0.4.1
         version: 0.4.1(svelte@4.2.19)
@@ -1813,8 +1813,8 @@ packages:
   lru-memoizer@2.3.0:
     resolution: {integrity: sha512-GXn7gyHAMhO13WSKrIiNfztwxodVsP8IoZ3XfrJV4yH2x0/OeTO/FIaAHTY5YekdGgW94njfuKmyyt1E0mR6Ug==}
 
-  lucide-svelte@0.424.0:
-    resolution: {integrity: sha512-mrEapPPlH5PWGMI0zs3dctR/6NylLx1VM9avRmH4OHN5aaldk4QYd/wTooROD4H6OKlC+7XOdgz0zX1tSxFlXw==}
+  lucide-svelte@0.456.0:
+    resolution: {integrity: sha512-SSdmxJOmL1h42ZypuGr54dYsXAT5o6WkQPKVDFnnrD0liOaXzfNNJuA7JbpkO9FFozBchyVpB1A1mKRmXOD8ug==}
     peerDependencies:
       svelte: ^3 || ^4 || ^5.0.0-next.42
 
@@ -4537,7 +4537,7 @@ snapshots:
       lodash.clonedeep: 4.5.0
       lru-cache: 6.0.0
 
-  lucide-svelte@0.424.0(svelte@4.2.19):
+  lucide-svelte@0.456.0(svelte@4.2.19):
     dependencies:
       svelte: 4.2.19
 

@@ -15,6 +15,7 @@
 	} from '../stores/sessionContext.svelte';
 	import SearchSidebarItem from './SearchSidebarItem.svelte';
 	import { getAppContext } from '../stores/appContext.svelte';
+	import HeadphoneOff from 'lucide-svelte/icons/headphone-off';
 	import cs from 'clsx';
 
 	export let sessionId: string;
@@ -51,7 +52,7 @@
 </script>
 
 <div
-	class={cs('scrollbar-none block h-full shrink-0 overflow-x-hidden bg-gray-50', {
+	class={cs('scrollbar-none block h-full shrink-0 overflow-x-hidden bg-background', {
 		'w-full overflow-y-auto px-2 md:w-64': $openSettingsDrawer$,
 		'w-0': !$openSettingsDrawer$
 	})}
@@ -65,6 +66,15 @@
 		style="transition: opacity 0.1s ease"
 		data-sveltekit-preload-data
 	>
+		{#if !inLast24Hrs.length && !inLast7Days.length && !inLast30Days.length}
+			<div class="flex w-full h-screen items-center animate-fade-in">
+				<div class="-mt-16 flex flex-col items-center">
+					<HeadphoneOff class="w-14 h-14" />
+					<span class="px-2 mt-3 text-gray-300 font-medium">Audiocasts will appear here</span>
+				</div>
+			</div>
+		{/if}
+
 		<div class="flex w-full flex-col pt-2" class:hidden={!inLast24Hrs.length}>
 			<div class="px-2 text-sm font-medium">Today</div>
 			{#each inLast24Hrs as item}

@@ -17,10 +17,11 @@
 			</svg>
 		</Button>
 	</Sheet.Trigger>
-	<Sheet.Content side="left" class="bg-gray-50">
+	<Sheet.Content side="left" class="bg-background border-muted">
 		<Sheet.Header class="mb-1 text-left">
-			<Sheet.Title class="ml-4">Past Threads</Sheet.Title>
+			<Sheet.Title class="ml-4 text-gray-200">Audiocasts</Sheet.Title>
 		</Sheet.Header>
+
 		<slot />
 	</Sheet.Content>
 </Sheet.Root>

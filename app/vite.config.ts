@@ -14,7 +14,7 @@ export default defineConfig({
 		minify: 'esbuild'
 	},
 	ssr: {
-		noExternal: []
+		noExternal: ['ramda', 'bits-ui', 'rxfire']
 	},
 	optimizeDeps: {
 		include: []
