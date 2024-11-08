@@ -1,7 +1,7 @@
 <script lang="ts" context="module">
 	import type { ContentCategory } from '@/utils/types';
 
-	export const content_examples: Record<ContentCategory, string> = {
+	export const contentExamples: Record<ContentCategory, string> = {
 		podcast:
 			'Create a podcast exploring the intersection of ancient philosophy and artificial intelligence.',
 		sermon: 'Write a sermon connecting the teachings of Augustine with modern digital ethics.',
@@ -20,11 +20,11 @@
 </script>
 
 <div class="w-full h-full block mt-16">
-	<div class="w-full md:w-4/5 mb-6">
-		<h3 class="text-2xl">You can start with one of the following</h3>
+	<div class="w-full mx-auto md:w-4/5 mb-6 text-center">
+		<h3 class="text-2xl sm:text-3xl font-semibold">You can start with one of the following</h3>
 	</div>
 	<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-4">
-		{#each Object.entries(content_examples) as [category, content]}
+		{#each Object.entries(contentExamples) as [category, content]}
 			<ExampleCard {content} href="/{sessionId}?category={category}" />
 		{/each}
 	</div>
