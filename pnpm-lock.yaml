@@ -37,15 +37,9 @@ importers:
       github-slugger:
         specifier: ^2.0.0
         version: 2.0.0
-      lucide-svelte:
-        specifier: ^0.424.0
-        version: 0.424.0(svelte@4.2.19)
       marked:
         specifier: ^14.1.4
         version: 14.1.4
-      mode-watcher:
-        specifier: ^0.4.1
-        version: 0.4.1(svelte@4.2.19)
       nanoid:
         specifier: ^5.0.7
         version: 5.0.8
@@ -64,9 +58,6 @@ importers:
       svelte-persisted-store:
         specifier: ^0.11.0
         version: 0.11.0(svelte@4.2.19)
-      svelte-sonner:
-        specifier: ^0.3.27
-        version: 0.3.28(svelte@4.2.19)
       tailwind-merge:
         specifier: ^2.4.0
         version: 2.5.4
@@ -131,6 +122,12 @@ importers:
       globals:
         specifier: ^15.0.0
         version: 15.12.0
+      lucide-svelte:
+        specifier: ^0.424.0
+        version: 0.424.0(svelte@4.2.19)
+      mode-watcher:
+        specifier: ^0.4.1
+        version: 0.4.1(svelte@4.2.19)
       postcss:
         specifier: ^8.4.41
         version: 8.4.47
@@ -146,6 +143,9 @@ importers:
       svelte-check:
         specifier: ^3.6.0
         version: 3.8.6(postcss-load-config@4.0.2(postcss@8.4.47))(postcss@8.4.47)(svelte@4.2.19)
+      svelte-sonner:
+        specifier: ^0.3.28
+        version: 0.3.28(svelte@4.2.19)
       tailwindcss:
         specifier: ^3.4.7
         version: 3.4.14

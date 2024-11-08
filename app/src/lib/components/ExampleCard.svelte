@@ -1,15 +1,15 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import { getChatSession } from '@/stores/chatStore.svelte';
+	import { getSessionContext } from '@/stores/sessionContext.svelte';
 	import { uuid } from '@/utils/uuid';
 
 	export let href: string;
 	export let content: string;
 
-	const { chatSession$ } = getChatSession();
+	const { addChatItem } = getSessionContext();
 
 	function handleClick() {
-		chatSession$.set([{ id: uuid(), content, role: 'user' }]);
+		addChatItem({ id: uuid(), content, role: 'user', loading: false });
 		goto(href);
 	}
 </script>

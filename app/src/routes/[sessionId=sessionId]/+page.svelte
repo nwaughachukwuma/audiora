@@ -1,6 +1,6 @@
 <script lang="ts">
 	import ChatContainer from '@/components/ChatContainer.svelte';
-	import { getChatSession, type ChatItem } from '$lib/stores/chatStore.svelte';
+	import { getSessionContext, type ChatItem } from '@/stores/sessionContext.svelte.js';
 	import ChatListItem from '@/components/chat-list/ChatListItem.svelte';
 	import { env } from '@env';
 	import { uuid } from '@/utils/uuid';
@@ -8,7 +8,7 @@
 
 	export let data;
 
-	const { chatSession$ } = getChatSession();
+	const { session$, addChatItem, updateChatContent } = getSessionContext();
 	let searchTerm = '';
 	let loading = false;
 
@@ -17,10 +17,10 @@
 	$: sessionId && handleFirstEntry();
 
 	async function handleFirstEntry() {
-		if ($chatSession$.length > 1) return;
+		if (!$session$ || $session$.chats.length > 1) return;
 
 		loading = true;
-		await chatRequest($chatSession$[0]).finally(() => (loading = false));
+		await chatRequest($session$.chats[0]).finally(() => (loading = false));
 	}
 
 	function scrollChatContent() {
@@ -38,45 +38,36 @@
 
 		const chatItem: ChatItem = { id: uuid(), content: searchTerm, role: 'user' };
 		searchTerm = '';
-		chatSession$.update((session) => [...session, chatItem]);
-
+		addChatItem(chatItem);
 		return chatRequest(chatItem).finally(() => (loading = false));
 	}
 
 	async function chatRequest(message: ChatItem) {
-		const __uid = uuid();
-		chatSession$.update((session) => [
-			...session,
-			{
-				id: __uid,
-				content: '',
-				role: 'assistant',
-				loading: true
-			}
-		]);
+		const chatItem = addChatItem({
+			id: uuid(),
+			content: '',
+			role: 'assistant',
+			loading: true
+		});
 
 		return fetch(`${env.API_BASE_URL}/chat/${sessionId}`, {
 			method: 'POST',
 			body: JSON.stringify({ message, content_category: category }),
 			headers: { 'Content-Type': 'application/json' }
-		}).then((res) => handleStreamingResponse(res, __uid));
+		}).then((res) => handleStreamingResponse(res, chatItem.id));
 	}
 
 	async function handleStreamingResponse(res: Response, id: string) {
 		if (!res.ok) throw new Error('Failed to get response from the server');
 
 		for await (const chunk of streamingResponse(res)) {
-			chatSession$.update((session) => {
-				const lastItem = session.find((item) => item.id === id);
-				if (!lastItem) return session;
-
-				const updatedMessage = { ...lastItem, loading: false, content: lastItem.content + chunk };
-				return session.map((item) => (item.id === id ? updatedMessage : item));
-			});
+			updateChatContent(id, chunk);
 		}
 
 		scrollChatContent();
 	}
+
+	$: sessionChats = $session$?.chats || [];
 </script>
 
 <ChatContainer bind:searchTerm on:click={handleSearch} on:keypress={handleSearch}>
@@ -86,9 +77,11 @@
 		</p>
 
 		<div class="flex flex-col gap-y-3">
-			{#key $chatSession$}
-				{#each $chatSession$ as item (item.id)}
+			{#key sessionChats}
+				{#each sessionChats as item (item.id)}
 					<ChatListItem type={item.role} content={item.content} loading={item.loading} />
+				{:else}
+					<p class="text-center text-gray-400">No chat history</p>
 				{/each}
 			{/key}
 		</div>
