@@ -8,12 +8,10 @@
 	import { createEventDispatcher } from 'svelte';
 	import { browser } from '$app/environment';
 	import { type Session, SESSION_KEY, getSessionContext } from '../stores/sessionContext.svelte';
-	import SearchSidebarItem from './SearchSidebarItem.svelte';
+	import SearchSidebarItem from './SidebarItem.svelte';
 	import { getAppContext } from '../stores/appContext.svelte';
 	import HeadphoneOff from 'lucide-svelte/icons/headphone-off';
 	import cs from 'clsx';
-
-	export let sessionId: string;
 
 	const dispatch = createEventDispatcher<{ clickItem: void }>();
 
@@ -47,13 +45,10 @@
 </script>
 
 <div
-	class={cs(
-		'scrollbar-none border border-gray-800 block h-full shrink-0 overflow-x-hidden bg-background',
-		{
-			'w-full overflow-y-auto px-2 md:w-64': $openSettingsDrawer$,
-			'w-0': !$openSettingsDrawer$
-		}
-	)}
+	class={cs('scrollbar-none block h-full shrink-0 overflow-x-hidden bg-gray-900', {
+		'w-full overflow-y-auto px-2 md:w-72': $openSettingsDrawer$,
+		'w-0': !$openSettingsDrawer$
+	})}
 	style="transition: width 0.3s cubic-bezier(0.34, 1.47, 0.64, 1), padding 0.3s ease;"
 >
 	<nav
@@ -64,13 +59,15 @@
 		style="transition: opacity 0.1s ease"
 		data-sveltekit-preload-data
 	>
-		{#if !inLast24Hrs.length && !inLast7Days.length && !inLast30Days.length}
-			<div class="flex w-full h-screen items-center animate-fade-in">
-				<div class="-mt-16 flex flex-col text-gray-300 items-center">
-					<HeadphoneOff class="w-14 h-14" />
-					<span class="px-2 mt-3 font-medium">Audiocasts will appear here</span>
+		{#if $openSettingsDrawer$}
+			{#if !inLast24Hrs.length && !inLast7Days.length && !inLast30Days.length}
+				<div class="flex w-full h-screen items-center animate-fade-in">
+					<div class="-mt-16 flex flex-col text-gray-300 items-center">
+						<HeadphoneOff class="w-14 h-14" />
+						<span class="px-2 mt-3 font-medium">Audiocasts will appear here</span>
+					</div>
 				</div>
-			</div>
+			{/if}
 		{/if}
 
 		<div class="flex w-full flex-col gap-y-1.5 pt-2" class:hidden={!inLast24Hrs.length}>

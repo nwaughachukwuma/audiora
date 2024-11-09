@@ -3,8 +3,8 @@
 	import Logo from './Logo.svelte';
 	import { PlusIcon } from 'lucide-svelte';
 	import * as Tooltip from './ui/tooltip';
-	import SearchSlideSheet from './SearchSlideSheet.svelte';
-	import SearchSidebar from './SearchSidebar.svelte';
+	import SearchSlideSheet from './SlideSheet.svelte';
+	import SearchSidebar from './Sidebar.svelte';
 	import { Button } from './ui/button';
 	import { getAppContext } from '$lib/stores/appContext.svelte';
 
@@ -25,7 +25,7 @@
 				<svelte-fragment>
 					{#if openSheet}
 						{#key sessionId}
-							<SearchSidebar {sessionId} on:clickItem={() => (openSheet = false)} />
+							<SearchSidebar on:clickItem={() => (openSheet = false)} />
 						{/key}
 					{/if}
 				</svelte-fragment>
