@@ -5,7 +5,7 @@
 </script>
 
 <div
-	class="mx-auto flex h-full max-w-full flex-col items-center gap-1 overflow-hidden px-2 sm:max-w-xl sm:px-1 lg:max-w-3xl"
+	class="mx-auto flex h-full w-full max-w-full flex-col items-center gap-1 overflow-hidden px-2 sm:max-w-xl sm:px-1 lg:max-w-3xl"
 >
 	<div id="chatContainer1" class="overflow-auto scrollbar-y-1 w-full block">
 		<slot name="content"></slot>

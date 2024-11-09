@@ -5,6 +5,7 @@
 	import { env } from '@env';
 	import { uuid } from '@/utils/uuid';
 	import { streamingResponse } from '$lib/utils/streamingResponse';
+	import { MessageSquareOff } from 'lucide-svelte';
 
 	export let data;
 
@@ -72,7 +73,7 @@
 
 <ChatContainer bind:searchTerm on:click={handleSearch} on:keypress={handleSearch}>
 	<div slot="content" class="block w-full">
-		<p class="mt-10 p-3 bg-sky-950/70 text-sky-200 rounded-md mb-4">
+		<p class="mt-10 p-3 bg-sky-950/70 text-sky-200 rounded-md mb-4 w-full">
 			Chat session to understand your preferences
 		</p>
 
@@ -81,7 +82,10 @@
 				{#each sessionChats as item (item.id)}
 					<ChatListItem type={item.role} content={item.content} loading={item.loading} />
 				{:else}
-					<p class="text-center text-gray-400">No chat history</p>
+					<div class="flex flex-col text-gray-300 h-40 mt-16 gap-y-3 items-center justify-center">
+						<MessageSquareOff class="w-16 h-16" />
+						<p class="text-center text-gray-400 text-xl md:text-2xl">No chat history</p>
+					</div>
 				{/each}
 			{/key}
 		</div>

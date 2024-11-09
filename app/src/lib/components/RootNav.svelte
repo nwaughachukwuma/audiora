@@ -55,7 +55,7 @@
 			<Tooltip.Root>
 				<Tooltip.Trigger>
 					<a
-						href="/search"
+						href="/"
 						class="ml-6 flex h-7 items-center justify-center rounded-md border border-gray-300 p-1 px-1.5 text-gray-500 transition-colors duration-200 hover:border-gray-500 hover:text-gray-600"
 					>
 						<PlusIcon class="h-4 w-4" />

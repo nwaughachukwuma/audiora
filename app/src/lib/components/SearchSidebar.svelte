@@ -68,28 +68,28 @@
 	>
 		{#if !inLast24Hrs.length && !inLast7Days.length && !inLast30Days.length}
 			<div class="flex w-full h-screen items-center animate-fade-in">
-				<div class="-mt-16 flex flex-col items-center">
+				<div class="-mt-16 flex flex-col text-gray-300 items-center">
 					<HeadphoneOff class="w-14 h-14" />
-					<span class="px-2 mt-3 text-gray-300 font-medium">Audiocasts will appear here</span>
+					<span class="px-2 mt-3 font-medium">Audiocasts will appear here</span>
 				</div>
 			</div>
 		{/if}
 
-		<div class="flex w-full flex-col pt-2" class:hidden={!inLast24Hrs.length}>
+		<div class="flex w-full flex-col gap-y-1.5 pt-2" class:hidden={!inLast24Hrs.length}>
 			<div class="px-2 text-sm font-medium">Today</div>
 			{#each inLast24Hrs as item}
 				<SearchSidebarItem {item} on:click={() => dispatch('clickItem')} />
 			{/each}
 		</div>
 
-		<div class="flex w-full flex-col pt-6" class:hidden={!inLast7Days.length}>
+		<div class="flex w-full flex-col gap-y-1.5 pt-6" class:hidden={!inLast7Days.length}>
 			<div class="px-2 text-sm font-medium">Last 7 days</div>
 			{#each inLast7Days as item}
 				<SearchSidebarItem {item} on:click={() => dispatch('clickItem')} />
 			{/each}
 		</div>
 
-		<div class="flex w-full flex-col pt-6" class:hidden={!inLast30Days.length}>
+		<div class="flex w-full flex-col gap-y-1.5 pt-6" class:hidden={!inLast30Days.length}>
 			<div class="px-2 text-sm font-medium">Last month</div>
 			{#each inLast30Days as item}
 				<SearchSidebarItem {item} on:click={() => dispatch('clickItem')} />
