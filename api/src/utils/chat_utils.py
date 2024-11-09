@@ -48,12 +48,12 @@ category_qualifiers: Dict[ContentCategory, str] = {
 }
 
 
-class SessionChatMessage(BaseModel):
+class SessionChatItem(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    content: str
     role: Literal["user", "assistant"]
+    content: str
 
 
 class SessionChatRequest(BaseModel):
-    content_category: ContentCategory
-    message: SessionChatMessage
+    contentCategory: ContentCategory
+    chatItem: SessionChatItem

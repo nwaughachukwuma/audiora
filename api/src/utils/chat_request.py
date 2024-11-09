@@ -1,7 +1,7 @@
 from typing import Any, Callable, List, Optional
 
 from src.services.openai_client import get_openai
-from src.utils.chat_utils import ContentCategory, SessionChatMessage
+from src.utils.chat_utils import ContentCategory, SessionChatItem
 
 
 def get_system_message(content_category: ContentCategory):
@@ -27,7 +27,7 @@ def get_system_message(content_category: ContentCategory):
 
 def chat_request(
     content_category: ContentCategory,
-    previous_messages: List[SessionChatMessage],
+    previous_messages: List[SessionChatItem],
     on_finish: Optional[Callable[[str], Any]] = None,
 ):
     response_stream = get_openai().chat.completions.create(

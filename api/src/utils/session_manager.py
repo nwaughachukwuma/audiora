@@ -8,7 +8,7 @@ from src.services.firestore_sdk import (
     arrayUnion,
     collections,
 )
-from src.utils.chat_utils import SessionChatMessage
+from src.utils.chat_utils import SessionChatItem
 
 
 @dataclass
@@ -22,7 +22,7 @@ class ChatMetadata:
 @dataclass
 class SessionModel:
     id: str
-    chats: List[SessionChatMessage]
+    chats: List[SessionChatItem]
     metadata: Optional[ChatMetadata]
     created_at: Optional[str] = None
 
@@ -75,7 +75,7 @@ class SessionManager(DBManager):
     def _update_title(self, title: str):
         return self._update({"metadata.title": title})
 
-    def _add_chat(self, chat: SessionChatMessage):
+    def _add_chat(self, chat: SessionChatItem):
         return self._update_document(self.collection, self.doc_id, {"chats": arrayUnion([chat.__dict__])})
 
     def _delete_chat(self, chat_id: str):
@@ -90,29 +90,29 @@ class SessionManager(DBManager):
             {"chats": arrayRemove([chat_to_remove.__dict__])},
         )
 
-    def _get_chat(self, chat_id: str) -> SessionChatMessage | None:
+    def _get_chat(self, chat_id: str) -> SessionChatItem | None:
         doc = self._get_document(self.collection, self.doc_id)
         if not doc.exists:
             return None
 
         item = [chat for chat in doc.get("chats") if chat.id == chat_id][0]
         if item:
-            return SessionChatMessage(
+            return SessionChatItem(
                 content=item["content"],
                 id=item["id"],
                 role=item["role"],
             )
 
-    def _get_chats(self) -> List[SessionChatMessage]:
+    def _get_chats(self) -> List[SessionChatItem]:
         doc = self._get_document(self.collection, self.doc_id)
         if not doc.exists:
             return []
 
         chats = cast(Dict, doc.get("chats"))
         return [
-            SessionChatMessage(
-                content=chat["content"],
+            SessionChatItem(
                 id=chat["id"],
+                content=chat["content"],
                 role=chat["role"],
             )
             for chat in chats
