@@ -19,7 +19,6 @@
 
 	async function handleFirstEntry() {
 		if (!$session$ || $session$.chats.length > 1) return;
-
 		loading = true;
 		await chatRequest($session$.chats[0]).finally(() => (loading = false));
 	}
@@ -37,14 +36,20 @@
 		loading = true;
 		scrollChatContent();
 
-		const chatItem: ChatItem = { id: uuid(), content: searchTerm, role: 'user' };
+		const chatItem: ChatItem = {
+			id: uuid(),
+			content: searchTerm,
+			role: 'user',
+			loading: false
+		};
 		searchTerm = '';
 		addChatItem(chatItem);
+
 		return chatRequest(chatItem).finally(() => (loading = false));
 	}
 
-	async function chatRequest(message: ChatItem) {
-		const chatItem = addChatItem({
+	async function chatRequest(uChatItem: ChatItem) {
+		const aChatItem = addChatItem({
 			id: uuid(),
 			content: '',
 			role: 'assistant',
@@ -53,9 +58,9 @@
 
 		return fetch(`${env.API_BASE_URL}/chat/${sessionId}`, {
 			method: 'POST',
-			body: JSON.stringify({ message, content_category: category }),
+			body: JSON.stringify({ chatItem: uChatItem, contentCategory: category }),
 			headers: { 'Content-Type': 'application/json' }
-		}).then((res) => handleStreamingResponse(res, chatItem.id));
+		}).then((res) => handleStreamingResponse(res, aChatItem.id));
 	}
 
 	async function handleStreamingResponse(res: Response, id: string) {
@@ -65,7 +70,7 @@
 			updateChatContent(id, chunk);
 		}
 
-		scrollChatContent();
+		return Promise.resolve(scrollChatContent());
 	}
 
 	$: sessionChats = $session$?.chats || [];

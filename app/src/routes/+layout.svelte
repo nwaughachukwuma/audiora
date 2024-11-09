@@ -3,10 +3,11 @@
 </script>
 
 <script>
+	import { browser } from '$app/environment';
 	import { Toaster } from '$lib/components/ui/sonner';
 	import { setSessionContext } from '@/stores/sessionContext.svelte';
 	import RootNav from '@/components/RootNav.svelte';
-	import SearchSidebar from '@/components/SearchSidebar.svelte';
+	import SearchSidebar from '@/components/Sidebar.svelte';
 
 	export let data;
 
@@ -24,10 +25,12 @@
 
 	<div class="relative flex h-full w-full gap-x-2">
 		<span class="hidden md:block">
-			<SearchSidebar {sessionId} />
+			<SearchSidebar />
 		</span>
 
-		<slot />
+		{#if browser}
+			<slot />
+		{/if}
 	</div>
 </div>
 <Toaster />

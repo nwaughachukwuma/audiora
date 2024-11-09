@@ -13,7 +13,7 @@ const baseHandle: Handle = async ({ event, resolve }) => {
 };
 
 const handleSession: Handle = async ({ event, resolve }) => {
-	event.locals.sessionId = uuid();
+	event.locals.sessionId = event.params.sessionId || uuid();
 	return resolve(event);
 };
 

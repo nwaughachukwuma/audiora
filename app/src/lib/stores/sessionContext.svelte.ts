@@ -55,11 +55,10 @@ export function setSessionContext(sessionId: string) {
 		},
 		updateChatContent: (chatId: string, chunk: string) => {
 			session$.update((session) => {
-				console.log('updateChatContent', chatId, chunk, session);
 				if (!session) return session;
 
 				const chats = session.chats.map((i) =>
-					i.id === chatId ? { ...i, content: i.content + chunk } : i
+					i.id === chatId ? { ...i, loading: false, content: i.content + chunk } : i
 				);
 				session.chats = chats;
 				return session;

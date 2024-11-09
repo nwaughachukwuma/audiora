@@ -56,6 +56,7 @@ async def root():
 
 @app.post("/chat/{session_id}", response_model=Generator[str, Any, None])
 async def chat_endpoint(session_id: str, request: SessionChatRequest, background_tasks: BackgroundTasks):
+    """Chat endpoint"""
     content_category = request.contentCategory
     db = SessionManager(session_id)
     db._add_chat(request.chatItem)
