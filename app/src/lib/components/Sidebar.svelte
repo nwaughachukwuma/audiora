@@ -40,7 +40,8 @@
 			.map(
 				([key, value]) =>
 					[key.replace(`${SESSION_KEY}_`, ''), JSON.parse(value) as Session] as const
-			);
+			)
+			.filter(([_, v]) => Boolean(v));
 	}
 </script>
 

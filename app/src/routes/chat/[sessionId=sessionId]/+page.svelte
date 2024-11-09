@@ -9,12 +9,12 @@
 
 	export let data;
 
-	const { session$, addChatItem, updateChatContent } = getSessionContext();
+	const { session$, addChatItem, updateChatContent, sessionId$ } = getSessionContext();
 	let searchTerm = '';
 	let loading = false;
 
 	$: category = data.category;
-	$: sessionId = data.sessionId;
+	$: sessionId = $sessionId$;
 	$: sessionId && handleFirstEntry();
 
 	async function handleFirstEntry() {

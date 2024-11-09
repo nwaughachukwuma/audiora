@@ -1,11 +1,13 @@
 <script lang="ts">
 	import RenderExamples from '@/components/RenderExamples.svelte';
 	import ChatContainer from '@/components/ChatContainer.svelte';
+	import { getSessionContext } from '@/stores/sessionContext.svelte.js';
 
-	export let data;
+	const { sessionId$ } = getSessionContext();
 
 	let searchTerm = '';
-	$: sessionId = data.sessionId;
+	$: sessionId = $sessionId$;
+
 	function handleSearch() {
 		if (searchTerm) {
 			console.log(searchTerm);

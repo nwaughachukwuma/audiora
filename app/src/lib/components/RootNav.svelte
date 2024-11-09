@@ -7,6 +7,7 @@
 	import SearchSidebar from './Sidebar.svelte';
 	import { Button } from './ui/button';
 	import { getAppContext } from '$lib/stores/appContext.svelte';
+	import { goto } from '$app/navigation';
 
 	export let sessionId: string;
 
@@ -16,6 +17,13 @@
 
 	$: openSettingsDrawer$.set(openSheet);
 	$: pathname = $page.url.pathname;
+
+	function generateNew() {
+		goto('/', {
+			invalidateAll: true,
+			replaceState: true
+		});
+	}
 </script>
 
 <nav class="relative flex h-16 w-full items-center">
@@ -50,20 +58,19 @@
 		</a>
 	</div>
 
-	<div class="ml-6 w-full flex h-full max-h-full items-center justify-between px-3">
+	<div class="ml-12 w-full flex h-full max-h-full items-center justify-between px-3">
 		{#if pathname.match(/chat\/\S+/g)}
 			<Tooltip.Root>
 				<Tooltip.Trigger>
-					<a
-						href="/"
-						class="ml-6 flex h-7 items-center justify-center rounded-md border border-gray-300 p-1 px-1.5 text-gray-500 transition-colors duration-200 hover:border-gray-500 hover:text-gray-600"
+					<Button
+						on:click={generateNew}
+						variant="ghost"
+						class="flex h-7 items-center justify-center rounded-md border border-gray-600 p-1 px-1.5 text-gray-500 transition-colors duration-200 hover:border-gray-500"
 					>
 						<PlusIcon class="h-4 w-4" />
-					</a>
+					</Button>
 				</Tooltip.Trigger>
-				<Tooltip.Content>
-					<p>New Generation</p>
-				</Tooltip.Content>
+				<Tooltip.Content class="bg-gray-600 border-none">New Generation</Tooltip.Content>
 			</Tooltip.Root>
 		{/if}
 	</div>

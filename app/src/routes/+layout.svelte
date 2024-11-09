@@ -8,10 +8,12 @@
 	import { setSessionContext } from '@/stores/sessionContext.svelte';
 	import RootNav from '@/components/RootNav.svelte';
 	import SearchSidebar from '@/components/Sidebar.svelte';
+	import { page } from '$app/stores';
+	import Spinner from '@/components/Spinner.svelte';
 
 	export let data;
 
-	$: sessionId = data.sessionId;
+	$: sessionId = $page.params.sessionId || data.sessionId;
 	$: setSessionContext(sessionId);
 </script>
 
@@ -19,7 +21,6 @@
 	<title>Audiora</title>
 </svelte:head>
 
-<!-- <main class="container p-0 pt-10 max-sm:px-2"></main> -->
 <div class="h-screen bg-background block w-full">
 	<RootNav {sessionId} />
 
@@ -28,9 +29,16 @@
 			<SearchSidebar />
 		</span>
 
-		{#if browser}
-			<slot />
+		{#if !browser}
+			<div class="-mt-16 flex h-full w-full items-center justify-center sm:-mt-24">
+				<Spinner />
+			</div>
+		{:else}
+			{#key sessionId}
+				<slot />
+			{/key}
 		{/if}
 	</div>
 </div>
+
 <Toaster />
