@@ -18,6 +18,7 @@ export type Session = {
 	chats: ChatItem[];
 	title: string;
 	nonce: number;
+	completed?: boolean;
 };
 
 export function setSessionContext(sessionId: string) {

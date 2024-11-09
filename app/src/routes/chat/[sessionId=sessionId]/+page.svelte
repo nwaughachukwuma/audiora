@@ -78,18 +78,20 @@
 
 <ChatContainer bind:searchTerm on:click={handleSearch} on:keypress={handleSearch}>
 	<div slot="content" class="block w-full">
-		<p class="mt-10 p-3 bg-sky-950/70 text-sky-200 rounded-md mb-4 w-full">
+		<p class="mt-6 p-3 bg-sky-950/70 text-sky-200 rounded-md mb-4 w-full">
 			Chat session to understand your preferences
 		</p>
 
-		<div class="flex flex-col gap-y-3">
+		<div class="flex flex-col gap-y-3 h-full">
 			{#key sessionChats}
 				{#each sessionChats as item (item.id)}
 					<ChatListItem type={item.role} content={item.content} loading={item.loading} />
 				{:else}
 					<div class="flex flex-col text-gray-300 h-40 mt-16 gap-y-3 items-center justify-center">
 						<MessageSquareOff class="w-16 h-16" />
-						<p class="text-center text-gray-400 text-xl md:text-2xl">No chat history</p>
+						<p class="text-center text-gray-400 text-xl md:text-2xl">
+							Chat history will appear here
+						</p>
 					</div>
 				{/each}
 			{/key}
