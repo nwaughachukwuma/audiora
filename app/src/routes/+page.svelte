@@ -5,9 +5,7 @@
 	export let data;
 
 	let searchTerm = '';
-
 	$: sessionId = data.sessionId;
-
 	function handleSearch() {
 		if (searchTerm) {
 			console.log(searchTerm);

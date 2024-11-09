@@ -1,3 +1,4 @@
+import type { ContentCategory } from '@/utils/types';
 import { setContext, getContext } from 'svelte';
 import { persisted } from 'svelte-persisted-store';
 
@@ -13,6 +14,7 @@ export type ChatItem = {
 
 export type Session = {
 	id: string;
+	category: ContentCategory;
 	chats: ChatItem[];
 	title: string;
 	nonce: number;
@@ -23,18 +25,20 @@ export function setSessionContext(sessionId: string) {
 
 	return setContext(CONTEXT_KEY, {
 		session$,
+		startSession: (category: ContentCategory) => {
+			session$.set({
+				id: sessionId,
+				category,
+				title: 'Untitled',
+				nonce: Date.now(),
+				chats: []
+			});
+			return session$;
+		},
 		addChatItem(chatItem: ChatItem) {
 			session$.update((session) => {
-				if (session) {
-					session.chats.push(chatItem);
-					return session;
-				}
-				return {
-					id: sessionId,
-					title: 'Untitled',
-					nonce: Date.now(),
-					chats: [chatItem]
-				};
+				if (session) session.chats.push(chatItem);
+				return session;
 			});
 			return chatItem;
 		},

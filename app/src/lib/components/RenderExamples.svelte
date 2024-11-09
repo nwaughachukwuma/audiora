@@ -17,6 +17,10 @@
 <script lang="ts">
 	import ExampleCard from './ExampleCard.svelte';
 	export let sessionId: string;
+
+	$: contentExamplesDict = Object.entries(contentExamples) as Array<
+		[category: ContentCategory, content: string]
+	>;
 </script>
 
 <div class="w-full h-full block mt-16">
@@ -24,8 +28,8 @@
 		<h3 class="text-2xl sm:text-3xl font-semibold">You can start with one of the following</h3>
 	</div>
 	<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-4">
-		{#each Object.entries(contentExamples) as [category, content]}
-			<ExampleCard {content} href="/chat/{sessionId}?category={category}" />
+		{#each contentExamplesDict as [category, content]}
+			<ExampleCard {content} href="/chat/{sessionId}" {category} />
 		{/each}
 	</div>
 </div>

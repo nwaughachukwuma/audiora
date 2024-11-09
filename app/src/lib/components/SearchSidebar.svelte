@@ -7,12 +7,7 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
 	import { browser } from '$app/environment';
-	import {
-		type Session,
-		SESSION_KEY,
-		setSessionContext,
-		getSessionContext
-	} from '../stores/sessionContext.svelte';
+	import { type Session, SESSION_KEY, getSessionContext } from '../stores/sessionContext.svelte';
 	import SearchSidebarItem from './SearchSidebarItem.svelte';
 	import { getAppContext } from '../stores/appContext.svelte';
 	import HeadphoneOff from 'lucide-svelte/icons/headphone-off';
@@ -24,7 +19,7 @@
 
 	const { openSettingsDrawer$ } = getAppContext();
 
-	$: ({ session$ } = getSessionContext() || setSessionContext(sessionId));
+	$: ({ session$ } = getSessionContext());
 
 	$: sessionItems = browser || $session$ ? getSessionItems() : [];
 
@@ -33,7 +28,7 @@
 		.map(([sessionId, item]) => ({
 			title: item.title || 'Untitled',
 			nonce: item.nonce,
-			href: `/chat/${sessionId}`
+			href: `/chat/${sessionId}?category=${item.category}`
 		}))
 		.sort((a, b) => b.nonce - a.nonce);
 
@@ -52,10 +47,13 @@
 </script>
 
 <div
-	class={cs('scrollbar-none block h-full shrink-0 overflow-x-hidden bg-background', {
-		'w-full overflow-y-auto px-2 md:w-64': $openSettingsDrawer$,
-		'w-0': !$openSettingsDrawer$
-	})}
+	class={cs(
+		'scrollbar-none border border-gray-800 block h-full shrink-0 overflow-x-hidden bg-background',
+		{
+			'w-full overflow-y-auto px-2 md:w-64': $openSettingsDrawer$,
+			'w-0': !$openSettingsDrawer$
+		}
+	)}
 	style="transition: width 0.3s cubic-bezier(0.34, 1.47, 0.64, 1), padding 0.3s ease;"
 >
 	<nav

@@ -26,6 +26,7 @@
 		<span class="hidden md:block">
 			<SearchSidebar {sessionId} />
 		</span>
+
 		<slot />
 	</div>
 </div>
