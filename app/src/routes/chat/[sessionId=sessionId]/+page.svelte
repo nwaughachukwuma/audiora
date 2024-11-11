@@ -5,7 +5,7 @@
 	import { env } from '@env';
 	import { uuid } from '@/utils/uuid';
 	import { streamingResponse } from '$lib/utils/streamingResponse';
-	import { MessageSquareOff } from 'lucide-svelte';
+	import CheckFinalResponse from '@/components/CheckFinalResponse.svelte';
 
 	export let data;
 
@@ -42,14 +42,14 @@
 			role: 'user',
 			loading: false
 		};
-		searchTerm = '';
 		addChatItem(chatItem);
+		searchTerm = '';
 
 		return chatRequest(chatItem).finally(() => (loading = false));
 	}
 
-	async function chatRequest(uChatItem: ChatItem) {
-		const aChatItem = addChatItem({
+	async function chatRequest(uItem: ChatItem) {
+		const aItem = addChatItem({
 			id: uuid(),
 			content: '',
 			role: 'assistant',
@@ -58,9 +58,9 @@
 
 		return fetch(`${env.API_BASE_URL}/chat/${sessionId}`, {
 			method: 'POST',
-			body: JSON.stringify({ chatItem: uChatItem, contentCategory: category }),
+			body: JSON.stringify({ chatItem: uItem, contentCategory: category }),
 			headers: { 'Content-Type': 'application/json' }
-		}).then((res) => handleStreamingResponse(res, aChatItem.id));
+		}).then((res) => handleStreamingResponse(res, aItem.id));
 	}
 
 	async function handleStreamingResponse(res: Response, id: string) {
@@ -79,20 +79,21 @@
 <ChatContainer bind:searchTerm on:click={handleSearch} on:keypress={handleSearch}>
 	<div slot="content" class="block w-full">
 		<p class="mt-6 p-3 bg-sky-950/70 text-sky-200 rounded-md mb-4 w-full">
-			Chat session to understand your preferences
+			Help us understand your preferences to curate the best audiocast for you.
 		</p>
 
 		<div class="flex flex-col gap-y-3 h-full">
 			{#key sessionChats}
 				{#each sessionChats as item (item.id)}
 					<ChatListItem type={item.role} content={item.content} loading={item.loading} />
-				{:else}
-					<div class="flex flex-col text-gray-300 h-40 mt-16 gap-y-3 items-center justify-center">
-						<MessageSquareOff class="w-16 h-16" />
-						<p class="text-center text-gray-400 text-xl md:text-2xl">
-							Chat history will appear here
-						</p>
-					</div>
+
+					<CheckFinalResponse
+						content={item.content}
+						on:finalResponse={scrollChatContent}
+						on:generate
+						on:reviewSource
+						on:startNew
+					/>
 				{/each}
 			{/key}
 		</div>

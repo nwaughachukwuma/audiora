@@ -70,7 +70,7 @@
 						<PlusIcon class="h-4 w-4" />
 					</Button>
 				</Tooltip.Trigger>
-				<Tooltip.Content class="bg-gray-600 border-none">New Generation</Tooltip.Content>
+				<Tooltip.Content class="bg-gray-600 border-none">New Audiocast</Tooltip.Content>
 			</Tooltip.Root>
 		{/if}
 	</div>
