@@ -37,12 +37,8 @@
 
 		$audioSource$ = response;
 	}
-
-	async function onstartNew() {
-		return goto('/', { invalidateAll: true, replaceState: true });
-	}
 </script>
 
 <div>
-	<slot {ongenerate} {onreviewSource} {onstartNew}></slot>
+	<slot {ongenerate} {onreviewSource}></slot>
 </div>

@@ -13,8 +13,14 @@ def get_audiocast(session_id: str):
     """
     Get audiocast based on session id
     """
-    storage_manager = StorageManager()
-    filepath = storage_manager.download_from_gcs(session_id)
+    try:
+        storage_manager = StorageManager()
+        filepath = storage_manager.download_from_gcs(session_id)
+    except Exception as e:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Audiocast asset not found for session_id: {session_id}",
+        )
 
     session_data = SessionManager(session_id).data()
     if not session_data:

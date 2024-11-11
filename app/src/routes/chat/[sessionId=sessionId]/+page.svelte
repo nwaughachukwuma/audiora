@@ -1,14 +1,14 @@
 <script lang="ts">
 	import ChatContainer from '@/components/ChatContainer.svelte';
 	import { getSessionContext, type ChatItem } from '@/stores/sessionContext.svelte.js';
-	import ChatListItem from '@/components/chat-list/ChatListItem.svelte';
+	import ChatListItem from '@/components/ChatListItem.svelte';
 	import { env } from '@env';
 	import { uuid } from '@/utils/uuid';
 	import { streamingResponse } from '$lib/utils/streamingResponse';
 	import CheckFinalResponse, {
 		FINAL_RESPONSE_SUFFIX
 	} from '@/components/CheckFinalResponse.svelte';
-	import ChatListActionItems from '@/components/chat-list/ChatListActionItems.svelte';
+	import ChatListActionItems from '@/components/ChatListActionItems.svelte';
 	import { onMount } from 'svelte';
 	import { debounce } from 'throttle-debounce';
 	import Spinner from '@/components/Spinner.svelte';
@@ -102,13 +102,12 @@
 					<ChatListItem type={item.role} content={item.content} loading={item.loading} />
 
 					{#if finalResponse}
-						<ChatListActionItems {sessionId} let:ongenerate let:onreviewSource let:onstartNew>
+						<ChatListActionItems {sessionId} let:ongenerate let:onreviewSource>
 							{#if $fetchingSource$}
 								<Spinner />
 							{:else}
 								<CheckFinalResponse
 									content={item.content}
-									on:startNew={onstartNew}
 									on:generate={({ detail }) => ongenerate(detail.summary)}
 									on:reviewSource={({ detail }) => onreviewSource(category, detail.summary)}
 								/>

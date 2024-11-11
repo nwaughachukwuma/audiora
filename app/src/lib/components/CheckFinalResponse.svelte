@@ -13,7 +13,6 @@
 	export let content: string;
 
 	const dispatch = createEventDispatcher<{
-		startNew: void;
 		reviewSource: { summary: string };
 		generate: { summary: string };
 	}>();
@@ -37,7 +36,7 @@
 		>
 	</div>
 {:else}
-	<div class="animate-fade-in grid sm:grid-cols-3 gap-3">
+	<div class="animate-fade-in grid sm:grid-cols-2 gap-3">
 		<Button
 			class="bg-emerald-600 text-emerald-100 hover:bg-emerald-700"
 			on:click={() => dispatch('generate', { summary: getSummary() })}>Generate Audiocast</Button
@@ -54,11 +53,5 @@
 				Review Source
 			</Button>
 		{/if}
-
-		<Button
-			variant="ghost"
-			class="text-emerald-600 hover:text-emerald-600 hover:bg-gray-800/40"
-			on:click={() => dispatch('startNew')}>Start New Session</Button
-		>
 	</div>
 {/if}
