@@ -1,36 +1,21 @@
-<script lang="ts" context="module">
-	type GenerateAudiocastResponse = {
-		url: string;
-		script: string;
-		source_content: string;
-		created_at?: string;
-	};
-</script>
-
 <script lang="ts">
 	import { goto } from '$app/navigation';
-	import type { ContentCategory } from '@/utils/types';
-	import { env } from '@env';
+	import { getSessionContext } from '@/stores/sessionContext.svelte';
 
 	export let sessionId: string;
-	export let category: ContentCategory;
-	export let generating = false;
+
+	const { session$ } = getSessionContext();
 
 	async function ongenerate(summary: string) {
-		if (generating) return;
+		session$.update((session) => {
+			if (!session) throw new Error('Session not found');
 
-		generating = true;
+			session.completed = true;
+			session.summary = summary;
+			return session;
+		});
 
-		return fetch(`${env.API_BASE_URL}/audiocast/generate`, {
-			method: 'POST',
-			body: JSON.stringify({ sessionId, summary, category }),
-			headers: { 'Content-Type': 'application/json' }
-		})
-			.then<GenerateAudiocastResponse>((res) => {
-				if (res.ok) res.json();
-				throw new Error('Failed to generate audiocast');
-			})
-			.finally(() => (generating = false));
+		return goto(`/audiocast/${sessionId}`, { replaceState: true });
 	}
 
 	function onreviewSource() {

@@ -20,6 +20,7 @@ export type Session = {
 	title: string;
 	nonce: number;
 	completed?: boolean;
+	summary?: string;
 };
 
 export function setSessionContext(sessionId: string) {

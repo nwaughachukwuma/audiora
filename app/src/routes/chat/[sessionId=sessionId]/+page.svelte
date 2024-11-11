@@ -16,8 +16,6 @@
 
 	let searchTerm = '';
 	let loading = false;
-	let generatingAudiocast = false;
-
 	let mounted = false;
 
 	$: category = data.category;
@@ -98,14 +96,7 @@
 				{#each sessionChats as item (item.id)}
 					<ChatListItem type={item.role} content={item.content} loading={item.loading} />
 
-					<ChatListActionItems
-						{category}
-						{sessionId}
-						bind:generating={generatingAudiocast}
-						let:ongenerate
-						let:onreviewSource
-						let:onstartNew
-					>
+					<ChatListActionItems {sessionId} let:ongenerate let:onreviewSource let:onstartNew>
 						<CheckFinalResponse
 							content={item.content}
 							on:finalResponse={scrollChatContent}
