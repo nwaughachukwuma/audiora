@@ -15,10 +15,8 @@ class GetAudiocastSourceModel(BaseModel):
 
 
 async def get_audiocast_source(request: GetAudiocastSourceModel, background_tasks: BackgroundTasks):
-    """## Generate audiocast based on a summary of user's request
-
-    ### Steps:
-    1. Generate source content
+    """
+    Generate audiocast based on a summary of user's request
     """
     summary = request.summary
     category = request.category

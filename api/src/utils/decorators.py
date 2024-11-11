@@ -50,7 +50,7 @@ def use_cache_manager(cache_key: str):
                 if value:
                     return value
 
-            result = await func(cache, *args, **kwargs)
+            result = await func(*args, **kwargs)
 
             if result and cache:
                 redis = cache.get("redis")
