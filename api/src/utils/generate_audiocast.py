@@ -4,11 +4,12 @@ from fastapi import BackgroundTasks, HTTPException
 
 from src.services.storage import StorageManager
 from src.utils.audio_manager import AudioManager, AudioManagerConfig
-from src.utils.audiocast_request import AudioScriptMaker, generate_source_content
+from src.utils.audiocast_request import AudioScriptMaker
 from src.utils.audiocast_utils import (
     GenerateAudioCastRequest,
     GenerateAudioCastResponse,
 )
+from src.utils.get_audiocast_source import GetAudiocastSourceModel, get_audiocast_source
 from src.utils.session_manager import SessionManager
 from src.utils.waveform_utils import WaveformUtils
 
@@ -21,21 +22,27 @@ async def generate_audiocast(request: GenerateAudioCastRequest, background_tasks
     2. Generate audio script
     3. Generate audio
     4a. Store audio
-    4b. TODO: Store the audio waveform on GCS
+    4b. Store the audio waveform on GCS
     5. Update session
     """
     summary = request.summary
     category = request.category
     session_id = request.sessionId
 
+    source_content = get_audiocast_source(
+        GetAudiocastSourceModel(
+            sessionId=session_id,
+            category=category,
+            summary=summary,
+        ),
+        background_tasks,
+    )
+
     db = SessionManager(session_id)
 
     def update_session_info(info: str):
         background_tasks.add_task(db._update_info, info)
 
-    update_session_info("Generating source content...")
-
-    source_content = generate_source_content(category, summary)
     if not source_content:
         raise HTTPException(status_code=500, detail="Failed to generate source content")
 

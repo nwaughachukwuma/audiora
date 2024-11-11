@@ -1,7 +1,7 @@
 from time import time
 from typing import Any, Callable, Generator
 
-from fastapi import BackgroundTasks, FastAPI, Request
+from fastapi import BackgroundTasks, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi_utilities import add_timer_middleware
@@ -18,6 +18,7 @@ from src.utils.generate_audiocast import (
     generate_audiocast,
 )
 from src.utils.get_audiocast import get_audiocast
+from src.utils.get_audiocast_source import GetAudiocastSourceModel, get_audiocast_source
 from src.utils.session_manager import SessionManager
 
 app = FastAPI(title="Audiora", version="1.0.0")
@@ -90,6 +91,14 @@ async def generate_audiocast_endpoint(
 async def get_audiocast_endpoint(session_id: str):
     result = get_audiocast(session_id)
     return result
+
+
+@app.post("/get-audiocast-source", response_model=str)
+async def review_source_endpoint(request: GetAudiocastSourceModel, background_tasks: BackgroundTasks):
+    source_content = get_audiocast_source(request, background_tasks)
+    if not source_content:
+        raise HTTPException(status_code=500, detail="Failed to generate source content")
+    return source_content
 
 
 @app.get("/get-signed-url", response_model=str)
