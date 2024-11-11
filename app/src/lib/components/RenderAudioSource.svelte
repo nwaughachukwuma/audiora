@@ -2,18 +2,17 @@
 	import * as Drawer from './ui/drawer';
 	import { Button } from './ui/button';
 	import { parse } from 'marked';
-	import { cn } from '@/utils/ui.utils';
 
 	export let audioSource: string;
 
-	let snapPoints = [0.4, 0.75, 0.9];
+	let snapPoints = [0.75, 0.9];
 	let activeSnapPoint = snapPoints[0];
 </script>
 
 <Drawer.Root {snapPoints} bind:activeSnapPoint direction="bottom" dismissible shouldScaleBackground>
 	<Drawer.Trigger>
-		<Button variant="ghost" class="bg-gray-800 hover:bg-gray-700 text-white px-16"
-			>Show AudioSource
+		<Button variant="ghost" class="bg-gray-800 hover:bg-gray-700 text-white"
+			>Manage Audiocast Sources
 		</Button>
 	</Drawer.Trigger>
 
@@ -23,13 +22,10 @@
 		<Drawer.Content class="border-neutral-800 pb-40 block h-full w-full rounded-t-md">
 			<Drawer.Title
 				class="text-2xl px-4 py-2 mx-auto md:max-w-3xl xl:max-w-4xl w-full gradient-gray-to-emerald font-medium"
-				>Audiocast Source</Drawer.Title
-			>
-			<div
-				class={cn('h-full overflow-hidden', {
-					'overflow-y-auto': activeSnapPoint > snapPoints[0]
-				})}
-			>
+				>Audiocast Source
+			</Drawer.Title>
+
+			<div class="h-full overflow-hidden overflow-y-auto">
 				<div
 					class="mx-auto relative w-full h-[calc(100%+120px)] max-w-full px-4 py-2 md:max-w-3xl xl:max-w-4xl"
 				>

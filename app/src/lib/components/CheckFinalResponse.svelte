@@ -8,6 +8,7 @@
 	import { createEventDispatcher } from 'svelte';
 	import { Button } from './ui/button';
 	import { getSessionContext } from '@/stores/sessionContext.svelte';
+	import RenderAudioSource from '@/components/RenderAudioSource.svelte';
 
 	export let content: string;
 
@@ -17,7 +18,7 @@
 		generate: { summary: string };
 	}>();
 
-	const { sessionId$, sessionCompleted$ } = getSessionContext();
+	const { sessionId$, sessionCompleted$, audioSource$ } = getSessionContext();
 
 	function getSummary() {
 		const replacePrefixRegex = new RegExp(FINAL_RESPONSE_PREFIX, 'gi');
@@ -42,13 +43,17 @@
 			on:click={() => dispatch('generate', { summary: getSummary() })}>Generate Audiocast</Button
 		>
 
-		<Button
-			variant="ghost"
-			class="bg-gray-800 hover:bg-gray-700 text-emerald-600 hover:text-emerald-600"
-			on:click={() => dispatch('reviewSource', { summary: getSummary() })}
-		>
-			Review Source
-		</Button>
+		{#if $audioSource$}
+			<RenderAudioSource audioSource={$audioSource$} />
+		{:else}
+			<Button
+				variant="ghost"
+				class="bg-gray-800 hover:bg-gray-700 text-emerald-600 hover:text-emerald-600"
+				on:click={() => dispatch('reviewSource', { summary: getSummary() })}
+			>
+				Review Source
+			</Button>
+		{/if}
 
 		<Button
 			variant="ghost"

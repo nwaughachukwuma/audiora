@@ -12,11 +12,10 @@
 	import { onMount } from 'svelte';
 	import { debounce } from 'throttle-debounce';
 	import Spinner from '@/components/Spinner.svelte';
-	import RenderAudioSource from '@/components/RenderAudioSource.svelte';
 
 	export let data;
 
-	const { session$, addChatItem, updateChatContent, sessionId$, fetchingSource$, audioSource$ } =
+	const { session$, addChatItem, updateChatContent, sessionId$, fetchingSource$ } =
 		getSessionContext();
 
 	let searchTerm = '';
@@ -102,9 +101,7 @@
 					{@const finalResponse = item.content.includes(FINAL_RESPONSE_SUFFIX)}
 					<ChatListItem type={item.role} content={item.content} loading={item.loading} />
 
-					{#if finalResponse && $audioSource$}
-						<RenderAudioSource audioSource={$audioSource$} />
-					{:else if finalResponse}
+					{#if finalResponse}
 						<ChatListActionItems {sessionId} let:ongenerate let:onreviewSource let:onstartNew>
 							{#if $fetchingSource$}
 								<Spinner />
