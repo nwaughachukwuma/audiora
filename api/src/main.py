@@ -1,6 +1,7 @@
 from time import time
 from typing import Any, Callable, Generator
 
+from api.src.utils.get_session_title import GetSessionTitleModel, get_session_title
 from fastapi import BackgroundTasks, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
@@ -114,3 +115,9 @@ async def get_signed_url_endpoint(blobname: str):
             "Cache-Control": "public, max-age=86390, immutable",
         },
     )
+
+
+@app.post("/get-session-label", response_model=str)
+async def get_session_title_endpoint(request: GetSessionTitleModel, background_tasks: BackgroundTasks):
+    source_content = await get_session_title(request, background_tasks)
+    return source_content

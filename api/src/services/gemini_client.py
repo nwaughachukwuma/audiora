@@ -1,8 +1,7 @@
 from dataclasses import dataclass
-from typing import Literal
+from typing import Any, Callable, Literal, Optional
 
 import google.generativeai as genai
-
 from api.src.env_var import GEMINI_API_KEY
 
 
@@ -28,6 +27,7 @@ class GeminiConfig:
 def generate_content(
     prompt: list[str],
     config: GeminiConfig,
+    on_finish: Optional[Callable[[str], Any]] = None,
 ):
     model = get_gemini().GenerativeModel(
         model_name=config.model_name,
@@ -39,5 +39,20 @@ def generate_content(
         system_instruction=config.system_prompt,
     )
 
-    response = model.generate_content(prompt)
-    return response.text
+    response = model.generate_content(prompt, stream=config.stream)
+    if not config.stream:
+        return response.text
+
+    def _generator():
+        full_text = ""
+        for chunk in response:
+            full_text += chunk.text
+            yield chunk.text
+
+        if on_finish:
+            try:
+                on_finish(full_text)
+            except Exception:
+                pass
+
+    return _generator()
