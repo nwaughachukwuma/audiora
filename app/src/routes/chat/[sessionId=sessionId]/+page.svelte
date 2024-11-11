@@ -12,6 +12,7 @@
 	import { onMount } from 'svelte';
 	import { debounce } from 'throttle-debounce';
 	import Spinner from '@/components/Spinner.svelte';
+	import RenderAudioSource from '@/components/RenderAudioSource.svelte';
 
 	export let data;
 
@@ -102,10 +103,8 @@
 					<ChatListItem type={item.role} content={item.content} loading={item.loading} />
 
 					{#if finalResponse && $audioSource$}
-						<!-- TODO: Render this in a bottom sheet and allow user modification -->
-						{@html $audioSource$}
+						<RenderAudioSource audioSource={$audioSource$} />
 					{:else if finalResponse}
-						{scrollChatContent()}
 						<ChatListActionItems {sessionId} let:ongenerate let:onreviewSource let:onstartNew>
 							{#if $fetchingSource$}
 								<Spinner />

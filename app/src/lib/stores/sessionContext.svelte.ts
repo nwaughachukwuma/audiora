@@ -29,7 +29,7 @@ export function setSessionContext(sessionId: string) {
 	const sessionCompleted$ = derived(session$, ($session) => !!$session?.completed);
 
 	const fetchingSource$ = writable(false);
-	const audioSource$ = writable('');
+	const audioSource$ = persisted<string>(`AUDIOCAST_SOURCE_${sessionId}`, '');
 
 	return setContext(CONTEXT_KEY, {
 		session$,
