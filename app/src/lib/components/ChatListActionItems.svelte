@@ -3,6 +3,7 @@
 	import { getSessionContext } from '@/stores/sessionContext.svelte';
 	import type { ContentCategory } from '@/utils/types';
 	import { env } from '@env';
+	import { toast } from 'svelte-sonner';
 
 	export let sessionId: string;
 
@@ -24,7 +25,7 @@
 		if ($fetchingSource$) return;
 		$fetchingSource$ = true;
 
-		const response = await fetch(`${env.API_BASE_URL}/get-audiocast-source`, {
+		return fetch(`${env.API_BASE_URL}/get-audiocast-source`, {
 			method: 'POST',
 			body: JSON.stringify({ sessionId, category, summary }),
 			headers: { 'Content-Type': 'application/json' }
@@ -33,9 +34,12 @@
 				if (res.ok) return res.json();
 				throw new Error('Failed to get audiocast source');
 			})
+			.then((res) => {
+				$audioSource$ = res;
+				toast.success('Audiocast source generated successfully');
+			})
+			.catch((error) => toast.error(error.message))
 			.finally(() => ($fetchingSource$ = false));
-
-		$audioSource$ = response;
 	}
 </script>
 

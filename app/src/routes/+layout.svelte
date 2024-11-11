@@ -26,7 +26,9 @@
 
 	<div class="relative flex h-full w-full gap-x-2">
 		<span class="hidden md:block">
-			<SearchSidebar />
+			{#key sessionId}
+				<SearchSidebar />
+			{/key}
 		</span>
 
 		{#if !browser}

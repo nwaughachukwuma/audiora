@@ -104,7 +104,9 @@
 					{#if finalResponse}
 						<ChatListActionItems {sessionId} let:ongenerate let:onreviewSource>
 							{#if $fetchingSource$}
-								<Spinner />
+								<div class="block w-full animate-pulse text-center p-2 text-gray-300">
+									Fetching Audiocast Source...Please wait
+								</div>
 							{:else}
 								<CheckFinalResponse
 									content={item.content}

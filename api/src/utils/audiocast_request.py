@@ -5,7 +5,6 @@ from src.services.anthropic_client import get_anthropic_sync
 from src.services.gemini_client import GeminiConfig, generate_content
 from src.services.openai_client import get_openai
 from src.utils.chat_utils import ContentCategory
-from src.utils.make_seed import make_seed
 from src.utils.prompt_templates.source_content_prompt import get_content_source_prompt
 from src.utils.prompt_templates.streamline_audio import streamline_audio_script_prompt
 from src.utils.prompt_templates.tts_prompt import Metadata, TTSPromptMaker
@@ -35,7 +34,6 @@ def generate_source_content(category: ContentCategory, summary: str):
         ],
         temperature=0.5,
         max_tokens=4096,
-        seed=make_seed({"category": category, "summary": summary}),
     )
 
     return response.choices[0].message.content
