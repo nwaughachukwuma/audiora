@@ -6,6 +6,7 @@
 	import { uuid } from '@/utils/uuid';
 	import { streamingResponse } from '$lib/utils/streamingResponse';
 	import CheckFinalResponse from '@/components/CheckFinalResponse.svelte';
+	import ChatListActionItems from '@/components/chat-list/ChatListActionItems.svelte';
 
 	export let data;
 
@@ -87,13 +88,21 @@
 				{#each sessionChats as item (item.id)}
 					<ChatListItem type={item.role} content={item.content} loading={item.loading} />
 
-					<CheckFinalResponse
-						content={item.content}
-						on:finalResponse={scrollChatContent}
-						on:generate
-						on:reviewSource
-						on:startNew
-					/>
+					<ChatListActionItems
+						{category}
+						{sessionId}
+						let:ongenerate
+						let:onreviewSource
+						let:onstartNew
+					>
+						<CheckFinalResponse
+							content={item.content}
+							on:finalResponse={scrollChatContent}
+							on:generate={({ detail }) => ongenerate(detail.summary)}
+							on:reviewSource={onreviewSource}
+							on:startNew={onstartNew}
+						/>
+					</ChatListActionItems>
 				{/each}
 			{/key}
 		</div>
