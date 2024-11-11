@@ -28,10 +28,15 @@ export function setSessionContext(sessionId: string) {
 	const sessionId$ = writable(sessionId);
 	const sessionCompleted$ = derived(session$, ($session) => !!$session?.completed);
 
+	const fetchingSource$ = writable(false);
+	const audioSource$ = writable('');
+
 	return setContext(CONTEXT_KEY, {
 		session$,
 		sessionId$,
 		sessionCompleted$,
+		fetchingSource$,
+		audioSource$,
 		startSession: (category: ContentCategory) => {
 			session$.set({
 				id: sessionId,

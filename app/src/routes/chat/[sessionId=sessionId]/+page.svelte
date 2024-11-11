@@ -5,14 +5,18 @@
 	import { env } from '@env';
 	import { uuid } from '@/utils/uuid';
 	import { streamingResponse } from '$lib/utils/streamingResponse';
-	import CheckFinalResponse from '@/components/CheckFinalResponse.svelte';
+	import CheckFinalResponse, {
+		FINAL_RESPONSE_SUFFIX
+	} from '@/components/CheckFinalResponse.svelte';
 	import ChatListActionItems from '@/components/chat-list/ChatListActionItems.svelte';
 	import { onMount } from 'svelte';
 	import { debounce } from 'throttle-debounce';
+	import Spinner from '@/components/Spinner.svelte';
 
 	export let data;
 
-	const { session$, addChatItem, updateChatContent, sessionId$ } = getSessionContext();
+	const { session$, addChatItem, updateChatContent, sessionId$, fetchingSource$, audioSource$ } =
+		getSessionContext();
 
 	let searchTerm = '';
 	let loading = false;
@@ -94,17 +98,27 @@
 		<div class="flex flex-col gap-y-3 h-full">
 			{#key sessionChats}
 				{#each sessionChats as item (item.id)}
+					{@const finalResponse = item.content.includes(FINAL_RESPONSE_SUFFIX)}
 					<ChatListItem type={item.role} content={item.content} loading={item.loading} />
 
-					<ChatListActionItems {sessionId} let:ongenerate let:onreviewSource let:onstartNew>
-						<CheckFinalResponse
-							content={item.content}
-							on:finalResponse={scrollChatContent}
-							on:generate={({ detail }) => ongenerate(detail.summary)}
-							on:reviewSource={onreviewSource}
-							on:startNew={onstartNew}
-						/>
-					</ChatListActionItems>
+					{#if finalResponse && $audioSource$}
+						<!-- TODO: Render this in a bottom sheet and allow user modification -->
+						{@html $audioSource$}
+					{:else if finalResponse}
+						{scrollChatContent()}
+						<ChatListActionItems {sessionId} let:ongenerate let:onreviewSource let:onstartNew>
+							{#if $fetchingSource$}
+								<Spinner />
+							{:else}
+								<CheckFinalResponse
+									content={item.content}
+									on:startNew={onstartNew}
+									on:generate={({ detail }) => ongenerate(detail.summary)}
+									on:reviewSource={({ detail }) => onreviewSource(category, detail.summary)}
+								/>
+							{/if}
+						</ChatListActionItems>
+					{/if}
 				{/each}
 			{/key}
 		</div>

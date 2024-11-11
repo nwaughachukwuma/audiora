@@ -3,7 +3,7 @@
 	import ChatBoxContainer from './ChatBoxContainer.svelte';
 
 	export let searchTerm = '';
-	const { sessionCompleted$ } = getSessionContext();
+	const { sessionCompleted$, fetchingSource$, audioSource$ } = getSessionContext();
 	let navLoading = false;
 </script>
 
@@ -15,7 +15,7 @@
 		<div class="h-32"></div>
 	</div>
 
-	{#if !$sessionCompleted$}
+	{#if !$sessionCompleted$ && !$fetchingSource$ && !$audioSource$}
 		<ChatBoxContainer
 			bind:searchTerm
 			loading={navLoading}
