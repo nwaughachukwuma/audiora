@@ -100,7 +100,8 @@
 	}
 
 	$: shareableLink = `${$page.url.origin}/audiocast/${sessionId}`;
-	$: shareTitle = `This audiocast was generated via @try_audiora 🔥 \n\n`;
+	$: shareTitle =
+		`Listen to this AI generated audio 🎧 about ${title} 🔥`.replace(/\n+/, '') + '\n';
 </script>
 
 <div>

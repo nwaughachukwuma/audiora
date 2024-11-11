@@ -31,8 +31,8 @@
 			<XShare
 				text={title}
 				{url}
-				hashtags="try_audiora,ai_audio,generative_audio"
-				via="username"
+				hashtags="ai_audio,generative_audio"
+				via="try_audiora"
 				related="other,users"
 			/>
 
