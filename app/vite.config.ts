@@ -17,6 +17,6 @@ export default defineConfig({
 		noExternal: ['ramda', 'bits-ui', 'rxfire']
 	},
 	optimizeDeps: {
-		include: []
+		include: ['copy-to-clipboard']
 	}
 });

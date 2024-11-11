@@ -13,6 +13,9 @@
 	import { getSessionContext } from '@/stores/sessionContext.svelte';
 	import RenderAudioSource from '@/components/RenderAudioSource.svelte';
 	import { streamingResponse } from '@/utils/streamingResponse';
+	import { Share2Icon } from 'lucide-svelte';
+	import ShareModal from './share/ShareModal.svelte';
+	import { page } from '$app/stores';
 
 	export let sessionId: string;
 	export let category: ContentCategory;
@@ -95,17 +98,32 @@
 			});
 		}
 	}
+
+	$: shareableLink = `${$page.url.origin}/audiocast/${sessionId}`;
+	$: shareTitle = `This audiocast was generated via @try_audiora 🔥 \n\n`;
 </script>
 
 <div>
 	{#if $sessionCompleted$}
-		<div class="mt-3 w-full items-center justify-center flex">
-			<a
+		<div class="mt-3 w-full items-center justify-center gap-3 grid grid-cols-2 sm:grid-cols-2">
+			<Button
 				href="/audiocast/{$sessionId$}"
 				data-sveltekit-preload-data="hover"
-				class="py-3 rounded-md px-16 no-underline hover:no-underline bg-emerald-600 text-emerald-100 hover:bg-emerald-700"
-				>View Audiocast</a
+				class="py-6 rounded-md text-base no-underline text-center hover:no-underline bg-emerald-600 text-emerald-100 hover:bg-emerald-700"
+				>View Audiocast</Button
 			>
+
+			<ShareModal url={shareableLink} title={shareTitle}>
+				<Button
+					slot="trigger"
+					variant="ghost"
+					class="py-6 w-full text-base rounded-md no-underline hover:no-underline bg-gray-800 text-gray-200 hover:bg-gray-700"
+					on:click
+				>
+					<span> Share </span>
+					<Share2Icon class="w-4 h-4 ml-2 inline" />
+				</Button>
+			</ShareModal>
 		</div>
 	{:else}
 		<div class="animate-fade-in grid sm:grid-cols-2 gap-3">
