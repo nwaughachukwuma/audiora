@@ -7,16 +7,24 @@
 	import { streamingResponse } from '$lib/utils/streamingResponse';
 	import CheckFinalResponse from '@/components/CheckFinalResponse.svelte';
 	import ChatListActionItems from '@/components/chat-list/ChatListActionItems.svelte';
+	import { onMount } from 'svelte';
+	import { debounce } from 'throttle-debounce';
 
 	export let data;
 
 	const { session$, addChatItem, updateChatContent, sessionId$ } = getSessionContext();
+
 	let searchTerm = '';
 	let loading = false;
+	let generatingAudiocast = false;
+
+	let mounted = false;
 
 	$: category = data.category;
 	$: sessionId = $sessionId$;
 	$: sessionId && handleFirstEntry();
+
+	$: mounted && scrollChatContent();
 
 	async function handleFirstEntry() {
 		if (!$session$ || $session$.chats.length > 1) return;
@@ -24,13 +32,13 @@
 		await chatRequest($session$.chats[0]).finally(() => (loading = false));
 	}
 
-	function scrollChatContent() {
+	const scrollChatContent = debounce(500, () => {
 		const chatContent = document.getElementById('chatContainer1');
 		if (!chatContent) return;
 		requestAnimationFrame(() => {
 			chatContent.scrollTo({ top: chatContent.scrollHeight, behavior: 'smooth' });
 		});
-	}
+	});
 
 	async function handleSearch() {
 		if (loading || !searchTerm) return;
@@ -75,6 +83,8 @@
 	}
 
 	$: sessionChats = $session$?.chats || [];
+
+	onMount(() => (mounted = true));
 </script>
 
 <ChatContainer bind:searchTerm on:click={handleSearch} on:keypress={handleSearch}>
@@ -91,6 +101,7 @@
 					<ChatListActionItems
 						{category}
 						{sessionId}
+						bind:generating={generatingAudiocast}
 						let:ongenerate
 						let:onreviewSource
 						let:onstartNew
