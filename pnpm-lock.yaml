@@ -155,6 +155,9 @@ importers:
       typescript-eslint:
         specifier: ^8.0.0
         version: 8.13.0(eslint@9.14.0(jiti@1.21.6))(typescript@5.6.3)
+      vaul-svelte:
+        specifier: ^0.3.2
+        version: 0.3.2(svelte@4.2.19)
       vite:
         specifier: ^5.4.2
         version: 5.4.10(@types/node@22.9.0)
@@ -2496,6 +2499,11 @@ packages:
   uuid@9.0.1:
     resolution: {integrity: sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==}
     hasBin: true
+
+  vaul-svelte@0.3.2:
+    resolution: {integrity: sha512-X4OGWttSTVUl417qGDsSFgOvIx24DoiMRY/jaP9z0v9FL8LQQJ0RQ1ZM0QpdyQPRlNd24ewjNQHh5EgYDtfNpw==}
+    peerDependencies:
+      svelte: ^4.0.0 || ^5.0.0-next.1
 
   vite-node@2.1.4:
     resolution: {integrity: sha512-kqa9v+oi4HwkG6g8ufRnb5AeplcRw8jUF6/7/Qz1qRQOXHImG8YnLbB+LLszENwFnoBl9xIf9nVdCFzNd7GQEg==}
@@ -5189,6 +5197,11 @@ snapshots:
 
   uuid@9.0.1:
     optional: true
+
+  vaul-svelte@0.3.2(svelte@4.2.19):
+    dependencies:
+      bits-ui: 0.21.16(svelte@4.2.19)
+      svelte: 4.2.19
 
   vite-node@2.1.4(@types/node@22.9.0):
     dependencies:
