@@ -71,7 +71,7 @@
 				</RenderMedia>
 
 				<Accordion.Root>
-					<Accordion.Item value="item-0">
+					<Accordion.Item value="item-0" class="border-gray-800">
 						<Accordion.Trigger>Show Waveform</Accordion.Trigger>
 						<Accordion.Content>
 							<RenderMedia filename="{$session$.id}.mp4" let:uri>
@@ -85,10 +85,10 @@
 						</Accordion.Content>
 					</Accordion.Item>
 
-					<Accordion.Item value="item-1">
+					<Accordion.Item value="item-1" class="border-gray-800">
 						<Accordion.Trigger>Audio Transcript</Accordion.Trigger>
 						<Accordion.Content>
-							<div class="flex w-full flex-col gap-y-3">
+							<div class="flex w-full flex-col gap-y-3 p-2 bg-gray-900/70 text-gray-300">
 								{#await parse(parseScript(script)) then parsedContent}
 									{@html parsedContent}
 								{/await}
@@ -96,10 +96,10 @@
 						</Accordion.Content>
 					</Accordion.Item>
 
-					<Accordion.Item value="item-2">
+					<Accordion.Item value="item-2" class="border-gray-800">
 						<Accordion.Trigger>Source Content</Accordion.Trigger>
 						<Accordion.Content>
-							<div class="flex w-full flex-col gap-y-3">
+							<div class="flex w-full flex-col gap-y-3 bg-gray-900/70 text-gray-300 p-2">
 								{#await parse(sourceContent) then parsedContent}
 									{@html parsedContent}
 								{/await}

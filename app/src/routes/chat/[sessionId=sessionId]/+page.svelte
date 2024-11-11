@@ -1,17 +1,15 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import ChatContainer from '@/components/ChatContainer.svelte';
 	import { getSessionContext, type ChatItem } from '@/stores/sessionContext.svelte.js';
 	import ChatListItem from '@/components/ChatListItem.svelte';
 	import { env } from '@env';
 	import { uuid } from '@/utils/uuid';
 	import { streamingResponse } from '$lib/utils/streamingResponse';
-	import CheckFinalResponse, {
+	import ChatListActionItems, {
 		FINAL_RESPONSE_SUFFIX
-	} from '@/components/CheckFinalResponse.svelte';
-	import ChatListActionItems from '@/components/ChatListActionItems.svelte';
-	import { onMount } from 'svelte';
+	} from '@/components/ChatListActionItems.svelte';
 	import { debounce } from 'throttle-debounce';
-	import Spinner from '@/components/Spinner.svelte';
 
 	export let data;
 
@@ -101,20 +99,12 @@
 					{@const finalResponse = item.content.includes(FINAL_RESPONSE_SUFFIX)}
 					<ChatListItem type={item.role} content={item.content} loading={item.loading} />
 
-					{#if finalResponse}
-						<ChatListActionItems {sessionId} let:ongenerate let:onreviewSource>
-							{#if $fetchingSource$}
-								<div class="block w-full animate-pulse text-center p-2 text-gray-300">
-									Fetching Audiocast Source...Please wait
-								</div>
-							{:else}
-								<CheckFinalResponse
-									content={item.content}
-									on:generate={({ detail }) => ongenerate(detail.summary)}
-									on:reviewSource={({ detail }) => onreviewSource(category, detail.summary)}
-								/>
-							{/if}
-						</ChatListActionItems>
+					{#if finalResponse && $fetchingSource$}
+						<div class="block w-full animate-pulse text-center p-2 text-gray-300">
+							Fetching Audiocast Source...Please wait
+						</div>
+					{:else if finalResponse}
+						<ChatListActionItems {sessionId} {category} content={item.content} />
 					{/if}
 				{/each}
 			{/key}
