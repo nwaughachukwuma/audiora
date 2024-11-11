@@ -1,3 +1,4 @@
+import datetime
 import os
 from dataclasses import dataclass
 from io import BytesIO
@@ -8,7 +9,7 @@ from uuid import uuid4
 from google.cloud import storage
 from pydub import AudioSegment
 
-from api.src.env_var import BUCKET_NAME
+from src.env_var import BUCKET_NAME
 
 storage_client = storage.Client()
 bucket = storage_client.bucket(BUCKET_NAME)
@@ -92,3 +93,15 @@ class StorageManager:
 
         blob.download_to_filename(tmp_file_path)
         return tmp_file_path
+
+    def get_signed_url(self, blobname, expiration=datetime.timedelta(days=1)):
+        """get a signed URL for a blob"""
+        blob = bucket.blob(blobname)
+        if not blob.exists():
+            raise Exception(f"Blob {blobname} does not exist")
+
+        return blob.generate_signed_url(
+            version="v4",
+            expiration=expiration,
+            method="GET",
+        )

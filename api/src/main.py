@@ -3,9 +3,10 @@ from typing import Any, Callable, Generator
 
 from fastapi import BackgroundTasks, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi_utilities import add_timer_middleware
 
+from src.services.storage import StorageManager
 from src.utils.chat_request import chat_request
 from src.utils.chat_utils import (
     SessionChatItem,
@@ -89,3 +90,18 @@ async def generate_audiocast_endpoint(
 async def get_audiocast_endpoint(session_id: str):
     result = get_audiocast(session_id)
     return result
+
+
+@app.get("/get-signed-url", response_model=str)
+async def get_signed_url_endpoint(blobname: str):
+    """
+    Get signed URL for generated audiocast
+    """
+    url = StorageManager().get_signed_url(blobname=blobname)
+    return JSONResponse(
+        content=url,
+        headers={
+            "Content-Type": "application/json",
+            "Cache-Control": "public, max-age=86390, immutable",
+        },
+    )
