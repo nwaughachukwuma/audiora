@@ -1,4 +1,4 @@
-<script lang="ts" context="module">
+<script context="module">
 	import '../app.css';
 </script>
 
@@ -10,9 +10,11 @@
 	import SearchSidebar from '@/components/Sidebar.svelte';
 	import { page } from '$app/stores';
 	import Spinner from '@/components/Spinner.svelte';
+	import { setAppContext } from '@/stores/appContext.svelte';
 
 	export let data;
 
+	$: setAppContext();
 	$: sessionId = $page.params.sessionId || data.sessionId;
 	$: setSessionContext(sessionId);
 </script>
@@ -26,9 +28,11 @@
 
 	<div class="relative flex h-full w-full gap-x-2">
 		<span class="hidden md:block">
-			{#key sessionId}
-				<SearchSidebar />
-			{/key}
+			{#if browser}
+				{#key sessionId}
+					<SearchSidebar />
+				{/key}
+			{/if}
 		</span>
 
 		{#if !browser}

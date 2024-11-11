@@ -4,7 +4,7 @@ import { persisted } from 'svelte-persisted-store';
 const CONTEXT_KEY = {};
 
 export const setAppContext = () => {
-	const openSettingsDrawer$ = persisted('SETTINGS_DRAWER', true);
+	const openSettingsDrawer$ = persisted('SETTINGS_DRAWER', false);
 	return setContext(CONTEXT_KEY, {
 		openSettingsDrawer$
 	});
