@@ -1,6 +1,9 @@
 <script>
+	import { getSessionContext } from '@/stores/sessionContext.svelte';
 	import ChatBoxContainer from './ChatBoxContainer.svelte';
+
 	export let searchTerm = '';
+	const { sessionCompleted$ } = getSessionContext();
 	let navLoading = false;
 </script>
 
@@ -12,5 +15,14 @@
 		<div class="h-32"></div>
 	</div>
 
-	<ChatBoxContainer bind:searchTerm loading={navLoading} showIcon on:keypress on:click />
+	{#if !$sessionCompleted$}
+		<ChatBoxContainer
+			bind:searchTerm
+			loading={navLoading}
+			showIcon
+			disabled={$sessionCompleted$}
+			on:keypress
+			on:click
+		/>
+	{/if}
 </div>

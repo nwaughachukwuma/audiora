@@ -1,7 +1,7 @@
 import type { ContentCategory } from '@/utils/types';
 import { setContext, getContext } from 'svelte';
 import { persisted } from 'svelte-persisted-store';
-import { writable } from 'svelte/store';
+import { derived, writable } from 'svelte/store';
 
 const CONTEXT_KEY = {};
 export const SESSION_KEY = 'AUDIOCAST_SESSION';
@@ -26,10 +26,12 @@ export type Session = {
 export function setSessionContext(sessionId: string) {
 	const session$ = persisted<Session | null>(`${SESSION_KEY}_${sessionId}`, null);
 	const sessionId$ = writable(sessionId);
+	const sessionCompleted$ = derived(session$, ($session) => !!$session?.completed);
 
 	return setContext(CONTEXT_KEY, {
 		session$,
 		sessionId$,
+		sessionCompleted$,
 		startSession: (category: ContentCategory) => {
 			session$.set({
 				id: sessionId,
