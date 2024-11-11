@@ -2,8 +2,8 @@ from fastapi import BackgroundTasks
 from pydantic import BaseModel
 
 from src.utils.audiocast_request import generate_source_content
-from src.utils.cache_manager import ONE_MONTH, cache_manager
 from src.utils.chat_utils import ContentCategory
+from src.utils.decorators import use_cache_manager
 from src.utils.make_seed import get_hash
 from src.utils.session_manager import SessionManager
 
@@ -26,28 +26,18 @@ async def get_audiocast_source(request: GetAudiocastSourceModel, background_task
 
     params = {"sessionId": session_id, "category": category, "summary": summary}
     cache_key = get_hash(params, "audio_source")
-    cache = await cache_manager(cache_key)
 
-    if cache:
-        cached_value = cache.get("cached_value")
-        if cached_value:
-            return cached_value
+    @use_cache_manager(cache_key)
+    async def _handler():
+        db = SessionManager(session_id)
 
-    db = SessionManager(session_id)
+        def update_session_info(info: str):
+            background_tasks.add_task(db._update_info, info)
 
-    def update_session_info(info: str):
-        background_tasks.add_task(db._update_info, info)
+        update_session_info("Generating source content...")
 
-    update_session_info("Generating source content...")
+        source_content = generate_source_content(category, summary)
 
-    source_content = generate_source_content(category, summary)
+        return source_content
 
-    async def save_to_cache(content: str):
-        if cache:
-            redis = cache.get("redis")
-            await redis.set(cache_key, content, ex=ONE_MONTH)
-
-    if source_content:
-        background_tasks.add_task(save_to_cache, source_content)
-
-    return source_content
+    return await _handler()
