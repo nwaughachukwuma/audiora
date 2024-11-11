@@ -19,11 +19,12 @@ async def get_session_title(request: GetSessionTitleModel, background_tasks: Bac
     """
     system_prompt = f"""Your task is deduce a concise, comprehensive and descriptive topic or title for the following content.
 
-    Content category: {request.summary}
     High level summary: {request.category}
+    Content category: {request.summary}
 
     1. Keep it succint within the length of a short phrase.
-    2. No preambles or unnecessary information, just the topic or title.
+    2. Be exhaustive as possible, capturing both the category and summary.
+    3. No preambles or unnecessary information, just the topic or title.
     """
 
     session_id = request.sessionId

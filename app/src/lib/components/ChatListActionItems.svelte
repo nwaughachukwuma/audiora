@@ -12,10 +12,12 @@
 	import { Button } from './ui/button';
 	import { getSessionContext } from '@/stores/sessionContext.svelte';
 	import RenderAudioSource from '@/components/RenderAudioSource.svelte';
+	import { streamingResponse } from '@/utils/streamingResponse';
 
 	export let sessionId: string;
 	export let category: ContentCategory;
 	export let content: string;
+	export let title: string;
 
 	const { session$, audioSource$, fetchingSource$, sessionId$, sessionCompleted$ } =
 		getSessionContext();
@@ -57,6 +59,41 @@
 			})
 			.catch((error) => toast.error(error.message))
 			.finally(() => ($fetchingSource$ = false));
+	}
+
+	$: if (title.toLowerCase() === 'untitled') getSessionTitle();
+
+	let generatingTitle = false;
+
+	async function getSessionTitle() {
+		if (generatingTitle) return;
+		generatingTitle = true;
+
+		return fetch(`${env.API_BASE_URL}/get-session-title`, {
+			method: 'POST',
+			body: JSON.stringify({
+				sessionId,
+				category,
+				summary: getSummary()
+			}),
+			headers: { 'Content-Type': 'application/json' }
+		})
+			.then(handleStreamingResponse)
+			.finally(() => (generatingTitle = false));
+	}
+
+	async function handleStreamingResponse(res: Response) {
+		if (!res.ok) return;
+
+		for await (const chunk of streamingResponse(res)) {
+			session$.update((session) => {
+				if (session) {
+					if (session.title.toLowerCase() === 'untitled') session.title = '';
+					session.title += chunk;
+				}
+				return session;
+			});
+		}
 	}
 </script>
 
