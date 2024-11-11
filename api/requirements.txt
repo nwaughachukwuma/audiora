@@ -28,3 +28,4 @@ seewav
 setuptools
 uvicorn
 uvloop
+redis[hiredis]
