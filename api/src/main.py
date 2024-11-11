@@ -117,7 +117,7 @@ async def get_signed_url_endpoint(blobname: str):
     )
 
 
-@app.post("/get-session-label", response_model=str)
+@app.post("/get-session-title", response_model=str)
 async def get_session_title_endpoint(request: GetSessionTitleModel, background_tasks: BackgroundTasks):
     source_content = await get_session_title(request, background_tasks)
     return source_content

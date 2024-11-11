@@ -89,6 +89,9 @@
 
 <ChatContainer bind:searchTerm on:click={handleSearch} on:keypress={handleSearch}>
 	<div slot="content" class="block w-full">
+		{#if $session$?.title}
+			<h1 class="text-2xl font-semibold text-sky-200 mb-4">{$session$.title}</h1>
+		{/if}
 		<p class="mt-6 p-3 bg-sky-950/70 text-sky-200 rounded-md mb-4 w-full">
 			Help us understand your preferences to curate the best audiocast for you.
 		</p>
@@ -104,7 +107,12 @@
 							Fetching Audiocast Source...Please wait
 						</div>
 					{:else if finalResponse}
-						<ChatListActionItems {sessionId} {category} content={item.content} />
+						<ChatListActionItems
+							title={$session$?.title || 'Untitled'}
+							{sessionId}
+							{category}
+							content={item.content}
+						/>
 					{/if}
 				{/each}
 			{/key}

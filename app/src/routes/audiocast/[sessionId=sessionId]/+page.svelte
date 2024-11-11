@@ -63,6 +63,10 @@
 			{@const script = data.script}
 			{@const sourceContent = data.source_content}
 			<div class="flex w-full px-4 flex-col gap-y-3 sm:max-w-xl lg:max-w-3xl max-w-full">
+				{#if $session$.title}
+					<h1 class="text-2xl font-semibold text-sky-200 mb-4">{$session$.title}</h1>
+				{/if}
+
 				<RenderMedia filename="{$session$.id}.mp4" let:uri>
 					<audio controls class="w-full animate-fade-in block">
 						<source src={uri} type="audio/mpeg" />

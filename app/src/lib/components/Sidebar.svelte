@@ -48,7 +48,7 @@
 
 <div
 	class={cs('scrollbar-none block h-full shrink-0 overflow-x-hidden bg-gray-900', {
-		'w-full overflow-y-auto px-2 md:w-72': $openSettingsDrawer$,
+		'w-full overflow-y-auto px-2 md:w-72 xl:w-80': $openSettingsDrawer$,
 		'w-0': !$openSettingsDrawer$
 	})}
 	style="transition: width 0.3s cubic-bezier(0.34, 1.47, 0.64, 1), padding 0.3s ease;"

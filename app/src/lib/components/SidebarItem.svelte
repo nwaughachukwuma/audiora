@@ -12,7 +12,6 @@
 	import { crossfade } from 'svelte/transition';
 	import { page } from '$app/stores';
 	import { Button } from './ui/button';
-	import cs from 'clsx';
 	import { cn } from '@/utils/ui.utils';
 
 	export let item: SearchSidebarItem;
