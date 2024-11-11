@@ -29,7 +29,7 @@ async def generate_audiocast(request: GenerateAudioCastRequest, background_tasks
     category = request.category
     session_id = request.sessionId
 
-    source_content = get_audiocast_source(
+    source_content = await get_audiocast_source(
         GetAudiocastSourceModel(
             sessionId=session_id,
             category=category,

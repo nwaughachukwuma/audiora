@@ -95,7 +95,7 @@ async def get_audiocast_endpoint(session_id: str):
 
 @app.post("/get-audiocast-source", response_model=str)
 async def review_source_endpoint(request: GetAudiocastSourceModel, background_tasks: BackgroundTasks):
-    source_content = get_audiocast_source(request, background_tasks)
+    source_content = await get_audiocast_source(request, background_tasks)
     if not source_content:
         raise HTTPException(status_code=500, detail="Failed to generate source content")
     return source_content
