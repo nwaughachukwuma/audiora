@@ -17,7 +17,7 @@
 			</svg>
 		</Button>
 	</Sheet.Trigger>
-	<Sheet.Content side="left" class="bg-background border-muted">
+	<Sheet.Content side="left" class="bg-gray-900 border-muted">
 		<Sheet.Header class="mb-1 text-left">
 			<Sheet.Title class="ml-4 text-gray-200">Audiocasts</Sheet.Title>
 		</Sheet.Header>
