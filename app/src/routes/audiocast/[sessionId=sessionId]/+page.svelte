@@ -18,8 +18,8 @@
 	import type { ContentCategory } from '@/utils/types';
 	import { env } from '@env';
 	import { parse } from 'marked';
-	import RenderAudiocast from '@/components/RenderAudiocast.svelte';
 	import * as Accordion from '@/components/ui/accordion';
+	import RenderMedia from '@/components/RenderMedia.svelte';
 
 	const { session$ } = getSessionContext();
 
@@ -52,9 +52,7 @@
 	}
 </script>
 
-<div
-	class="mx-auto flex h-full w-full max-w-full flex-col items-center overflow-hidden px-2 sm:max-w-xl sm:px-1 lg:max-w-3xl"
->
+<div class="mx-auto flex h-full w-full pb-40 overflow-auto mt-6 flex-col items-center px-2 sm:px-1">
 	{#if $session$?.summary}
 		{@const { summary, category } = $session$}
 		{#await getAudiocast($session$.id, category, summary)}
@@ -64,10 +62,29 @@
 		{:then data}
 			{@const script = data.script}
 			{@const sourceContent = data.source_content}
-			<div class="flex w-full flex-col gap-y-3">
-				<RenderAudiocast sessionId={$session$.id} />
+			<div class="flex w-full px-4 flex-col gap-y-3 sm:max-w-xl lg:max-w-3xl max-w-full">
+				<RenderMedia filename="{$session$.id}.mp4" let:uri>
+					<audio controls class="w-full animate-fade-in block">
+						<source src={uri} type="audio/mpeg" />
+						Your browser does not support the audio element.
+					</audio>
+				</RenderMedia>
 
 				<Accordion.Root>
+					<Accordion.Item value="item-0">
+						<Accordion.Trigger>Show Waveform</Accordion.Trigger>
+						<Accordion.Content>
+							<RenderMedia filename="{$session$.id}.mp4" let:uri>
+								<video controls class="w-full h-64 animate-fade-in block">
+									<source src={uri} type="video/mp4" />
+									Your browser does not support the video element.
+
+									<track kind="captions" />
+								</video>
+							</RenderMedia>
+						</Accordion.Content>
+					</Accordion.Item>
+
 					<Accordion.Item value="item-1">
 						<Accordion.Trigger>Audio Transcript</Accordion.Trigger>
 						<Accordion.Content>
@@ -78,9 +95,7 @@
 							</div>
 						</Accordion.Content>
 					</Accordion.Item>
-				</Accordion.Root>
 
-				<Accordion.Root>
 					<Accordion.Item value="item-2">
 						<Accordion.Trigger>Source Content</Accordion.Trigger>
 						<Accordion.Content>

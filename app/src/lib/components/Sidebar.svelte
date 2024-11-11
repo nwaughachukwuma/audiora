@@ -26,7 +26,8 @@
 		.map(([sessionId, item]) => ({
 			title: item.title || 'Untitled',
 			nonce: item.nonce,
-			href: `/chat/${sessionId}?category=${item.category}`
+			href: `/chat/${sessionId}?category=${item.category}`,
+			sessionId
 		}))
 		.sort((a, b) => b.nonce - a.nonce);
 

@@ -3,6 +3,7 @@
 		title: string;
 		nonce: number;
 		href: string;
+		sessionId: string;
 	};
 </script>
 
@@ -21,7 +22,7 @@
 		easing: cubicInOut
 	});
 
-	$: isActive = $page.url.href.includes(item.href);
+	$: isActive = $page.url.href.includes(item.sessionId);
 </script>
 
 <Button
