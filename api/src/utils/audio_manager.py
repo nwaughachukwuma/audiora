@@ -25,10 +25,19 @@ class AudioManager(AudioManagerSpeechGenerator, ContentSplitter):
         self.config = AudioManagerConfig(**custom_config.__dict__) if custom_config else AudioManagerConfig()
         self.config.ensure_directories()
 
-    def _get_tags(self, audio_script: str) -> List[str]:
-        tags = re.findall(r"<(Speaker\d+)>", audio_script)
+    def _get_provider_custom_tags(self) -> List[str]:
+        # ["say-as", "prosody", "break", "emphasis", "mark"]
+        if self.config.tts_provider == "openai":
+            return ["voice"]
+        elif self.config.tts_provider == "elevenlabs":
+            return ["voice", "prosody", "break"]
+        else:
+            return []
+
+    def _get_tags(self, audio_script: str):
+        tags: List[str] = re.findall(r"<(Speaker\d+)>", audio_script)
         tags.sort()
-        return list(set(tags))
+        return list(set(tags)) + self._get_provider_custom_tags()
 
     async def generate_speech(self, audio_script: str):
         """

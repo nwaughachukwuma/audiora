@@ -13,29 +13,21 @@ def clean_tss_markup(input_text: str, tags: List[str] = []) -> str:
     Returns:
         str: Cleaned text with unsupported TSS markup tags removed.
     """
-    # List of SSML tags
-    supported_tags = [
-        "speak",
-        "lang",
-        "p",
-        "phoneme",
-        "s",
-        "say-as",
-        "sub",
-        "prosody",
-        "break",
-        "emphasis",
-        "mark",
-    ]
+    # List of SSML tags generally supported by e.g., OpenAI and ElevenLabs
+    supported_tags = ["speak", "lang", "p", "phoneme", "s", "sub"]
 
     # Append additional tags to the supported tags list
     supported_tags.extend(tags)
+
     # Create a pattern that matches any tag not in the supported list
     pattern = r"</?(?!(?:" + "|".join(supported_tags) + r")\b)[^>]+>"
+
+    # Remove unsupported tags
     cleaned_text = re.sub(pattern, "", input_text)
 
     # Remove any leftover empty lines
     cleaned_text = re.sub(r"\n\s*\n", "\n", cleaned_text)
+
     # Ensure closing tags for additional tags are preserved
     for tag in tags:
         cleaned_text = re.sub(
