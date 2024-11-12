@@ -1,0 +1,41 @@
+name: Cleanup
+on:
+  pull_request:
+    types: [closed]
+    paths:
+      - "src/ui/app/**"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PROJECT_ID: ${{ secrets.PROJECT_ID }}
+  VERSION: ${{ format('pr-{0}', github.event.number) }}
+  CI: true
+
+jobs:
+  delete-preview-versions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: "${{ secrets.GCP_SA_KEY }}"
+      - uses: google-github-actions/setup-gcloud@v2
+      - run: |
+          gcloud app versions delete ${{ env.VERSION }} -q || true
+        continue-on-error: true
+
+  delete_stale_versions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: ${{ github.ref == 'refs/heads/main' }}
+    steps:
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: "${{ secrets.GCP_SA_KEY }}"
+      - uses: google-github-actions/setup-gcloud@v2
+      - run: |
+          bash ./.github/apps/delete-stale-app-versions.sh
+        continue-on-error: true
