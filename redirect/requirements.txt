@@ -1,5 +1,4 @@
-fastapi
-uvicorn
+Flask
 gunicorn
 
 python-dotenv

@@ -1,46 +1,23 @@
 import os
 
 from dotenv import load_dotenv
-from fastapi import FastAPI
-from fastapi.responses import RedirectResponse
-
-app = FastAPI()
+from flask import Flask, redirect, request
 
 load_dotenv()
 
-API_URL = os.environ["API_URL"]
+app = Flask(__name__)
+
+API_BASE_URL = os.environ["API_URL"]
+methods = ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"]
 
 
-@app.get("/{full_path:path}")
-def read_root_get(full_path: str):
-    return RedirectResponse(url=API_URL)
+@app.route("/", defaults={"path": ""}, methods=methods)
+@app.route("/<path:path>", methods=methods)
+def redirect_handler(path):
+    qs = request.query_string.decode("utf-8")
+    new_url = f"{API_BASE_URL}/{path}?{qs}" if path else f"{API_BASE_URL}?{qs}"
+    return redirect(new_url, code=301)
 
 
-@app.post("/{full_path:path}")
-def read_root_post(full_path: str):
-    return RedirectResponse(url=API_URL)
-
-
-@app.put("/{full_path:path}")
-def read_root_put(full_path: str):
-    return RedirectResponse(url=API_URL)
-
-
-@app.delete("/{full_path:path}")
-def read_root_delete(full_path: str):
-    return RedirectResponse(url=API_URL)
-
-
-@app.patch("/{full_path:path}")
-def read_root_patch(full_path: str):
-    return RedirectResponse(url=API_URL)
-
-
-@app.options("/{full_path:path}")
-def read_root_options(full_path: str):
-    return RedirectResponse(url=API_URL)
-
-
-@app.head("/{full_path:path}")
-def read_root_head(full_path: str):
-    return RedirectResponse(url=API_URL)
+if __name__ == "__main__":
+    app.run(debug=False)

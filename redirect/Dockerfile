@@ -21,8 +21,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 ENV HOST '0.0.0.0'
 EXPOSE $PORT
-
-ENV WORKER 4
-ENV THREADS 16
-ENV TIMEOUT 0
-CMD exec gunicorn -k uvicorn.workers.UvicornWorker -b :$PORT -w $WORKER --threads $THREADS -t $TIMEOUT --preload main:app
+CMD exec gunicorn -b :$PORT main:app
