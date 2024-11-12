@@ -15,7 +15,7 @@
 	<div class="sm:max-w-xl lg:max-w-3xl max-w-full w-full">
 		<div class="scrollbar-y-1 w-full h-[calc(100%-4rem)] block">
 			<slot name="content"></slot>
-			<div class="h-48"></div>
+			<div class="h-24"></div>
 		</div>
 
 		{#if !$sessionCompleted$ && !$fetchingSource$ && !$audioSource$}

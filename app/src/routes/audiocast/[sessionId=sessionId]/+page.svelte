@@ -69,11 +69,9 @@
 	}
 </script>
 
-<div
-	class="mx-auto flex h-full w-full pb-40 overflow-auto mt-16 flex-col items-center px-2 sm:px-1"
->
+<div class="mx-auto flex h-full w-full pb-40 overflow-auto mt-6 flex-col items-center px-2 sm:px-1">
 	{#await getAudiocast(sessionId)}
-		<div class="flex flex-col w-full items-center justify-center -mt-4">
+		<div class="flex flex-col w-full items-center justify-center -mt-6">
 			<AudiocastPageSkeletonLoader />
 
 			{#if generating}
