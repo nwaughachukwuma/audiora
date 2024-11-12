@@ -86,6 +86,7 @@ jobs:
     outputs:
       healthcheck_outcome: ${{ steps.healthcheck.outcome }}
     steps:
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -112,9 +113,8 @@ jobs:
             API_BASE_URL=${{ secrets.API_BASE_URL }}
 
       - run: curl -f "${{ steps.deploy.outputs.url }}"
-
       - uses: marocchino/sticky-pull-request-comment@v2
         with:
-          header: app
+          header: gae_app
           message: |
-            app: ${{ steps.deploy.outputs.url }} (${{ github.event.pull_request.head.sha }})
+            gae_app: ${{ steps.deploy.outputs.url }} (${{ github.event.pull_request.head.sha }})
