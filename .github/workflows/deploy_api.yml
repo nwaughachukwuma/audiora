@@ -3,16 +3,12 @@ on:
   pull_request:
     paths:
       - "api/**"
-      - "services/**"
-      - "utils_pkg/**"
       - ".github/workflows/deploy_api.yml"
   push:
     branches:
       - main
     paths:
       - "api/**"
-      - "services/**"
-      - "utils_pkg/**"
       - ".github/workflows/deploy_api.yml"
     tags:
       - "release-*"
@@ -36,6 +32,7 @@ jobs:
     outputs:
       SHORT_SHA: ${{ steps.prepare_env.outputs.SHORT_SHA }}
       VERSION: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.number) || format('main-{0}', steps.prepare_env.outputs.SHORT_SHA) }}
+      TAGGED: ${{ steps.prepare_env.outputs.TAGGED }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -46,10 +43,6 @@ jobs:
 
           SHORT_SHA=$(git rev-parse --short HEAD)
           echo "SHORT_SHA=$SHORT_SHA" >> $GITHUB_OUTPUT
-
-          RAW=$(git branch -r --contains $SHORT_SHA)
-          TAG_BRANCH_NAME="${RAW##*/}"
-          echo "TAG_BRANCH_NAME=$TAG_BRANCH_NAME" >> $GITHUB_OUTPUT
 
   deploy:
     runs-on: ubuntu-latest
@@ -74,21 +67,11 @@ jobs:
       - uses: google-github-actions/setup-gcloud@v2
       - run: gcloud config set app/cloud_build_timeout 300
 
-      - run: |
-          cp ./api/.dockerignore .dockerignore
-          cp ./api/.gcloudignore .gcloudignore
-          cp ./api/Dockerfile Dockerfile
-
-          cat .dockerignore
-          cat .gcloudignore
-          cat Dockerfile
-
-      - name: Deploy to Cloud Run
-        id: deploy
+      - id: deploy
         uses: google-github-actions/deploy-cloudrun@v2
         with:
           service: ${{ env.SERVICE }}
-          source: ./
+          source: ./api
           tag: ${{ env.VERSION }}
           no_traffic: true
           timeout: "5m"
