@@ -1,0 +1,32 @@
+name: node_pnpm_cache
+description: Composite action to setup Node with pnpm and cache node_modules
+
+inputs:
+  cache-paths:
+    description: paths to cache
+    required: false
+  cache-key:
+    description: cache key
+    required: true
+
+outputs:
+  cache-hit:
+    description: forward the actions/cache cache-hit output
+    value: ${{ steps.node-cache.outputs.cache-hit }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 20
+    - uses: actions/cache@v4
+      with:
+        path: |
+          ~/.local/share/pnpm/store
+          **/node_modules
+          ${{ inputs.cache-paths }}
+        key: ${{ inputs.cache-key }}
+    - uses: pnpm/action-setup@v3
+      with:
+        version: 8

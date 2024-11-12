@@ -50,7 +50,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - id: cache-app
-        uses: ./.github/actions/setup-node-pnpm-cache
+        uses: ./.github/actions/node_pnpm_cache
         with:
           cache-key: app-${{ hashFiles('**/pnpm-lock.yaml') }}
           cache-paths: |
