@@ -93,4 +93,5 @@ async def generate_audiocast(request: GenerateAudioCastRequest, background_tasks
         created_at=datetime.now().strftime("%Y-%m-%d %H:%M"),
         chats=session_data.chats,
         title=title,
+        category=session_data.category,
     )

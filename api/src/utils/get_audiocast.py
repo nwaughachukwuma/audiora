@@ -41,4 +41,5 @@ def get_audiocast(session_id: str):
         created_at=created_at,
         chats=session_data.chats,
         title=title,
+        category=session_data.category,
     )

@@ -15,6 +15,7 @@ class GenerateAudioCastResponse(BaseModel):
     script: str
     source_content: str
     chats: List[SessionChatItem]
+    category: ContentCategory
     title: str | None
     created_at: str | None
 
