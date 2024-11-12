@@ -43,6 +43,9 @@ importers:
       marked:
         specifier: ^14.1.4
         version: 14.1.4
+      mode-watcher:
+        specifier: ^0.4.1
+        version: 0.4.1(svelte@4.2.19)
       nanoid:
         specifier: ^5.0.7
         version: 5.0.8
@@ -122,9 +125,6 @@ importers:
       globals:
         specifier: ^15.0.0
         version: 15.12.0
-      mode-watcher:
-        specifier: ^0.4.1
-        version: 0.4.1(svelte@4.2.19)
       postcss:
         specifier: ^8.4.41
         version: 8.4.49
