@@ -9,9 +9,10 @@
 	type GenerateAudiocastResponse = {
 		script: string;
 		source_content: string;
-		created_at?: string;
 		chats: Array<Omit<ChatItem, 'loading'>>;
+		category: ContentCategory;
 		title: ChatMetadata['title'];
+		created_at?: string;
 	};
 
 	function parseScript(script: string) {
@@ -83,9 +84,15 @@
 		</div>
 	{:then data}
 		<div class="flex w-full px-4 flex-col gap-y-3 sm:max-w-xl lg:max-w-3xl max-w-full">
-			{#if data.title}
-				<h1 class="text-2xl font-semibold text-sky-200 mb-4">{data.title}</h1>
-			{/if}
+			<div class="mb-4 flex flex-col gap-y-2">
+				<span class="capitalize bg-gray-800 text-gray-300 w-fit py-1 px-3 rounded-md">
+					{data.category}
+				</span>
+
+				{#if data.title}
+					<h1 class="text-2xl font-semibold text-sky-200">{data.title}</h1>
+				{/if}
+			</div>
 
 			<RenderMedia filename={sessionId} let:uri>
 				<audio controls class="w-full animate-fade-in block">

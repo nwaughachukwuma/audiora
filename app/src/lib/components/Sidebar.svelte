@@ -24,10 +24,10 @@
 	$: sidebarItems = sessionItems
 		.filter(([_, item]) => item.chats.length)
 		.map(([sessionId, item]) => ({
+			sessionId,
 			title: item.title || 'Untitled',
 			nonce: item.nonce,
-			href: `/chat/${sessionId}?category=${item.category}`,
-			sessionId
+			category: item.category
 		}))
 		.sort((a, b) => b.nonce - a.nonce);
 
@@ -43,6 +43,10 @@
 					[key.replace(`${SESSION_KEY}_`, ''), JSON.parse(value) as Session] as const
 			)
 			.filter(([_, v]) => Boolean(v));
+	}
+
+	function dispatchClickItem() {
+		dispatch('clickItem');
 	}
 </script>
 
@@ -75,21 +79,21 @@
 		<div class="flex w-full flex-col gap-y-1.5 pt-2" class:hidden={!inLast24Hrs.length}>
 			<div class="px-2 text-sm font-medium">Today</div>
 			{#each inLast24Hrs as item}
-				<SearchSidebarItem {item} on:click={() => dispatch('clickItem')} />
+				<SearchSidebarItem {item} on:click={dispatchClickItem} />
 			{/each}
 		</div>
 
 		<div class="flex w-full flex-col gap-y-1.5 pt-6" class:hidden={!inLast7Days.length}>
 			<div class="px-2 text-sm font-medium">Last 7 days</div>
 			{#each inLast7Days as item}
-				<SearchSidebarItem {item} on:click={() => dispatch('clickItem')} />
+				<SearchSidebarItem {item} on:click={dispatchClickItem} />
 			{/each}
 		</div>
 
 		<div class="flex w-full flex-col gap-y-1.5 pt-6" class:hidden={!inLast30Days.length}>
 			<div class="px-2 text-sm font-medium">Last month</div>
 			{#each inLast30Days as item}
-				<SearchSidebarItem {item} on:click={() => dispatch('clickItem')} />
+				<SearchSidebarItem {item} on:click={dispatchClickItem} />
 			{/each}
 		</div>
 		<div class="block h-20"></div>

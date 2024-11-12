@@ -1,9 +1,10 @@
 <script lang="ts" context="module">
+	import type { ContentCategory } from '@/utils/types';
 	export type SearchSidebarItem = {
 		title: string;
 		nonce: number;
-		href: string;
 		sessionId: string;
+		category: ContentCategory;
 	};
 </script>
 
@@ -21,13 +22,14 @@
 		easing: cubicInOut
 	});
 
+	$: href = `/chat/${item.sessionId}?category=${item.category}`;
 	$: isActive = $page.url.href.includes(item.sessionId);
 </script>
 
 <Button
-	href={item.href}
+	{href}
 	variant="ghost"
-	class="relative no-underline hover:no-underline justify-start px-2 hover:bg-gray-700 bg-gray-900"
+	class="relative no-underline group hover:no-underline justify-start py-6 flex items-center px-2 hover:bg-gray-700 bg-gray-900"
 	data-sveltekit-noscroll
 	on:click
 >
@@ -45,5 +47,9 @@
 		title={item.title}
 	>
 		{item.title}
+	</div>
+
+	<div class="text-[10px] px-2 hidden group-hover:block absolute bottom-0 right-0 text-sky-200">
+		{item.category}
 	</div>
 </Button>
