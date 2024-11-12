@@ -2,18 +2,14 @@ name: Deploy app to cloudrun
 on:
   pull_request:
     paths:
-      - "app/**"
-      - "services/**"
-      - "utils_pkg/**"
-      - ".github/workflows/deploy_app.yml"
+      - "redirect/**"
+      - ".github/workflows/deploy_redirect.yml"
   push:
     branches:
       - main
     paths:
-      - "app/**"
-      - "services/**"
-      - "utils_pkg/**"
-      - ".github/workflows/deploy_app.yml"
+      - "redirect/**"
+      - ".github/workflows/deploy_redirect.yml"
     tags:
       - "release-*"
 
@@ -39,7 +35,6 @@ jobs:
       - id: prepare_env
         run: |
           echo "TAGGED=${{ startsWith(github.ref, 'refs/tags/api') }}" >> $GITHUB_OUTPUT
-
           SHORT_SHA=$(git rev-parse --short HEAD)
           echo "SHORT_SHA=$SHORT_SHA" >> $GITHUB_OUTPUT
 
@@ -66,17 +61,9 @@ jobs:
       - uses: google-github-actions/setup-gcloud@v2
       - run: gcloud config set app/cloud_build_timeout 300
 
-      - run: |
-          cp ./app/.dockerignore .dockerignore
-          cp ./app/.gcloudignore .gcloudignore
-          cp ./app/Dockerfile Dockerfile
-
-          cat .dockerignore
-          cat .gcloudignore
-          cat Dockerfile
-
       - id: deploy
         uses: google-github-actions/deploy-cloudrun@v2
+        working-directory: redirect
         with:
           service: ${{ env.SERVICE }}
           source: ./
@@ -91,9 +78,9 @@ jobs:
       - run: curl -f "${{ steps.deploy.outputs.url }}"
       - uses: marocchino/sticky-pull-request-comment@v2
         with:
-          header: audiora
+          header: redirect
           message: |
-            audiora: ${{ steps.deploy.outputs.url }} (${{ github.event.pull_request.head.sha }})
+            redirect: ${{ steps.deploy.outputs.url }} (${{ github.event.pull_request.head.sha }})
 
   promote:
     runs-on: ubuntu-latest
