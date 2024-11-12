@@ -66,7 +66,8 @@ class SessionManager(DBManager):
 
         return SessionModel(
             id=data["id"],
-            category=data["category"],
+            # Fallback to "podcast" for previously created sessions.
+            category=data.get("category", "podcast"),
             chats=data["chats"],
             metadata=ChatMetadata(
                 source=metadata.get("source", ""),
