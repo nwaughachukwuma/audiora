@@ -2,7 +2,8 @@ from dataclasses import dataclass
 from typing import Any, Callable, Literal, Optional
 
 import google.generativeai as genai
-from api.src.env_var import GEMINI_API_KEY
+
+from src.env_var import GEMINI_API_KEY
 
 
 def get_gemini():

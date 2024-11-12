@@ -1,6 +1,6 @@
 from elevenlabs.client import ElevenLabs
 
-from api.src.env_var import ELEVENLABS_API_KEY
+from src.env_var import ELEVENLABS_API_KEY
 
 client = ElevenLabs(
     api_key=ELEVENLABS_API_KEY,

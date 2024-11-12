@@ -2,7 +2,6 @@ import asyncio
 from time import time
 from typing import Any, Callable, Generator
 
-from api.src.utils.get_session_title import GetSessionTitleModel, get_session_title
 from fastapi import BackgroundTasks, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
@@ -21,6 +20,7 @@ from src.utils.generate_audiocast import (
 )
 from src.utils.get_audiocast import get_audiocast
 from src.utils.get_audiocast_source import GetAudiocastSourceModel, get_audiocast_source
+from src.utils.get_session_title import GetSessionTitleModel, get_session_title
 from src.utils.session_manager import SessionManager
 
 app = FastAPI(title="Audiora", version="1.0.0")
