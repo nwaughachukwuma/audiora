@@ -57,7 +57,7 @@ jobs:
           cache-paths: |
             ~/.cache/Cypress
 
-      - run: pnpm install
+      - run: pnpm install --no-frozen-lockfile
         if: steps.cache-app.outputs.cache-hit != 'true'
 
       - uses: google-github-actions/auth@v2
