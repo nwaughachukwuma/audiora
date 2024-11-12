@@ -34,7 +34,12 @@
 	<title>Audiora</title>
 </svelte:head>
 
-<ChatContainer bind:searchTerm on:click={handleSearch} on:keypress={handleSearch}>
+<ChatContainer
+	disableTextInput={triggerSelectCategory}
+	bind:searchTerm
+	on:click={handleSearch}
+	on:keypress={handleSearch}
+>
 	<svelte:fragment slot="content">
 		{#if triggerSelectCategory && selectContent}
 			<RenderCategorySelection

@@ -3,6 +3,7 @@
 	import ChatBoxContainer from './ChatBoxContainer.svelte';
 
 	export let searchTerm = '';
+	export let disableTextInput = false;
 	const { sessionCompleted$, fetchingSource$, audioSource$ } = getSessionContext();
 	let navLoading = false;
 </script>
@@ -22,7 +23,7 @@
 				bind:searchTerm
 				loading={navLoading}
 				showIcon
-				disabled={$sessionCompleted$}
+				disabled={$sessionCompleted$ || disableTextInput}
 				on:keypress
 				on:click
 			/>
