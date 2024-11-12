@@ -110,8 +110,7 @@ jobs:
             CLOUD_STORAGE_BUCKET=${{ secrets.BUCKET_NAME }}
             API_BASE_URL=${{ secrets.API_BASE_URL }}
 
-      - id: healthcheck
-        run: curl -f "${{ steps.deploy.outputs.url }}"
+      - run: curl -f "${{ steps.deploy.outputs.url }}"
 
       - uses: marocchino/sticky-pull-request-comment@v2
         with:

@@ -67,7 +67,7 @@ jobs:
           no_traffic: true
           timeout: "5m"
           gcloud_version: "482.0.0"
-          flags: "--allow-unauthenticated --memory=1Gi"
+          flags: "--allow-unauthenticated --memory=1Gi --cpu=1"
           env_vars: |
             ENV=prod
 
