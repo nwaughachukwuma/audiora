@@ -17,7 +17,7 @@
 	}
 </script>
 
-<div class="w-full flex flex-col gapy-3">
+<div class="w-full flex items-center flex-col gapy-3">
 	{#await getSignedURL()}
 		<Spinner />
 	{:then uri}

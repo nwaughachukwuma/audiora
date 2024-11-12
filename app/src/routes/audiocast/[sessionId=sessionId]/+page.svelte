@@ -21,7 +21,6 @@
 </script>
 
 <script lang="ts">
-	import Spinner from '@/components/Spinner.svelte';
 	import { getSessionContext, type ChatItem } from '@/stores/sessionContext.svelte';
 	import type { ContentCategory } from '@/utils/types';
 	import { env } from '@env';
@@ -30,7 +29,8 @@
 	import RenderMedia from '@/components/RenderMedia.svelte';
 	import { page } from '$app/stores';
 	import AudiocastPageAction from '@/components/AudiocastPageAction.svelte';
-	import AudiocastChats from '@/components/AudiocastChats.svelte';
+	import AudiocastPageChat from '@/components/AudiocastPageChat.svelte';
+	import AudiocastPageSkeletonLoader from '@/components/AudiocastPageSkeletonLoader.svelte';
 
 	const { session$ } = getSessionContext();
 
@@ -68,10 +68,12 @@
 	}
 </script>
 
-<div class="mx-auto flex h-full w-full pb-40 overflow-auto mt-6 flex-col items-center px-2 sm:px-1">
+<div
+	class="mx-auto flex h-full w-full pb-40 overflow-auto mt-16 flex-col items-center px-2 sm:px-1"
+>
 	{#await getAudiocast(sessionId)}
-		<div class="-mt-16 flex h-full w-full items-center justify-center sm:-mt-24">
-			<Spinner />
+		<div class="flex w-full items-center justify-center -mt-4">
+			<AudiocastPageSkeletonLoader />
 		</div>
 	{:then data}
 		<div class="flex w-full px-4 flex-col gap-y-3 sm:max-w-xl lg:max-w-3xl max-w-full">
@@ -125,7 +127,7 @@
 			</Accordion.Root>
 
 			<AudiocastPageAction {sessionId} sessionTitle={data.title || 'Untitled'} on:showChats>
-				<AudiocastChats slot="chats-button" chats={data.chats} />
+				<AudiocastPageChat slot="chats-button" chats={data.chats} />
 			</AudiocastPageAction>
 		</div>
 	{:catch error}
