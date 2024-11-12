@@ -25,7 +25,7 @@ class AudioManager(AudioManagerSpeechGenerator, ContentSplitter):
         self.config = AudioManagerConfig(**custom_config.__dict__) if custom_config else AudioManagerConfig()
         self.config.ensure_directories()
 
-    def _get_provider_custom_tags(self) -> List[str]:
+    def _get_ssml_tags(self) -> List[str]:
         # ["say-as", "prosody", "break", "emphasis", "mark"]
         if self.config.tts_provider == "openai":
             return ["voice"]
@@ -37,7 +37,7 @@ class AudioManager(AudioManagerSpeechGenerator, ContentSplitter):
     def _get_tags(self, audio_script: str):
         tags: List[str] = re.findall(r"<(Speaker\d+)>", audio_script)
         tags.sort()
-        return list(set(tags)) + self._get_provider_custom_tags()
+        return list(set(tags))
 
     async def generate_speech(self, audio_script: str):
         """
@@ -59,7 +59,9 @@ class AudioManager(AudioManagerSpeechGenerator, ContentSplitter):
             Exception: If there's an error in converting text to speech.
         """
         tags = self._get_tags(audio_script)
-        audio_script = clean_tss_markup(audio_script, tags)
+        ssml_tags = self._get_ssml_tags()
+
+        audio_script = clean_tss_markup(audio_script, tags + ssml_tags)
         nway_content = self.split_content(audio_script, tags)
 
         print(f"nway_content: {nway_content}")
