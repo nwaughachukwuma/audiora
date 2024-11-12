@@ -1,3 +1,4 @@
+import asyncio
 from time import time
 from typing import Any, Callable, Generator
 
@@ -107,14 +108,26 @@ async def get_signed_url_endpoint(blobname: str):
     """
     Get signed URL for generated audiocast
     """
-    url = StorageManager().get_signed_url(blobname=blobname)
-    return JSONResponse(
-        content=url,
-        headers={
-            "Content-Type": "application/json",
-            "Cache-Control": "public, max-age=86390, immutable",
-        },
-    )
+    retry_count = 0
+    max_retries = 3
+
+    while retry_count < max_retries:
+        try:
+            url = StorageManager().get_signed_url(blobname=blobname)
+            return JSONResponse(
+                content=url,
+                headers={
+                    "Content-Type": "application/json",
+                    "Cache-Control": "public, max-age=86390, immutable",
+                },
+            )
+        except Exception:
+            pass
+
+        await asyncio.sleep(5)
+        retry_count += 1
+
+    raise HTTPException(status_code=500, detail="Failed to get signed URL")
 
 
 @app.post("/get-session-title", response_model=str)
