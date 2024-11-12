@@ -7,7 +7,7 @@ load_dotenv()
 
 app = Flask(__name__)
 
-API_BASE_URL = os.environ["API_URL"]
+APP_URL = os.environ["APP_URL"]
 methods = ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"]
 
 
@@ -15,7 +15,7 @@ methods = ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"]
 @app.route("/<path:path>", methods=methods)
 def redirect_handler(path):
     qs = request.query_string.decode("utf-8")
-    new_url = f"{API_BASE_URL}/{path}?{qs}" if path else f"{API_BASE_URL}?{qs}"
+    new_url = f"{APP_URL}/{path}?{qs}" if path else f"{APP_URL}?{qs}"
     return redirect(new_url, code=301)
 
 
