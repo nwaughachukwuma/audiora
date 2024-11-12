@@ -3,7 +3,7 @@
 	<div class="h-8 w-48 bg-gray-800 rounded animate-pulse mb-8" />
 
 	<!-- {/* Player container */} -->
-	<div class="w-full rounded-lg bg-gray-800 p-4 mb-6">
+	<div class="w-full rounded-lg bg-gray-800 p-4 mb-4">
 		<!-- {/* Player controls and progress row */} -->
 		<div class="flex items-center gap-4 mb-2">
 			<!-- {/* Play button skeleton */} -->
@@ -21,7 +21,7 @@
 	</div>
 
 	{#each Array(3).fill(0) as _, index (index)}
-		<div class="mb-4">
+		<div class="mb-2">
 			<div class="flex items-center justify-between p-4 border-b border-gray-800">
 				<div class="h-6 w-32 bg-gray-800 rounded animate-pulse" />
 				<div class="w-6 h-6 bg-gray-800 rounded animate-pulse" />
@@ -29,7 +29,7 @@
 		</div>
 	{/each}
 
-	<div class="flex gap-4 mt-6">
+	<div class="flex gap-3 mt-6">
 		<div class="w-12 h-12 bg-gray-800 rounded animate-pulse" />
 		<div class="w-12 h-12 bg-gray-800 rounded animate-pulse" />
 		<div class="w-40 h-12 bg-gray-800 rounded animate-pulse" />
