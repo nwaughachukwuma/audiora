@@ -1,5 +1,7 @@
 runtime: nodejs20
 
+service: audiora-app
+
 entrypoint: node build/index.js
 
 inbound_services:
@@ -26,9 +28,3 @@ handlers:
   - url: /.*
     secure: always
     script: auto
-
-env_variables:
-  NODE_ENV: production
-  BUCKET_NAME: 'gs://veedo-29931.appspot.com'
-  CLOUD_STORAGE_BUCKET: 'gs://veedo-29931.appspot.com'
-  BODY_SIZE_LIMIT: Infinity

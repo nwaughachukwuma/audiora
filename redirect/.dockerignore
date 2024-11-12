@@ -1,0 +1,5 @@
+.vscode/
+api/
+app/
+tests/
+.env.*
