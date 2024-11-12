@@ -11,3 +11,5 @@ keys/
 .ruff_cache/
 node_modules/
 .DS_Store
+
+tsconfig.tsbuildinfo

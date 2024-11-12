@@ -66,8 +66,13 @@ jobs:
 
       - run: pnpm sync
         working-directory: app
+      - run: pnpm tsc
+        working-directory: app
+      - run: pnpm check
+        working-directory: app
       - run: pnpm build
         working-directory: app
+
       - uses: actions/upload-artifact@v4
         with:
           name: app
