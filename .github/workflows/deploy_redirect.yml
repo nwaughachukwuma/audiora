@@ -1,4 +1,4 @@
-name: Deploy app to cloudrun
+name: Deploy redirect to cloudrun
 on:
   pull_request:
     paths:
