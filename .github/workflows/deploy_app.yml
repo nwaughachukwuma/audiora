@@ -1,4 +1,4 @@
-name: Deploy app to google app engine
+name: Deploy app to GAE
 on:
   pull_request:
     paths:
@@ -30,6 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       VERSION: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.number) || format('main-{0}', steps.prepare_env.outputs.SHORT_SHA) }}
+      TAGGED: ${{ steps.prepare_env.outputs.TAGGED }}
       MAIN: ${{ github.ref == 'refs/heads/main' }}
     steps:
       - uses: actions/checkout@v4

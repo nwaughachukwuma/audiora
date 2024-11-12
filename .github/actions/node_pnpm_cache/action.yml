@@ -1,5 +1,5 @@
 name: node_pnpm_cache
-description: Composite action to setup Node with pnpm and cache node_modules
+description: Composite action for node and pnpm caching
 
 inputs:
   cache-paths:
