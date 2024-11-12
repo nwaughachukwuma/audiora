@@ -60,8 +60,8 @@ async def root():
 @app.post("/chat/{session_id}", response_model=Generator[str, Any, None])
 async def chat_endpoint(session_id: str, request: SessionChatRequest, background_tasks: BackgroundTasks):
     """Chat endpoint"""
-    content_category = request.contentCategory
-    db = SessionManager(session_id)
+    category = request.contentCategory
+    db = SessionManager(session_id, category)
     db._add_chat(request.chatItem)
 
     def on_finish(text: str):
@@ -71,7 +71,7 @@ async def chat_endpoint(session_id: str, request: SessionChatRequest, background
         )
 
     response = chat_request(
-        content_category=content_category,
+        content_category=category,
         previous_messages=db._get_chats(),
         on_finish=on_finish,
     )

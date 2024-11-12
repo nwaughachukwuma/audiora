@@ -27,15 +27,12 @@ async def get_audiocast_source(request: GetAudiocastSourceModel, background_task
 
     @use_cache_manager(cache_key)
     async def _handler():
-        db = SessionManager(session_id)
-
         def update_session_info(info: str):
+            db = SessionManager(session_id, category)
             background_tasks.add_task(db._update_info, info)
 
         update_session_info("Generating source content...")
-
         source_content = generate_source_content(category, summary)
-
         return source_content
 
     return await _handler()

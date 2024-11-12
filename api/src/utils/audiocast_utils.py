@@ -1,8 +1,8 @@
-from typing import TypedDict
+from typing import List, TypedDict
 
 from pydantic import BaseModel
 
-from src.utils.chat_utils import ContentCategory
+from src.utils.chat_utils import ContentCategory, SessionChatItem
 
 
 class GenerateAudioCastRequest(BaseModel):
@@ -12,9 +12,10 @@ class GenerateAudioCastRequest(BaseModel):
 
 
 class GenerateAudioCastResponse(BaseModel):
-    url: str
     script: str
     source_content: str
+    chats: List[SessionChatItem]
+    title: str | None
     created_at: str | None
 
 

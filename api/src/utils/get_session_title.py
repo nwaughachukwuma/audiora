@@ -31,7 +31,7 @@ async def get_session_title(request: GetSessionTitleModel, background_tasks: Bac
 
     def _on_finish(title: str):
         print(f"Generated title: {title}")
-        db = SessionManager(session_id)
+        db = SessionManager(session_id, request.category)
         background_tasks.add_task(db._update_title, title)
 
     response = generate_content(

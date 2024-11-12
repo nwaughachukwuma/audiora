@@ -8,7 +8,7 @@ from src.services.firestore_sdk import (
     arrayUnion,
     collections,
 )
-from src.utils.chat_utils import SessionChatItem
+from src.utils.chat_utils import ContentCategory, SessionChatItem
 
 
 @dataclass
@@ -22,6 +22,7 @@ class ChatMetadata:
 @dataclass
 class SessionModel:
     id: str
+    category: ContentCategory
     chats: List[SessionChatItem]
     metadata: Optional[ChatMetadata]
     created_at: Optional[str] = None
@@ -29,23 +30,33 @@ class SessionModel:
 
 class SessionManager(DBManager):
     collection: Collection = collections["audiora_sessions"]
+    category: ContentCategory
 
-    def __init__(self, session_id: str):
+    def __init__(self, session_id: str, category: ContentCategory):
         super().__init__()
 
         self.doc_id = session_id
-        session_doc = self._get_document(self.collection, self.doc_id)
-        # if the collection does not exist, create it
-        if not session_doc.exists:
-            payload = SessionModel(id=self.doc_id, chats=[], metadata=None)
+        self.category = category
+        self._init_document()
+
+    def _init_document(self):
+        """if the collection does not exist, create it"""
+        try:
+            session_doc = self._get_document(self.collection, self.doc_id)
+        except Exception:
+            session_doc = None
+
+        if not session_doc or not session_doc.exists:
+            payload = SessionModel(id=self.doc_id, chats=[], metadata=None, category=self.category)
             self._set_document(self.collection, self.doc_id, payload.__dict__)
 
     def _update(self, data: Dict):
         return self._update_document(self.collection, self.doc_id, data)
 
-    def data(self) -> SessionModel | None:
+    @classmethod
+    def data(cls, doc_id: str) -> SessionModel | None:
         """Get session data"""
-        doc = self._get_document(self.collection, self.doc_id)
+        doc = DBManager()._get_document(collections["audiora_sessions"], doc_id)
 
         data = doc.to_dict()
         if not doc.exists or not data:
@@ -55,10 +66,13 @@ class SessionManager(DBManager):
 
         return SessionModel(
             id=data["id"],
+            category=data["category"],
             chats=data["chats"],
             metadata=ChatMetadata(
                 source=metadata.get("source", ""),
                 transcript=metadata.get("transcript", ""),
+                info=metadata.get("info"),
+                title=metadata.get("title"),
             ),
             created_at=str(data["created_at"]),
         )
