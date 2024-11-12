@@ -7,7 +7,7 @@
 	import SearchSidebar from './Sidebar.svelte';
 	import { Button } from './ui/button';
 	import { getAppContext } from '$lib/stores/appContext.svelte';
-	import { goto } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
 	import { mediaBreakPoints$ } from '@/utils/mediaBreakpoints';
 
 	export let sessionId: string;
@@ -53,7 +53,7 @@
 			</div>
 		{/if}
 
-		<a class="block shrink-0" href="/">
+		<a class="block shrink-0" href="/" on:click={invalidateAll}>
 			<Logo />
 		</a>
 	</div>
