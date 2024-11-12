@@ -72,8 +72,14 @@
 	class="mx-auto flex h-full w-full pb-40 overflow-auto mt-16 flex-col items-center px-2 sm:px-1"
 >
 	{#await getAudiocast(sessionId)}
-		<div class="flex w-full items-center justify-center -mt-4">
+		<div class="flex flex-col w-full items-center justify-center -mt-4">
 			<AudiocastPageSkeletonLoader />
+
+			{#if generating}
+				<p class="mt-4 py-1 px-3 bg-sky-600/20 animate-pulse text-sky-300 rounded-sm">
+					Generating your audiocast...Please wait
+				</p>
+			{/if}
 		</div>
 	{:then data}
 		<div class="flex w-full px-4 flex-col gap-y-3 sm:max-w-xl lg:max-w-3xl max-w-full">
@@ -131,6 +137,6 @@
 			</AudiocastPageAction>
 		</div>
 	{:catch error}
-		<div>{String(error)}</div>
+		<div>Error: {String(error)}</div>
 	{/await}
 </div>
