@@ -58,15 +58,11 @@ jobs:
         with:
           credentials_json: "${{ secrets.GCP_SA_KEY }}"
 
-      - uses: google-github-actions/setup-gcloud@v2
-      - run: gcloud config set app/cloud_build_timeout 300
-
       - id: deploy
         uses: google-github-actions/deploy-cloudrun@v2
-        working-directory: redirect
         with:
           service: ${{ env.SERVICE }}
-          source: ./
+          source: ./redirect
           tag: ${{ env.VERSION }}
           no_traffic: true
           timeout: "5m"
