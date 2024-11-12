@@ -109,7 +109,9 @@
 					<ChatListItem type={item.role} content={item.content} loading={item.loading} />
 
 					{#if finalResponse && $fetchingSource$}
-						<div class="block w-full animate-pulse text-center p-2 text-gray-300">
+						<div
+							class="py-1 px-3 mx-auto w-fit bg-sky-600/20 animate-pulse text-sky-300 rounded-sm"
+						>
 							Fetching Audiocast Source...Please wait
 						</div>
 					{:else if finalResponse}
