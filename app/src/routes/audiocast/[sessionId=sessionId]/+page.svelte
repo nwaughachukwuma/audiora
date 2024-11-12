@@ -30,6 +30,7 @@
 	import RenderMedia from '@/components/RenderMedia.svelte';
 	import { page } from '$app/stores';
 	import AudiocastPageAction from '@/components/AudiocastPageAction.svelte';
+	import AudiocastChats from '@/components/AudiocastChats.svelte';
 
 	const { session$ } = getSessionContext();
 
@@ -123,7 +124,9 @@
 				</Accordion.Item>
 			</Accordion.Root>
 
-			<AudiocastPageAction {sessionId} sessionTitle={data.title || 'Untitled'} />
+			<AudiocastPageAction {sessionId} sessionTitle={data.title || 'Untitled'} on:showChats>
+				<AudiocastChats slot="chats-button" chats={data.chats} />
+			</AudiocastPageAction>
 		</div>
 	{:catch error}
 		<div>{String(error)}</div>

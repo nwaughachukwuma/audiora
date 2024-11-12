@@ -12,22 +12,23 @@
 	$: shareTitle = getShareTitle(sessionTitle);
 </script>
 
-<div class="mt-3 w-full items-center justify-center gap-3 grid grid-cols-2 sm:grid-cols-2">
+<div class="mt-3 items-center gap-3 flex w-fit">
+	<slot name="chats-button" />
+
 	<ShareModal url={shareableLink} title={shareTitle}>
 		<Button
 			slot="trigger"
 			variant="ghost"
-			class="py-6 w-full text-base rounded-md no-underline hover:no-underline bg-gray-800 text-gray-200 hover:bg-gray-700"
+			class="py-6 w-16 text-base rounded-md no-underline hover:no-underline bg-gray-800 text-gray-200 hover:bg-gray-700"
 			on:click
 		>
-			<span> Share </span>
-			<Share2Icon class="w-4 h-4 ml-2 inline" />
+			<Share2Icon class="w-4 inline" />
 		</Button>
 	</ShareModal>
 
 	<Button
 		on:click={() => goto('/', { invalidateAll: true, replaceState: true })}
-		class="py-6 rounded-md text-base no-underline text-center hover:no-underline bg-emerald-600 text-emerald-100 hover:bg-emerald-700"
+		class="py-6 px-10 rounded-md text-base no-underline text-center hover:no-underline bg-emerald-600/70 text-emerald-100 hover:bg-emerald-600"
 		>Create Audiocast
 	</Button>
 </div>
