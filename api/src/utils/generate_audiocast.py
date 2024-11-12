@@ -2,15 +2,16 @@ from datetime import datetime
 
 from fastapi import BackgroundTasks, HTTPException
 
-from services.storage import StorageManager
-from shared_utils_pkg.audiocast_utils import (
+from src.services.storage import StorageManager
+from src.utils.audio_manager import AudioManager, AudioManagerConfig
+from src.utils.audiocast_request import AudioScriptMaker
+from src.utils.audiocast_utils import (
     GenerateAudioCastRequest,
     GenerateAudioCastResponse,
 )
-from shared_utils_pkg.session_manager import SessionManager
-from shared_utils_pkg.waveform_utils import WaveformUtils
-from src.utils.audio_manager import AudioManager, AudioManagerConfig
-from src.utils.audiocast_request import AudioScriptMaker, generate_source_content
+from src.utils.get_audiocast_source import GetAudiocastSourceModel, get_audiocast_source
+from src.utils.session_manager import SessionManager
+from src.utils.waveform_utils import WaveformUtils
 
 
 async def generate_audiocast(request: GenerateAudioCastRequest, background_tasks: BackgroundTasks):
@@ -21,21 +22,27 @@ async def generate_audiocast(request: GenerateAudioCastRequest, background_tasks
     2. Generate audio script
     3. Generate audio
     4a. Store audio
-    4b. TODO: Store the audio waveform on GCS
+    4b. Store the audio waveform on GCS
     5. Update session
     """
     summary = request.summary
     category = request.category
     session_id = request.sessionId
 
-    db = SessionManager(session_id)
+    source_content = await get_audiocast_source(
+        GetAudiocastSourceModel(
+            sessionId=session_id,
+            category=category,
+            summary=summary,
+        ),
+        background_tasks,
+    )
+
+    db = SessionManager(session_id, category)
 
     def update_session_info(info: str):
         background_tasks.add_task(db._update_info, info)
 
-    update_session_info("Generating source content...")
-
-    source_content = generate_source_content(category, summary)
     if not source_content:
         raise HTTPException(status_code=500, detail="Failed to generate source content")
 
@@ -48,7 +55,7 @@ async def generate_audiocast(request: GenerateAudioCastRequest, background_tasks
 
     # Generate audio
     update_session_info("Generating audio...")
-    audio_path = await AudioManager(custom_config=AudioManagerConfig(tts_provider="elevenlabs")).generate_speech(
+    audio_path = await AudioManager(custom_config=AudioManagerConfig(tts_provider="openai")).generate_speech(
         audio_script
     )
 
@@ -71,9 +78,20 @@ async def generate_audiocast(request: GenerateAudioCastRequest, background_tasks
 
     background_tasks.add_task(_run_on_background)
 
+    session_data = SessionManager.data(session_id)
+    if not session_data:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Failed to get audiocast from the DB for session_id: {session_id}",
+        )
+
+    title = session_data.metadata.title if session_data.metadata and session_data.metadata.title else "Untitled"
+
     return GenerateAudioCastResponse(
-        url=audio_path,
         script=audio_script,
         source_content=source_content,
         created_at=datetime.now().strftime("%Y-%m-%d %H:%M"),
+        chats=session_data.chats,
+        title=title,
+        category=session_data.category,
     )

@@ -1,13 +1,13 @@
 import re
 from typing import Literal
 
-from services.anthropic_client import get_anthropic_sync
-from services.gemini_client import GeminiConfig, generate_content
-from services.openai_client import get_openai
+from src.services.anthropic_client import get_anthropic_sync
+from src.services.gemini_client import GeminiConfig, generate_content
+from src.services.openai_client import get_openai
+from src.utils.chat_utils import ContentCategory
 from src.utils.prompt_templates.source_content_prompt import get_content_source_prompt
 from src.utils.prompt_templates.streamline_audio import streamline_audio_script_prompt
 from src.utils.prompt_templates.tts_prompt import Metadata, TTSPromptMaker
-from shared_utils_pkg.chat_utils import ContentCategory
 
 
 def generate_source_content(category: ContentCategory, summary: str):
@@ -20,8 +20,8 @@ def generate_source_content(category: ContentCategory, summary: str):
     Returns:
         str: The audiocast source content
     """
-    refined_summary = re.sub("You want", "a user who wants", summary, flags=re.IGNORECASE)
-    refined_summary = re.sub("You", "a user", refined_summary, flags=re.IGNORECASE)
+    refined_summary = re.sub("You want", "A user who wants", summary, flags=re.IGNORECASE)
+    refined_summary = re.sub("You", "A user", refined_summary, flags=re.IGNORECASE)
 
     response = get_openai().chat.completions.create(
         model="gpt-4o",

@@ -1,0 +1,14 @@
+{
+  "name": "audiora",
+  "version": "1.0.0",
+  "description": "",
+  "author": "@nwaughachukwuma",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "keywords": [],
+  "license": "ISC"
+}

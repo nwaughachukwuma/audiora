@@ -1,0 +1,30 @@
+runtime: nodejs20
+
+service: audiora-app
+
+entrypoint: node build/index.js
+
+inbound_services:
+  - warmup
+
+handlers:
+  - url: /(.*?/)__data\.json
+    secure: always
+    script: auto
+  - url: /_app/immutable
+    static_dir: build/client/_app/immutable
+    expiration: 365d
+    http_headers:
+      Cache-Control: immutable
+  - url: /_app
+    static_dir: build/client/_app
+    expiration: 0s
+    http_headers:
+      Cache-Control: no-store
+  - url: /(.*\.(ico|png|svg|json))
+    static_files: build/client/\1
+    upload: build/client/(.*\.(ico|png|svg|json))
+    expiration: 10m
+  - url: /.*
+    secure: always
+    script: auto

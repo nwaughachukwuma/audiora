@@ -1,7 +1,7 @@
 from typing import Any, Callable, List, Optional
 
-from services.openai_client import get_openai
-from shared_utils_pkg.chat_utils import ContentCategory, SessionChatMessage
+from src.services.openai_client import get_openai
+from src.utils.chat_utils import ContentCategory, SessionChatItem
 
 
 def get_system_message(content_category: ContentCategory):
@@ -15,9 +15,9 @@ def get_system_message(content_category: ContentCategory):
 
     GENERAL IDEA AND WORKFLOW:
     1. A user comes to you with a request for an audiocast of type {content_category}.
-    2. You need to ask the user questions (elicitation) to understand what kind of audiocast they want to listen to. 
+    2. You need to ask the user questions (elicitation) to understand what kind of audiocast they want to listen to.
     3. Once you have enough context, within 3-5 exchanges, you should terminate the conversation.
-    
+
     IMPORTANT NOTES:
     1. Your task is to understand the user's request only by eliciting questions.
     2. Do not generate the audiocast or any other content yourself.
@@ -27,7 +27,7 @@ def get_system_message(content_category: ContentCategory):
 
 def chat_request(
     content_category: ContentCategory,
-    previous_messages: List[SessionChatMessage],
+    previous_messages: List[SessionChatItem],
     on_finish: Optional[Callable[[str], Any]] = None,
 ):
     response_stream = get_openai().chat.completions.create(
@@ -57,4 +57,3 @@ def chat_request(
             on_finish(text)
 
     return generator()
-

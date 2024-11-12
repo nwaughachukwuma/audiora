@@ -17,13 +17,13 @@ RUN apt-get -yqq update && apt-get -yqq install \
     python3-dev \
     xclip \
     && rm -rf /var/lib/apt/lists/*
-    
+
 COPY . ./
 # RUN rm -rf ./api
-    
+
 # Install production dependencies.
 RUN pip install --upgrade pip \
-  && pip install --no-cache-dir -r requirements.txt 
+  && pip install --no-cache-dir -r requirements.txt
 
 ENV HOST '0.0.0.0'
 EXPOSE $PORT

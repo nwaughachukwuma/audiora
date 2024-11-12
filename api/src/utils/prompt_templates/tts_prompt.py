@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from shared_utils_pkg.chat_utils import ContentCategory, category_qualifiers
+from src.utils.chat_utils import ContentCategory, category_qualifiers
 
 
 @dataclass
@@ -24,7 +24,7 @@ class TTSPromptMaker:
         Generate an optimized system prompt for converting a source content into the appropriate format.
         """
         return f"""You're a super-intelligent AI who generates different forms, styles and genres of audiocast script.
-        
+
         Your task is to transform the following source content into an engaging {self.category} TTS-optimized audiocast script.
 
         Source Content: {source_content}
