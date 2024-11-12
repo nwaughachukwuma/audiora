@@ -15,7 +15,7 @@
 	import { streamingResponse } from '@/utils/streamingResponse';
 	import { Share2Icon } from 'lucide-svelte';
 	import ShareModal from './share/ShareModal.svelte';
-	import { page } from '$app/stores';
+	import { getShareableLink, getShareTitle } from '@/utils/shareMeta';
 
 	export let sessionId: string;
 	export let category: ContentCategory;
@@ -99,9 +99,8 @@
 		}
 	}
 
-	$: shareableLink = `${$page.url.origin}/audiocast/${sessionId}`;
-	$: shareTitle =
-		`Listen to this AI generated audio 🎧 about ${title} 🔥`.replace(/\n+/, '') + '\n';
+	$: shareableLink = getShareableLink(sessionId);
+	$: shareTitle = getShareTitle(title);
 </script>
 
 <div>

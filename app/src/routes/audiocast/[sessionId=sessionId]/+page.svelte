@@ -29,6 +29,7 @@
 	import * as Accordion from '@/components/ui/accordion';
 	import RenderMedia from '@/components/RenderMedia.svelte';
 	import { page } from '$app/stores';
+	import AudiocastPageAction from '@/components/AudiocastPageAction.svelte';
 
 	const { session$ } = getSessionContext();
 
@@ -121,6 +122,8 @@
 					</Accordion.Content>
 				</Accordion.Item>
 			</Accordion.Root>
+
+			<AudiocastPageAction {sessionId} sessionTitle={data.title || 'Untitled'} />
 		</div>
 	{:catch error}
 		<div>{String(error)}</div>

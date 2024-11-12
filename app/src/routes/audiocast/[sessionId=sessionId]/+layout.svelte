@@ -1,28 +1,23 @@
 <script>
 	import { getSessionContext } from '@/stores/sessionContext.svelte';
 	import { Button } from '@/components/ui/button';
-	import { goto } from '$app/navigation';
-
 	const { session$ } = getSessionContext();
 </script>
 
-{#if !$session$}
-	<div>Session not found</div>
-	<Button
-		on:click={() => {
-			goto('/', { invalidateAll: true, replaceState: true });
-		}}
-		class="text-blue-500"
+{#if $session$ && !$session$.completed}
+	<div
+		class="w-full mx-auto px-4 md:max-w-xl h-full flex flex-col gap-3 items-center justify-center"
 	>
-		Return home
-	</Button>
-{:else if $session$.completed && $session$.summary}
-	<slot />
-{:else}
-	<div>
-		You've not completed specifying your content preferences. Please complete the chat session to
-		generate an audiocast.
-
-		<a href="/chat/{$session$.id}" class="text-blue-500">Generate Audiocast</a>
+		<p>
+			You've not completed specifying your content preferences. Please complete the chat session to
+			generate an audiocast.
+		</p>
+		<Button
+			href="/chat/{$session$.id}"
+			class="text-blue-500 px-16 no-underline hover:no-underline bg-gray-800 hover:bg-gray-700"
+			>Generate Audiocast</Button
+		>
 	</div>
+{:else}
+	<slot />
 {/if}
