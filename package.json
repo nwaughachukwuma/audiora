@@ -8,7 +8,14 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {},
-  "devDependencies": {},
+  "devDependencies": {
+    "@types/node": "^20",
+    "husky": "8.0.3",
+    "nano-staged": "0.8.0",
+    "npm-run-all": "4.1.5",
+    "prettier": "^3.1.1",
+    "typescript": "^5.6.3"
+  },
   "keywords": [],
   "license": "ISC"
 }

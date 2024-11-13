@@ -27,6 +27,8 @@ runs:
           **/node_modules
           ${{ inputs.cache-paths }}
         key: ${{ inputs.cache-key }}
-    - uses: pnpm/action-setup@v3
+    - uses: pnpm/action-setup@v4
       with:
-        version: 8
+        version: 9
+        run_install: |
+          args: [--no-frozen-lockfile]
