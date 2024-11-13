@@ -31,4 +31,4 @@ runs:
       with:
         version: 9
         run_install: |
-          args: [--frozen-lockfile]
+          args: [--no-frozen-lockfile]
