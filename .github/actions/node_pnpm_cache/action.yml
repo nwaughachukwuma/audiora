@@ -30,3 +30,5 @@ runs:
     - uses: pnpm/action-setup@v4
       with:
         version: 9
+        run_install: |
+          args: [--frozen-lockfile]
