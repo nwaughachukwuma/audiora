@@ -80,7 +80,9 @@ jobs:
             app/package.json
             app/.svelte-kit/tsconfig.json
             app/.gcloudignore
+            app/.dockerignore
             app/.npmrc
+            pnpm-lock.yaml
 
   deploy:
     runs-on: ubuntu-latest
