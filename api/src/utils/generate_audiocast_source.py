@@ -8,15 +8,15 @@ from src.utils.make_seed import get_hash
 from src.utils.session_manager import SessionManager
 
 
-class GetAudiocastSourceModel(BaseModel):
+class GenerateAudiocastSource(BaseModel):
     sessionId: str
     category: ContentCategory
     summary: str
 
 
-async def get_audiocast_source(request: GetAudiocastSourceModel, background_tasks: BackgroundTasks):
+async def generate_audiocast_source(request: GenerateAudiocastSource, background_tasks: BackgroundTasks):
     """
-    Generate audiocast based on a summary of user's request
+    Generate audiocast source material based on a user preferences.
     """
     summary = request.summary
     category = request.category

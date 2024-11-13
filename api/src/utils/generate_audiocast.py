@@ -9,7 +9,7 @@ from src.utils.audiocast_utils import (
     GenerateAudioCastRequest,
     GenerateAudioCastResponse,
 )
-from src.utils.get_audiocast_source import GetAudiocastSourceModel, get_audiocast_source
+from api.src.utils.generate_audiocast_source import GetAudiocastSourceModel, get_audiocast_source
 from src.utils.session_manager import SessionManager
 from src.utils.waveform_utils import WaveformUtils
 

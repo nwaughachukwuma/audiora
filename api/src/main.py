@@ -2,6 +2,7 @@ import asyncio
 from time import time
 from typing import Any, Callable, Generator
 
+from api.src.utils.generate_audiocast_source import GenerateAudiocastSource, generate_audiocast_source
 from fastapi import BackgroundTasks, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
@@ -19,7 +20,6 @@ from src.utils.generate_audiocast import (
     generate_audiocast,
 )
 from src.utils.get_audiocast import get_audiocast
-from src.utils.get_audiocast_source import GetAudiocastSourceModel, get_audiocast_source
 from src.utils.get_session_title import GetSessionTitleModel, get_session_title
 from src.utils.session_manager import SessionManager
 
@@ -95,9 +95,9 @@ async def get_audiocast_endpoint(session_id: str):
     return result
 
 
-@app.post("/get-audiocast-source", response_model=str)
-async def review_source_endpoint(request: GetAudiocastSourceModel, background_tasks: BackgroundTasks):
-    source_content = await get_audiocast_source(request, background_tasks)
+@app.post("/generate-audiocast-source", response_model=str)
+async def generate_audiocast_source_endpoint(request: GenerateAudiocastSource, background_tasks: BackgroundTasks):
+    source_content = await generate_audiocast_source(request, background_tasks)
     if not source_content:
         raise HTTPException(status_code=500, detail="Failed to generate source content")
     return source_content
