@@ -49,7 +49,7 @@
 
 		return fetch(`${env.API_BASE_URL}/generate-audiocast-source`, {
 			method: 'POST',
-			body: JSON.stringify({ sessionId, category, summary }),
+			body: JSON.stringify({ sessionId, category, preferenceSummary: summary }),
 			headers: { 'Content-Type': 'application/json' }
 		})
 			.then<string>((res) => {

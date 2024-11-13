@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from api.src.utils.generate_audiocast_source import GenerateAudiocastSource, generate_audiocast_source
 from fastapi import BackgroundTasks, HTTPException
 
 from src.services.storage import StorageManager
@@ -9,7 +10,6 @@ from src.utils.audiocast_utils import (
     GenerateAudioCastRequest,
     GenerateAudioCastResponse,
 )
-from api.src.utils.generate_audiocast_source import GetAudiocastSourceModel, get_audiocast_source
 from src.utils.session_manager import SessionManager
 from src.utils.waveform_utils import WaveformUtils
 
@@ -29,11 +29,11 @@ async def generate_audiocast(request: GenerateAudioCastRequest, background_tasks
     category = request.category
     session_id = request.sessionId
 
-    source_content = await get_audiocast_source(
-        GetAudiocastSourceModel(
+    source_content = await generate_audiocast_source(
+        GenerateAudiocastSource(
             sessionId=session_id,
             category=category,
-            summary=summary,
+            preferenceSummary=summary,
         ),
         background_tasks,
     )

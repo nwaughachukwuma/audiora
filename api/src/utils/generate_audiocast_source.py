@@ -11,14 +11,14 @@ from src.utils.session_manager import SessionManager
 class GenerateAudiocastSource(BaseModel):
     sessionId: str
     category: ContentCategory
-    summary: str
+    preferenceSummary: str
 
 
 async def generate_audiocast_source(request: GenerateAudiocastSource, background_tasks: BackgroundTasks):
     """
     Generate audiocast source material based on a user preferences.
     """
-    summary = request.summary
+    summary = request.preferenceSummary
     category = request.category
     session_id = request.sessionId
 
