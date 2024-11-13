@@ -92,6 +92,8 @@ jobs:
       healthcheck_outcome: ${{ steps.healthcheck.outcome }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -120,6 +122,6 @@ jobs:
       - run: curl -f "${{ steps.deploy.outputs.url }}"
       - uses: marocchino/sticky-pull-request-comment@v2
         with:
-          header: gae_app
+          header: app
           message: |
-            gae_app: ${{ steps.deploy.outputs.url }} (${{ github.event.pull_request.head.sha }})
+            app: ${{ steps.deploy.outputs.url }} (${{ github.event.pull_request.head.sha }})
