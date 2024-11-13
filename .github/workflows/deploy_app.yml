@@ -21,7 +21,7 @@ env:
   CI: true
   MAIN: ${{ github.ref == 'refs/heads/main' }}
   PROJECT_ID: ${{ secrets.PROJECT_ID }}
-  CONFIG_FILE: "app.yaml"
+  CONFIG_FILE: "app/app.yaml"
   SERVICE: audiora-app
   API_BASE_URL: ${{ secrets.API_BASE_URL }}
 
