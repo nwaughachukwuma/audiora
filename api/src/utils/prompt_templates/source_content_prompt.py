@@ -1,7 +1,7 @@
 from src.utils.chat_utils import ContentCategory, category_qualifiers
 
 
-def get_content_source_prompt(category: ContentCategory, summary: str):
+def generate_source_content_prompt(category: ContentCategory, summary: str):
     return f"""Generate {category_qualifiers[category]} content for {summary}.
 
     Primary Objectives:

@@ -5,38 +5,69 @@ from src.services.anthropic_client import get_anthropic_sync
 from src.services.gemini_client import GeminiConfig, generate_content
 from src.services.openai_client import get_openai
 from src.utils.chat_utils import ContentCategory
-from src.utils.prompt_templates.source_content_prompt import get_content_source_prompt
+from src.utils.prompt_templates.source_content_prompt import generate_source_content_prompt
 from src.utils.prompt_templates.streamline_audio import streamline_audio_script_prompt
 from src.utils.prompt_templates.tts_prompt import Metadata, TTSPromptMaker
 
 
-def generate_source_content(category: ContentCategory, summary: str):
-    """
-    Generate audiocast source conntent based on a summary of the user's request
+class SourceContentRefiner:
+    def __init__(self, category: ContentCategory, preference_summary: str):
+        self.category = category
+        self.preference_summary = preference_summary
 
-    Args:
-        category (ContentCategory): The content category
-        summary (str): The user's request summary
-    Returns:
-        str: The audiocast source content
-    """
-    refined_summary = re.sub("You want", "A user who wants", summary, flags=re.IGNORECASE)
-    refined_summary = re.sub("You", "A user", refined_summary, flags=re.IGNORECASE)
+    def _refine(self, content):
+        """
+        Moderate and augment the source content to ensure it aligns with the user's preferences.
+        """
+        return self.__use_gemini_flash(content)
 
-    response = get_openai().chat.completions.create(
-        model="gpt-4o",
-        messages=[
-            {
-                "role": "system",
-                "content": get_content_source_prompt(category, refined_summary),
-            },
-            {"role": "user", "content": "Now develop content."},
-        ],
-        temperature=0.5,
-        max_tokens=4096,
-    )
+    def __use_gemini_flash(self, content: str):
+        """
+        Use gemini flash to refine the source content.
+        """
+        return content
 
-    return response.choices[0].message.content
+
+class GenerateSourceContent(SourceContentRefiner):
+    category: ContentCategory
+
+    def __init__(self, category: ContentCategory, preference_summary: str):
+        self.category = category
+        self.preference_summary = preference_summary
+
+    def _run(self):
+        """
+        Generate audiocast source conntent based a user preference.
+        Args:
+            category (ContentCategory): The content category
+            preference_summary (str): summary of user preferences
+        Returns:
+            str: The audiocast source content
+        """
+        source_content = self.__use_openai(self.category, self.preference_summary)
+        return self._refine(source_content)
+
+    def __use_openai(self, category: ContentCategory, preference_summary: str):
+        """
+        Generate audiocast source content using OpenAI.
+        """
+        refined_summary = re.sub("You want", "A user who wants", preference_summary, flags=re.IGNORECASE)
+        refined_summary = re.sub("You", "A user", refined_summary, flags=re.IGNORECASE)
+
+        response = get_openai().chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {
+                    "role": "system",
+                    "content": generate_source_content_prompt(category, refined_summary),
+                },
+                {"role": "user", "content": "Now comprehensively and exhaustively develop the content."},
+            ],
+            temperature=0.5,
+            max_tokens=4096,
+        )
+
+        return response.choices[0].message.content
 
 
 AudioScriptProvider = Literal["openai", "anthropic"]
