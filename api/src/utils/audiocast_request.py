@@ -5,12 +5,14 @@ from src.services.anthropic_client import get_anthropic_sync
 from src.services.gemini_client import GeminiConfig, generate_content
 from src.services.openai_client import get_openai
 from src.utils.chat_utils import ContentCategory
-from src.utils.prompt_templates.source_content_prompt import generate_source_content_prompt
+from src.utils.prompt_templates.source_content_prompt import generate_refiner_prompt, generate_source_content_prompt
 from src.utils.prompt_templates.streamline_audio import streamline_audio_script_prompt
 from src.utils.prompt_templates.tts_prompt import Metadata, TTSPromptMaker
 
 
 class SourceContentRefiner:
+    category: ContentCategory
+
     def __init__(self, category: ContentCategory, preference_summary: str):
         self.category = category
         self.preference_summary = preference_summary
@@ -23,17 +25,23 @@ class SourceContentRefiner:
 
     def __use_gemini_flash(self, content: str):
         """
-        Use gemini flash to refine the source content.
+        Refine the source content using gemini flash.
         """
-        return content
+        response = generate_content(
+            prompt=["Now refine the content to match the user's preferences."],
+            config=GeminiConfig(
+                model_name="gemini-1.5-flash-002",
+                system_prompt=generate_refiner_prompt(content, self.category, self.preference_summary),
+                temperature=0.1,
+                max_output_tokens=4096,
+            ),
+        )
+        return str(response)
 
 
 class GenerateSourceContent(SourceContentRefiner):
-    category: ContentCategory
-
     def __init__(self, category: ContentCategory, preference_summary: str):
-        self.category = category
-        self.preference_summary = preference_summary
+        super().__init__(category, preference_summary)
 
     def _run(self):
         """
@@ -63,7 +71,7 @@ class GenerateSourceContent(SourceContentRefiner):
                 },
                 {"role": "user", "content": "Now comprehensively and exhaustively develop the content."},
             ],
-            temperature=0.5,
+            temperature=0.3,
             max_tokens=4096,
         )
 
