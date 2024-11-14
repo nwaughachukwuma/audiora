@@ -48,16 +48,16 @@ async def generate_audiocast(request: GenerateAudioCastRequest, background_tasks
 
     # Generate audio script
     update_session_info("Generating audio script...")
-    audio_script_maker = AudioScriptMaker(category, source_content)
-    audio_script = audio_script_maker.create(provider="anthropic")
+    script_maker = AudioScriptMaker(category, source_content)
+    audio_script = script_maker.create(provider="gemini")
+
     if not audio_script:
         raise HTTPException(status_code=500, detail="Failed to generate audio script")
 
     # Generate audio
     update_session_info("Generating audio...")
-    audio_path = await AudioManager(custom_config=AudioManagerConfig(tts_provider="openai")).generate_speech(
-        audio_script
-    )
+    audio_manager = AudioManager(custom_config=AudioManagerConfig(tts_provider="openai"))
+    audio_path = await audio_manager.generate_speech(audio_script)
 
     def _run_on_background():
         try:
