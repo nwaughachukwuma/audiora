@@ -19,3 +19,6 @@ REDIS_PASSWORD = environ["REDIS_PASSWORD"]
 
 APP_URL = environ.get("APP_URL", "http://localhost:8501")
 API_URL = environ["API_URL"]
+
+CSE_ID = environ["CSE_ID"]
+CSE_API_KEY = environ["GOOGLE_API_KEY"]
