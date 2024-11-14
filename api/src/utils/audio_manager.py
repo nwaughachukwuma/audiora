@@ -28,9 +28,9 @@ class AudioManager(AudioManagerSpeechGenerator, ContentSplitter):
     def _get_ssml_tags(self) -> List[str]:
         # ["say-as", "prosody", "break", "emphasis", "mark"]
         if self.config.tts_provider == "openai":
-            return ["voice"]
+            return []
         elif self.config.tts_provider == "elevenlabs":
-            return ["voice", "prosody", "break"]
+            return ["phoneme", "prosody", "break"]
         else:
             return []
 

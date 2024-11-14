@@ -69,10 +69,7 @@ class GoogleSearch:
         except Exception:
             return None
 
-    async def _scrape_page_content(
-        self,
-        url: str,
-    ) -> str:
+    async def _scrape_page_content(self, url: str) -> str:
         """
         Fetch and extract content from a webpage
         """

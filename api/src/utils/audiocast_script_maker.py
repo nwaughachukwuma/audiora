@@ -59,8 +59,8 @@ class AudioScriptMaker:
                     "content": "Now create a TTS-optimized audiocast script.",
                 },
             ],
-            temperature=0.5,
-            max_tokens=4096,
+            temperature=0.3,
+            max_tokens=7120,
         )
 
         return response.choices[0].message.content
@@ -75,8 +75,8 @@ class AudioScriptMaker:
                     "content": "Now create a TTS-optimized audiocast script.",
                 },
             ],
-            temperature=0.5,
-            max_tokens=4096,
+            temperature=0.3,
+            max_tokens=7120,
         )
 
         return "".join(item.text for item in result.content if item.type == "text")
@@ -96,8 +96,8 @@ class AudioScriptMaker:
             config=GeminiConfig(
                 model_name="gemini-1.5-flash-002",
                 system_prompt=streamline_audio_script_prompt(instruction, audio_script),
-                temperature=0.5,
-                max_output_tokens=4096,
+                temperature=0.1,
+                max_output_tokens=7120,
             ),
         )
 

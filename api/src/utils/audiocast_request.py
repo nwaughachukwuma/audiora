@@ -54,7 +54,7 @@ class GenerateSourceContent(SourceContext, SourceContentRefiner):
                 },
             ],
             temperature=0.3,
-            max_tokens=4096,
+            max_tokens=7120,
         )
 
         return response.choices[0].message.content
