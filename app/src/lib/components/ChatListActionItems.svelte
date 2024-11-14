@@ -137,7 +137,7 @@
 			{:else}
 				<Button
 					variant="ghost"
-					class="bg-gray-800 hover:bg-gray-700 text-emerald-600 hover:text-emerald-600"
+					class="bg-gray-800 py-6 text-base hover:bg-gray-700 text-emerald-600 hover:text-emerald-600"
 					on:click={() => onreviewSource(category, getSummary())}
 				>
 					Review Source
