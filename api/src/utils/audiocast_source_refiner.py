@@ -23,7 +23,7 @@ class SourceContentRefiner:
                 model_name="gemini-1.5-flash-002",
                 system_prompt=get_source_refiner_prompt(content, self.category, self.preference_summary),
                 temperature=0.1,
-                max_output_tokens=7120,
+                max_output_tokens=8048,
             ),
         )
 

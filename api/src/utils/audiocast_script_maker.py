@@ -60,7 +60,7 @@ class AudioScriptMaker:
                 },
             ],
             temperature=0.3,
-            max_tokens=7120,
+            max_tokens=8048,
         )
 
         return response.choices[0].message.content
@@ -76,7 +76,7 @@ class AudioScriptMaker:
                 },
             ],
             temperature=0.3,
-            max_tokens=7120,
+            max_tokens=8048,
         )
 
         return "".join(item.text for item in result.content if item.type == "text")
@@ -97,7 +97,7 @@ class AudioScriptMaker:
                 model_name="gemini-1.5-flash-002",
                 system_prompt=streamline_audio_script_prompt(instruction, audio_script),
                 temperature=0.1,
-                max_output_tokens=7120,
+                max_output_tokens=8048,
             ),
         )
 
