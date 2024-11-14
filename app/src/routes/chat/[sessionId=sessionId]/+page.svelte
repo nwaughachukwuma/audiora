@@ -110,9 +110,9 @@
 
 					{#if finalResponse && $fetchingSource$}
 						<div
-							class="py-1 px-3 mx-auto w-fit bg-sky-600/20 animate-pulse text-sky-300 rounded-sm"
+							class="py-2 px-4 mx-auto w-fit bg-sky-600/20 animate-pulse text-sky-300 rounded-sm"
 						>
-							Fetching Audiocast Source...Please wait
+							Generating Source Material...Please wait
 						</div>
 					{:else if finalResponse}
 						<ChatListActionItems

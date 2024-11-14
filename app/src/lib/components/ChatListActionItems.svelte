@@ -128,7 +128,7 @@
 	{:else}
 		<div class="animate-fade-in grid sm:grid-cols-2 gap-3">
 			<Button
-				class="bg-emerald-600 text-emerald-100 hover:bg-emerald-700"
+				class="bg-emerald-600 text-emerald-100 text-base py-6 hover:bg-emerald-700"
 				on:click={() => ongenerate(getSummary())}>Generate Audiocast</Button
 			>
 
