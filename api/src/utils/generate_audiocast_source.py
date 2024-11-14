@@ -33,7 +33,7 @@ async def generate_audiocast_source(request: GenerateAudiocastSource, background
 
         update_session_info("Generating source content...")
         source_content_generator = GenerateSourceContent(category, preference_summary)
-        source_content = source_content_generator._run()
+        source_content = await source_content_generator._run()
 
         return source_content
 
