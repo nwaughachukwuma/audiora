@@ -1,8 +1,7 @@
 import re
 
-from api.src.utils.audiocast_source_context import SourceContext
-
 from src.services.openai_client import get_openai
+from src.utils.audiocast_source_context import SourceContext
 from src.utils.audiocast_source_refiner import SourceContentRefiner
 from src.utils.chat_utils import ContentCategory
 from src.utils.prompt_templates.source_content_prompt import generate_source_content_prompt
