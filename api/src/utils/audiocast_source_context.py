@@ -1,7 +1,7 @@
 import asyncio
 
 from src.services.gemini_client import GeminiConfig, generate_content
-from src.services.web_search.index import WebSearch
+from src.services.web_search.search import WebSearch
 from src.utils.prompt_templates.searchable_queries_prompt import searchable_queries_prompt
 
 
@@ -36,6 +36,6 @@ class SourceContext(WebSearch):
         if not queries:
             return ""
 
-        tasks = [self._web_search(query) for query in queries]
+        tasks = [self.search(query) for query in queries]
         result = await asyncio.gather(*tasks)
         return "\n\n".join(result)

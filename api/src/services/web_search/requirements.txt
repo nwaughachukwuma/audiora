@@ -1,7 +1,0 @@
-asyncio
-httpx
-wikipedia
-lxml
-beautifulsoup4
-
-python-dotenv

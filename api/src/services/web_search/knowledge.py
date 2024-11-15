@@ -1,33 +1,17 @@
 import asyncio
-from dataclasses import dataclass
 
 import httpx
 import wikipedia
 from bs4 import BeautifulSoup
 
-
-@dataclass
-class KnowledgeSearchConfig:
-    max_results: int = 3
-    max_sources: int = 10
-    max_preview_chars: int = 1024
-
-
-@dataclass
-class SearchResult:
-    url: str
-    title: str
-    preview: str
-
-    def __str__(self):
-        return f"Title: {self.title}\nPreview: {self.preview}"
+from .config import KnowledgeSearchConfig, SearchResult
 
 
 class KnowledgeSearch:
-    config: KnowledgeSearchConfig
+    knowledge_config: KnowledgeSearchConfig
 
-    def __init__(self, config: KnowledgeSearchConfig | None = None):
-        self.config = config if config else KnowledgeSearchConfig()
+    def __init__(self, knowledge_config: KnowledgeSearchConfig | None = None):
+        self.knowledge_config = knowledge_config if knowledge_config else KnowledgeSearchConfig()
 
     async def fetch_knowledge(self, query: str):
         """
@@ -48,7 +32,7 @@ class KnowledgeSearch:
             if isinstance(result, list):
                 sources.extend(result)
 
-        sources = sources[: self.config.max_sources]
+        sources = sources[: self.knowledge_config.max_sources]
         return "\n\n".join(str(source) for source in sources if source.preview)
 
     async def _compile_wikipedia(self, query: str) -> str:
@@ -65,7 +49,7 @@ class KnowledgeSearch:
         """
         try:
             sources: list[SearchResult] = []
-            search_results = wikipedia.search(query, results=self.config.max_results)
+            search_results = wikipedia.search(query, results=self.knowledge_config.max_results)
 
             for title in search_results:
                 try:
@@ -96,7 +80,7 @@ class KnowledgeSearch:
             params = {
                 "search_query": f"all:{query}",
                 "start": 0,
-                "max_results": self.config.max_results,
+                "max_results": self.knowledge_config.max_results,
                 "sortBy": "relevance",
                 "sortOrder": "descending",
             }
@@ -131,12 +115,20 @@ class KnowledgeSearch:
         cleaned_paragraphs = [
             p
             for p in paragraphs
-            if not any(marker in p.lower() for marker in ["references", "external links", "see also", "== notes =="])
+            if not any(
+                marker in p.lower()
+                for marker in [
+                    "references",
+                    "external links",
+                    "see also",
+                    "== notes ==",
+                ]
+            )
         ]
 
         result = ""
         for p in cleaned_paragraphs:
-            if len(result + p) <= self.config.max_preview_chars:
+            if len(result + p) <= self.knowledge_config.max_preview_chars:
                 result += p + "\n\n"
             else:
                 break

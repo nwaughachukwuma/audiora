@@ -1,11 +1,12 @@
 import asyncio
 import os
-from dataclasses import dataclass
 from typing import Any, Coroutine, Dict, List
 from urllib.parse import unquote
 
 import httpx
 from bs4 import BeautifulSoup
+
+from .config import GoogleSearchConfig, SearchResult
 
 CSE_API_KEY = os.environ["GOOGLE_API_KEY"]
 CSE_ID = os.environ["CSE_ID"]
@@ -13,26 +14,15 @@ APP_DOMAIN = os.environ["APP_DOMAIN"]
 GOOGLE_SEARCH_URL = "https://www.googleapis.com/customsearch/v1"
 
 
-@dataclass
-class GoogleSearchConfig:
-    max_results: int = 3
-
-
-@dataclass
-class SearchResult:
-    url: str
-    title: str
-    preview: str
-
-    def __str__(self):
-        return f"Title: {self.title}\nPreview: {self.preview}"
-
-
 class GoogleSearch:
-    config: GoogleSearchConfig
+    google_config: GoogleSearchConfig
 
-    def __init__(self, config: GoogleSearchConfig | None = None):
-        self.config = config if config else GoogleSearchConfig()
+    def __init__(self, google_config: GoogleSearchConfig | None = None):
+        self.google_config = (
+            google_config
+            if google_config
+            else GoogleSearchConfig(api_key=CSE_API_KEY, cse_id=CSE_ID, app_domain=APP_DOMAIN)
+        )
 
     async def _compile_google_search(self, query: str):
         results = await self._google_search(query)
@@ -42,9 +32,14 @@ class GoogleSearch:
         """
         Perform a Google search using the Custom Search Engine API
         """
-        params = {"q": unquote(query), "key": CSE_API_KEY, "cx": CSE_ID, "num": 5}
+        params = {
+            "q": unquote(query),
+            "key": self.google_config.api_key,
+            "cx": self.google_config.cse_id,
+            "num": 5,
+        }
         params.update(kwargs)
-        headers = {"Referer": APP_DOMAIN}
+        headers = {"Referer": self.google_config.app_domain or ""}
 
         async with httpx.AsyncClient() as client:
             response = await client.get(GOOGLE_SEARCH_URL, params=params, headers=headers)
@@ -52,7 +47,7 @@ class GoogleSearch:
 
             json_data = response.json()
 
-        items = json_data.get("items", [])[: self.config.max_results]
+        items = json_data.get("items", [])[: self.google_config.max_results]
         result = await self.extract_relevant_items(items)
         return result
 
@@ -74,7 +69,17 @@ class GoogleSearch:
         return [item for item in results if isinstance(item, SearchResult)]
 
     def _is_valid_url(self, url: str) -> bool:
-        invalid_extensions = (".pdf", ".doc", ".docx", ".ppt", ".pptx", ".xls", ".xlsx", ".zip", ".rar")
+        invalid_extensions = (
+            ".pdf",
+            ".doc",
+            ".docx",
+            ".ppt",
+            ".pptx",
+            ".xls",
+            ".xlsx",
+            ".zip",
+            ".rar",
+        )
         invalid_domains = ("youtube.com", "vimeo.com", "facebook.com", "twitter.com")
         return not (url.endswith(invalid_extensions) or any(domain in url for domain in invalid_domains))
 
