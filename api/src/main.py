@@ -110,6 +110,7 @@ async def get_signed_url_endpoint(blobname: str):
     """
     retry_count = 0
     max_retries = 3
+    errors: list[str] = []
 
     while retry_count < max_retries:
         try:
@@ -121,13 +122,13 @@ async def get_signed_url_endpoint(blobname: str):
                     "Cache-Control": "public, max-age=86390, immutable",
                 },
             )
-        except Exception:
-            pass
+        except Exception as e:
+            errors.append(str(e))
 
         await asyncio.sleep(5)
         retry_count += 1
 
-    raise HTTPException(status_code=500, detail="Failed to get signed URL")
+    raise HTTPException(status_code=500, detail="".join(errors))
 
 
 @app.post("/get-session-title", response_model=str)
