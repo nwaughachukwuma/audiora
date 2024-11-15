@@ -1,13 +1,15 @@
 import asyncio
+import os
 from dataclasses import dataclass
-from typing import Any, Dict, List
+from typing import Any, Coroutine, Dict, List
 from urllib.parse import unquote
 
 import httpx
 from bs4 import BeautifulSoup
 
-from src.env_var import CSE_API_KEY, CSE_ID
-
+CSE_API_KEY = os.environ["CSE_API_KEY"]
+CSE_ID = os.environ["CSE_ID"]
+APP_DOMAIN = os.environ["APP_DOMAIN"]
 GOOGLE_SEARCH_URL = "https://www.googleapis.com/customsearch/v1"
 
 
@@ -25,11 +27,13 @@ class GoogleSearch:
         """
         params = {"q": unquote(query), "key": CSE_API_KEY, "cx": CSE_ID, "num": 5}
         params.update(kwargs)
-        headers = {"Referer": "https://veedo.ai"}
+        headers = {"Referer": APP_DOMAIN}
 
-        response = httpx.get(GOOGLE_SEARCH_URL, params=params, headers=headers)
-        response.raise_for_status()
-        json_data = response.json()
+        async with httpx.AsyncClient() as client:
+            response = await client.get(GOOGLE_SEARCH_URL, params=params, headers=headers)
+            response.raise_for_status()
+
+            json_data = response.json()
 
         items = json_data.get("items", [])[:limit]
         result = await self.extract_relevant_items(items)
@@ -40,11 +44,15 @@ class GoogleSearch:
         """
         Extract relevant items from the search results
         """
-        tasks = []
+        tasks: list[Coroutine[Any, Any, SearchResult | None]] = []
+
         for item in search_results:
-            url = item.get("link", "")
+            url = item.get("link")
             if url and self._is_valid_url(url):
-                tasks.append(self._process_search_item(item))
+                tasks.append(self._process_search_item(url, item))
+
+        if not tasks:
+            return ""
 
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
@@ -55,15 +63,16 @@ class GoogleSearch:
 
         return "\n\n".join(contents)
 
-    async def _process_search_item(self, item: Dict, char_limit=2000) -> SearchResult | None:
+    def _is_valid_url(self, url: str) -> bool:
+        invalid_extensions = (".pdf", ".doc", ".docx", ".ppt", ".pptx", ".xls", ".xlsx", ".zip", ".rar")
+        invalid_domains = ("youtube.com", "vimeo.com", "facebook.com", "twitter.com")
+        return not (url.endswith(invalid_extensions) or any(domain in url for domain in invalid_domains))
+
+    async def _process_search_item(self, url: str, item: Dict, char_limit=2000) -> SearchResult | None:
         """
-        Process a single search result item and fetch its content
+        Process and fetch the result of a single search item url
         """
         try:
-            url = item.get("link", "")
-            if not url:
-                raise ValueError("No URL found in search item")
-
             content = await self._scrape_page_content(url)
             return SearchResult(url=url, title=item.get("title", ""), preview=content[:char_limit])
         except Exception:
@@ -84,7 +93,8 @@ class GoogleSearch:
                 element.decompose()
 
             content_elements = soup.find_all(
-                ["article", "main", "div"], class_=["content", "article", "post", "entry", "main-content"]
+                ["article", "main", "div"],
+                class_=["content", "article", "post", "entry", "main-content"],
             )
 
             if not content_elements:
@@ -105,12 +115,7 @@ class GoogleSearch:
             return ""
 
     def _clean_content(self, content: str) -> str:
+        """Remove very short lines (likely navigation/menu items)"""
         content = " ".join(content.split())
-        # Remove very short lines (likely navigation/menu items)
         lines = [line for line in content.split("\n") if len(line) > 30]
         return "\n".join(lines)
-
-    def _is_valid_url(self, url: str) -> bool:
-        invalid_extensions = (".pdf", ".doc", ".docx", ".ppt", ".pptx", ".xls", ".xlsx", ".zip", ".rar")
-        invalid_domains = ("youtube.com", "vimeo.com", "facebook.com", "twitter.com")
-        return not (url.endswith(invalid_extensions) or any(domain in url for domain in invalid_domains))

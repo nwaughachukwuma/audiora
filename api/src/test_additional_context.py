@@ -1,9 +1,9 @@
 import asyncio
 
+from src.services.web_search.index import WebSearch
 from src.utils.audiocast_request import GenerateSourceContent
 from src.utils.audiocast_source_context import SourceContext
 from src.utils.chat_utils import ContentCategory
-from src.utils.google_search import GoogleSearch
 
 
 async def test_additional_context(preference_summary: str):
@@ -12,7 +12,7 @@ async def test_additional_context(preference_summary: str):
 
 
 async def test_google_search(query: str):
-    result = await GoogleSearch()._google_search(query)
+    result = await WebSearch()._google_search(query)
     return result
 
 

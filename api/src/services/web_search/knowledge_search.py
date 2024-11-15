@@ -8,21 +8,30 @@ from bs4 import BeautifulSoup
 
 
 @dataclass
-class KnowledgeSearchModel:
+class __Config:
+    max_results: int = 3
+    max_sources: int = 10
+    preview_max_chars: int = 1024
+
+
+@dataclass
+class SearchResult:
     url: str
     title: str
     content: str
 
 
 class KnowledgeSearch:
-    session: httpx.AsyncClient
+    config: __Config
 
-    async def fetch_knowledge(self, query: str, max_sources: int = 10):
+    def __init__(self, config: __Config | None = None):
+        self.config = config if config else __Config()
+
+    async def fetch_knowledge(self, query: str):
         """
         Fetch knowledge from multiple sources concurrently,
         including Wikipedia, arXiv, and other scientific sources
         """
-        self.session = httpx.AsyncClient(timeout=30.0)
         # listed in order of importance
         tasks = [
             self.search_wikipedia(query),
@@ -37,25 +46,23 @@ class KnowledgeSearch:
                 continue
             if isinstance(result, list):
                 sources.extend(result)
-            elif isinstance(result, KnowledgeSearchModel):
+            elif isinstance(result, SearchResult):
                 sources.append(result)
 
-        # return sources[:max_sources]
         contents: List[str] = []
-        for source in sources[:max_sources]:
-            if isinstance(source, KnowledgeSearchModel):
+        for source in sources[: self.config.max_sources]:
+            if isinstance(source, SearchResult):
                 contents.append(f"Title: {source.title}\nPreview: {source.content}")
 
-        await self.session.aclose()
         return "\n\n".join(contents)
 
-    async def search_wikipedia(self, query: str) -> List[KnowledgeSearchModel]:
+    async def search_wikipedia(self, query: str) -> List[SearchResult]:
         """
         Fetch relevant Wikipedia articles
         """
+        sources = []
         try:
-            search_results = wikipedia.search(query, results=3)
-            sources = []
+            search_results = wikipedia.search(query, results=self.config.max_results)
 
             for title in search_results:
                 try:
@@ -67,7 +74,7 @@ class KnowledgeSearch:
                     if not content:
                         continue
 
-                    sources.append(KnowledgeSearchModel(title=page.title, content=content, url=page.url))
+                    sources.append(SearchResult(url=page.url, title=page.title, content=content))
                 except wikipedia.exceptions.DisambiguationError:
                     continue
                 except wikipedia.exceptions.PageError:
@@ -77,7 +84,7 @@ class KnowledgeSearch:
         except Exception:
             return []
 
-    async def search_arxiv_papers(self, query: str) -> List[KnowledgeSearchModel]:
+    async def search_arxiv_papers(self, query: str) -> List[SearchResult]:
         """
         Fetch papers from arXiv and other scientific sources
         """
@@ -86,13 +93,13 @@ class KnowledgeSearch:
             params = {
                 "search_query": f"all:{query}",
                 "start": 0,
-                "max_results": 3,
+                "max_results": self.config.max_results,
                 "sortBy": "relevance",
                 "sortOrder": "descending",
             }
-
-            response = await self.session.get(ARXIV_URL, params=params)
-            response.raise_for_status()
+            async with httpx.AsyncClient(timeout=20) as client:
+                response = await client.get(ARXIV_URL, params=params)
+                response.raise_for_status()
 
             soup = BeautifulSoup(response.text, "lxml-xml")
             entries = soup.find_all("entry")
@@ -104,13 +111,13 @@ class KnowledgeSearch:
                 abstract = entry.summary.text.strip()
 
                 if abstract:
-                    sources.append(KnowledgeSearchModel(title=title, content=abstract, url=url))
+                    sources.append(SearchResult(url=url, title=title, content=abstract))
 
             return sources
         except Exception:
             return []
 
-    def _extract_relevant_wiki_sections(self, content: str, max_chars: int = 1024) -> str:
+    def _extract_relevant_wiki_sections(self, content: str) -> str:
         """
         Extract the most relevant sections from Wikipedia content
         """
@@ -124,7 +131,7 @@ class KnowledgeSearch:
 
         result = ""
         for p in cleaned_paragraphs:
-            if len(result + p) <= max_chars:
+            if len(result + p) <= self.config.preview_max_chars:
                 result += p + "\n\n"
             else:
                 break

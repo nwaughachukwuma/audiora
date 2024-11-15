@@ -1,12 +1,11 @@
 import asyncio
 
 from src.services.gemini_client import GeminiConfig, generate_content
-from src.utils.google_search import GoogleSearch
-from src.utils.knowledge_search import KnowledgeSearch
+from src.services.web_search.index import WebSearch
 from src.utils.prompt_templates.searchable_queries_prompt import searchable_queries_prompt
 
 
-class SourceContext(KnowledgeSearch, GoogleSearch):
+class SourceContext(WebSearch):
     def _get_search_queries(self, preference_summary: str):
         """
         Summarize the user preference into searchable phrases/queries
@@ -34,8 +33,6 @@ class SourceContext(KnowledgeSearch, GoogleSearch):
         if not queries:
             return ""
 
-        web_tasks = [self._google_search(query) for query in queries]
-        knowlege_tasks = [self.fetch_knowledge(query) for query in queries]
-        result = await asyncio.gather(*web_tasks, *knowlege_tasks)
-
+        tasks = [self._web_search(query) for query in queries]
+        result = await asyncio.gather(*tasks)
         return "\n\n".join(result)
