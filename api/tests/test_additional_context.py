@@ -1,6 +1,7 @@
 import asyncio
 
-from src.services.web_search.search import WebSearch
+from web_search import WebSearch
+
 from src.utils.audiocast_request import GenerateSourceContent
 from src.utils.audiocast_source_context import SourceContext
 from src.utils.chat_utils import ContentCategory
@@ -14,8 +15,8 @@ async def test_additional_context(preference_summary: str):
 
 @process_time()
 async def test_web_search(query: str):
-    result = await WebSearch().search(query)
-    return result
+    web_search = WebSearch()
+    return await web_search.search(query)
 
 
 async def test_generate_source_content(category: ContentCategory, preference_summary: str):

@@ -1,7 +1,8 @@
 import asyncio
 
+from web_search import WebSearch
+
 from src.services.gemini_client import GeminiConfig, generate_content
-from src.services.web_search.search import WebSearch
 from src.utils.prompt_templates.searchable_queries_prompt import searchable_queries_prompt
 
 
