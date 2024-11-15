@@ -6,7 +6,8 @@ from src.services.web_search.knowledge_search import KnowledgeSearch, __Config
 
 class WebSearch(GoogleSearch, KnowledgeSearch):
     def __init__(self, config: __Config | None = None):
-        super().__init__(config=config)
+        GoogleSearch.__init__(self)
+        KnowledgeSearch.__init__(self, config=config)
 
     async def _web_search(self, query: str):
         """

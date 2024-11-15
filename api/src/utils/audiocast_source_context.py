@@ -6,6 +6,9 @@ from src.utils.prompt_templates.searchable_queries_prompt import searchable_quer
 
 
 class SourceContext(WebSearch):
+    def __init__(self):
+        super().__init__()
+
     def _get_search_queries(self, preference_summary: str):
         """
         Summarize the user preference into searchable phrases/queries

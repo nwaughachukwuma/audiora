@@ -9,7 +9,8 @@ from src.utils.prompt_templates.source_content_prompt import generate_source_con
 
 class GenerateSourceContent(SourceContext, SourceContentRefiner):
     def __init__(self, category: ContentCategory, preference_summary: str):
-        super().__init__(category, preference_summary)
+        SourceContext.__init__(self)
+        SourceContentRefiner.__init__(self, category, preference_summary)
 
     async def _run(self):
         """
