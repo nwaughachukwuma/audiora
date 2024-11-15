@@ -1,6 +1,5 @@
 import asyncio
 from dataclasses import dataclass
-from typing import List
 
 import httpx
 import wikipedia
@@ -8,24 +7,27 @@ from bs4 import BeautifulSoup
 
 
 @dataclass
-class __Config:
+class KnowledgeSearchConfig:
     max_results: int = 3
     max_sources: int = 10
-    preview_max_chars: int = 1024
+    max_preview_chars: int = 1024
 
 
 @dataclass
 class SearchResult:
     url: str
     title: str
-    content: str
+    preview: str
+
+    def __str__(self):
+        return f"Title: {self.title}\nPreview: {self.preview}"
 
 
 class KnowledgeSearch:
-    config: __Config
+    config: KnowledgeSearchConfig
 
-    def __init__(self, config: __Config | None = None):
-        self.config = config if config else __Config()
+    def __init__(self, config: KnowledgeSearchConfig | None = None):
+        self.config = config if config else KnowledgeSearchConfig()
 
     async def fetch_knowledge(self, query: str):
         """
@@ -34,34 +36,35 @@ class KnowledgeSearch:
         """
         # listed in order of importance
         tasks = [
-            self.search_wikipedia(query),
-            self.search_arxiv_papers(query),
+            self._search_wikipedia(query),
+            self._search_arxiv_papers(query),
             # add more knowledge sources here
         ]
 
+        sources: list[SearchResult] = []
+
         results = await asyncio.gather(*tasks, return_exceptions=True)
-        sources = []
         for result in results:
-            if isinstance(result, Exception):
-                continue
             if isinstance(result, list):
                 sources.extend(result)
-            elif isinstance(result, SearchResult):
-                sources.append(result)
 
-        contents: List[str] = []
-        for source in sources[: self.config.max_sources]:
-            if isinstance(source, SearchResult):
-                contents.append(f"Title: {source.title}\nPreview: {source.content}")
+        sources = sources[: self.config.max_sources]
+        return "\n\n".join(str(source) for source in sources if source.preview)
 
-        return "\n\n".join(contents)
+    async def _compile_wikipedia(self, query: str) -> str:
+        results = await self._search_wikipedia(query)
+        return "\n\n".join(str(item) for item in results)
 
-    async def search_wikipedia(self, query: str) -> List[SearchResult]:
+    async def _compile_arxiv_papers(self, query: str) -> str:
+        results = await self._search_arxiv_papers(query)
+        return "\n\n".join(str(item) for item in results)
+
+    async def _search_wikipedia(self, query: str) -> list[SearchResult]:
         """
         Fetch relevant Wikipedia articles
         """
-        sources = []
         try:
+            sources: list[SearchResult] = []
             search_results = wikipedia.search(query, results=self.config.max_results)
 
             for title in search_results:
@@ -70,11 +73,11 @@ class KnowledgeSearch:
                     if not page.content:
                         continue
 
-                    content = self._extract_relevant_wiki_sections(page.content)
-                    if not content:
+                    preview = self._extract_relevant_wiki_sections(page.content)
+                    if not preview:
                         continue
 
-                    sources.append(SearchResult(url=page.url, title=page.title, content=content))
+                    sources.append(SearchResult(url=page.url, title=page.title, preview=preview))
                 except wikipedia.exceptions.DisambiguationError:
                     continue
                 except wikipedia.exceptions.PageError:
@@ -84,7 +87,7 @@ class KnowledgeSearch:
         except Exception:
             return []
 
-    async def search_arxiv_papers(self, query: str) -> List[SearchResult]:
+    async def _search_arxiv_papers(self, query: str) -> list[SearchResult]:
         """
         Fetch papers from arXiv and other scientific sources
         """
@@ -104,14 +107,16 @@ class KnowledgeSearch:
             soup = BeautifulSoup(response.text, "lxml-xml")
             entries = soup.find_all("entry")
 
-            sources = []
+            sources: list[SearchResult] = []
             for entry in entries:
                 title = entry.title.text.strip()
                 url = entry.id.text.strip()
-                abstract = entry.summary.text.strip()
+                preview = entry.summary.text.strip()
 
-                if abstract:
-                    sources.append(SearchResult(url=url, title=title, content=abstract))
+                if not preview:
+                    continue
+
+                sources.append(SearchResult(url=url, title=title, preview=preview))
 
             return sources
         except Exception:
@@ -131,7 +136,7 @@ class KnowledgeSearch:
 
         result = ""
         for p in cleaned_paragraphs:
-            if len(result + p) <= self.config.preview_max_chars:
+            if len(result + p) <= self.config.max_preview_chars:
                 result += p + "\n\n"
             else:
                 break

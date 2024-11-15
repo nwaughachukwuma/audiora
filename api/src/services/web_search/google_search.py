@@ -7,10 +7,15 @@ from urllib.parse import unquote
 import httpx
 from bs4 import BeautifulSoup
 
-CSE_API_KEY = os.environ["CSE_API_KEY"]
+CSE_API_KEY = os.environ["GOOGLE_API_KEY"]
 CSE_ID = os.environ["CSE_ID"]
 APP_DOMAIN = os.environ["APP_DOMAIN"]
 GOOGLE_SEARCH_URL = "https://www.googleapis.com/customsearch/v1"
+
+
+@dataclass
+class GoogleSearchConfig:
+    max_results: int = 3
 
 
 @dataclass
@@ -19,9 +24,21 @@ class SearchResult:
     title: str
     preview: str
 
+    def __str__(self):
+        return f"Title: {self.title}\nPreview: {self.preview}"
+
 
 class GoogleSearch:
-    async def _google_search(self, query: str, limit=3, **kwargs):
+    config: GoogleSearchConfig
+
+    def __init__(self, config: GoogleSearchConfig | None = None):
+        self.config = config if config else GoogleSearchConfig()
+
+    async def _compile_google_search(self, query: str):
+        results = await self._google_search(query)
+        return "\n\n".join(str(item) for item in results if item.preview)
+
+    async def _google_search(self, query: str, **kwargs):
         """
         Perform a Google search using the Custom Search Engine API
         """
@@ -35,12 +52,11 @@ class GoogleSearch:
 
             json_data = response.json()
 
-        items = json_data.get("items", [])[:limit]
+        items = json_data.get("items", [])[: self.config.max_results]
         result = await self.extract_relevant_items(items)
-
         return result
 
-    async def extract_relevant_items(self, search_results: List[Dict[str, Any]]) -> str:
+    async def extract_relevant_items(self, search_results: List[Dict[str, Any]]) -> List[SearchResult]:
         """
         Extract relevant items from the search results
         """
@@ -52,16 +68,10 @@ class GoogleSearch:
                 tasks.append(self._process_search_item(url, item))
 
         if not tasks:
-            return ""
+            return []
 
         results = await asyncio.gather(*tasks, return_exceptions=True)
-
-        contents: List[str] = []
-        for item in results:
-            if isinstance(item, SearchResult) and item.preview:
-                contents.append(f"Title: {item.title}\nPreview: {item.preview}")
-
-        return "\n\n".join(contents)
+        return [item for item in results if isinstance(item, SearchResult)]
 
     def _is_valid_url(self, url: str) -> bool:
         invalid_extensions = (".pdf", ".doc", ".docx", ".ppt", ".pptx", ".xls", ".xlsx", ".zip", ".rar")

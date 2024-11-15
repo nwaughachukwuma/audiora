@@ -1,12 +1,5 @@
 from os import environ
 
-from dotenv import load_dotenv
-
-if environ.get("ENV", "local") == "local":
-    load_dotenv(dotenv_path="./.env.local")
-else:
-    load_dotenv()
-
 BUCKET_NAME = environ["BUCKET_NAME"]
 
 OPENAI_API_KEY = environ["OPENAI_API_KEY"]
