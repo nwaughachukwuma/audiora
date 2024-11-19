@@ -27,6 +27,7 @@ setup(
         "seewav",
         "pycairo",
         "watchdog",
+        "async-web-search",
     ],
     classifiers=[
         "Development Status :: 3 - Alpha",

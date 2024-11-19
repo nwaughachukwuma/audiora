@@ -30,8 +30,4 @@ uvicorn
 uvloop
 redis[hiredis]
 
-wikipedia
-lxml
-beautifulsoup4
-
- async-web-search
+async-web-search
