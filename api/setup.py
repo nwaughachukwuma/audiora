@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="audiora",
-    version="1.1.0",
+    version="1.1.1",
     description="Learn or listen to anything, anytime, leveraging AI",
     author="Chukwuma Nwaugha",
     author_email="chuks@veedo.ai",
