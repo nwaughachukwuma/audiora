@@ -15,14 +15,12 @@ async def test_additional_context(preference_summary: str):
 
 @process_time()
 async def test_web_search(query: str):
-    web_search = WebSearch()
-    return await web_search.search(query)
+    return await WebSearch().search(query)
 
 
 async def test_generate_source_content(category: ContentCategory, preference_summary: str):
     source_content_generator = GenerateSourceContent(category, preference_summary)
-    source_content = await source_content_generator._run()
-    return source_content
+    return await source_content_generator._run()
 
 
 if __name__ == "__main__":

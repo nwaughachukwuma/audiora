@@ -46,4 +46,4 @@ async def get_session_title(request: GetSessionTitleModel, background_tasks: Bac
         on_finish=_on_finish,
     )
 
-    return StreamingResponse(response)
+    return StreamingResponse(response, media_type="text/event-stream")
