@@ -29,3 +29,5 @@ setuptools
 uvicorn
 uvloop
 redis[hiredis]
+
+async-web-search

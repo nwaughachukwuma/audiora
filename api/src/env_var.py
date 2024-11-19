@@ -1,12 +1,5 @@
 from os import environ
 
-from dotenv import load_dotenv
-
-if environ.get("ENV", "local") == "local":
-    load_dotenv(dotenv_path="./.env.local")
-else:
-    load_dotenv()
-
 BUCKET_NAME = environ["BUCKET_NAME"]
 
 OPENAI_API_KEY = environ["OPENAI_API_KEY"]
@@ -19,3 +12,6 @@ REDIS_PASSWORD = environ["REDIS_PASSWORD"]
 
 APP_URL = environ.get("APP_URL", "http://localhost:8501")
 API_URL = environ["API_URL"]
+
+CSE_ID = environ["CSE_ID"]
+CSE_API_KEY = environ["GOOGLE_API_KEY"]

@@ -75,7 +75,7 @@
 			<AudiocastPageSkeletonLoader />
 
 			{#if generating}
-				<p class="mt-4 py-1 px-3 bg-sky-600/20 animate-pulse text-sky-300 rounded-sm">
+				<p class="mt-4 py-2 px-4 bg-sky-600/20 animate-pulse text-sky-300 rounded-sm">
 					Generating your audiocast...Please wait
 				</p>
 			{/if}

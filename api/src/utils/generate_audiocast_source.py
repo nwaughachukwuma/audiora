@@ -1,28 +1,28 @@
 from fastapi import BackgroundTasks
 from pydantic import BaseModel
 
-from src.utils.audiocast_request import generate_source_content
+from src.utils.audiocast_request import GenerateSourceContent
 from src.utils.chat_utils import ContentCategory
 from src.utils.decorators import use_cache_manager
 from src.utils.make_seed import get_hash
 from src.utils.session_manager import SessionManager
 
 
-class GetAudiocastSourceModel(BaseModel):
+class GenerateAudiocastSource(BaseModel):
     sessionId: str
     category: ContentCategory
-    summary: str
+    preferenceSummary: str
 
 
-async def get_audiocast_source(request: GetAudiocastSourceModel, background_tasks: BackgroundTasks):
+async def generate_audiocast_source(request: GenerateAudiocastSource, background_tasks: BackgroundTasks):
     """
-    Generate audiocast based on a summary of user's request
+    Generate audiocast source material based on user preferences.
     """
-    summary = request.summary
+    preference_summary = request.preferenceSummary
     category = request.category
     session_id = request.sessionId
 
-    params = {"sessionId": session_id, "category": category, "summary": summary}
+    params = {"sessionId": session_id, "category": category, "preference_summary": preference_summary}
     cache_key = get_hash(params, "audio_source")
 
     @use_cache_manager(cache_key)
@@ -32,7 +32,9 @@ async def get_audiocast_source(request: GetAudiocastSourceModel, background_task
             background_tasks.add_task(db._update_info, info)
 
         update_session_info("Generating source content...")
-        source_content = generate_source_content(category, summary)
+        source_content_generator = GenerateSourceContent(category, preference_summary)
+        source_content = await source_content_generator._run()
+
         return source_content
 
     return await _handler()

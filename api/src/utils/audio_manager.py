@@ -26,15 +26,14 @@ class AudioManager(AudioManagerSpeechGenerator, ContentSplitter):
         self.config.ensure_directories()
 
     def _get_ssml_tags(self) -> List[str]:
-        # ["say-as", "prosody", "break", "emphasis", "mark"]
         if self.config.tts_provider == "openai":
-            return ["voice"]
+            return []
         elif self.config.tts_provider == "elevenlabs":
-            return ["voice", "prosody", "break"]
+            return ["say-as", "emphasis", "phoneme", "prosody", "break"]
         else:
             return []
 
-    def _get_tags(self, audio_script: str):
+    def _get_speaker_tags(self, audio_script: str):
         tags: List[str] = re.findall(r"<(Speaker\d+)>", audio_script)
         tags.sort()
         return list(set(tags))
@@ -58,7 +57,7 @@ class AudioManager(AudioManagerSpeechGenerator, ContentSplitter):
         Raises:
             Exception: If there's an error in converting text to speech.
         """
-        tags = self._get_tags(audio_script)
+        tags = self._get_speaker_tags(audio_script)
         ssml_tags = self._get_ssml_tags()
 
         audio_script = clean_tss_markup(audio_script, tags + ssml_tags)

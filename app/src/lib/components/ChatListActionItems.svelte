@@ -47,9 +47,9 @@
 		if ($fetchingSource$) return;
 		$fetchingSource$ = true;
 
-		return fetch(`${env.API_BASE_URL}/get-audiocast-source`, {
+		return fetch(`${env.API_BASE_URL}/generate-audiocast-source`, {
 			method: 'POST',
-			body: JSON.stringify({ sessionId, category, summary }),
+			body: JSON.stringify({ sessionId, category, preferenceSummary: summary }),
 			headers: { 'Content-Type': 'application/json' }
 		})
 			.then<string>((res) => {
@@ -128,7 +128,7 @@
 	{:else}
 		<div class="animate-fade-in grid sm:grid-cols-2 gap-3">
 			<Button
-				class="bg-emerald-600 text-emerald-100 hover:bg-emerald-700"
+				class="bg-emerald-600 text-emerald-100 text-base py-6 hover:bg-emerald-700"
 				on:click={() => ongenerate(getSummary())}>Generate Audiocast</Button
 			>
 
@@ -137,7 +137,7 @@
 			{:else}
 				<Button
 					variant="ghost"
-					class="bg-gray-800 hover:bg-gray-700 text-emerald-600 hover:text-emerald-600"
+					class="bg-gray-800 py-6 text-base hover:bg-gray-700 text-emerald-600 hover:text-emerald-600"
 					on:click={() => onreviewSource(category, getSummary())}
 				>
 					Review Source

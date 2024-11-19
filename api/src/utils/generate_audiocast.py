@@ -4,12 +4,12 @@ from fastapi import BackgroundTasks, HTTPException
 
 from src.services.storage import StorageManager
 from src.utils.audio_manager import AudioManager, AudioManagerConfig
-from src.utils.audiocast_request import AudioScriptMaker
+from src.utils.audiocast_script_maker import AudioScriptMaker
 from src.utils.audiocast_utils import (
     GenerateAudioCastRequest,
     GenerateAudioCastResponse,
 )
-from src.utils.get_audiocast_source import GetAudiocastSourceModel, get_audiocast_source
+from src.utils.generate_audiocast_source import GenerateAudiocastSource, generate_audiocast_source
 from src.utils.session_manager import SessionManager
 from src.utils.waveform_utils import WaveformUtils
 
@@ -29,11 +29,11 @@ async def generate_audiocast(request: GenerateAudioCastRequest, background_tasks
     category = request.category
     session_id = request.sessionId
 
-    source_content = await get_audiocast_source(
-        GetAudiocastSourceModel(
+    source_content = await generate_audiocast_source(
+        GenerateAudiocastSource(
             sessionId=session_id,
             category=category,
-            summary=summary,
+            preferenceSummary=summary,
         ),
         background_tasks,
     )
@@ -48,16 +48,16 @@ async def generate_audiocast(request: GenerateAudioCastRequest, background_tasks
 
     # Generate audio script
     update_session_info("Generating audio script...")
-    audio_script_maker = AudioScriptMaker(category, source_content)
-    audio_script = audio_script_maker.create(provider="anthropic")
+    script_maker = AudioScriptMaker(category, source_content)
+    audio_script = script_maker.create(provider="gemini")
+
     if not audio_script:
         raise HTTPException(status_code=500, detail="Failed to generate audio script")
 
     # Generate audio
     update_session_info("Generating audio...")
-    audio_path = await AudioManager(custom_config=AudioManagerConfig(tts_provider="openai")).generate_speech(
-        audio_script
-    )
+    audio_manager = AudioManager(custom_config=AudioManagerConfig(tts_provider="openai"))
+    audio_path = await audio_manager.generate_speech(audio_script)
 
     def _run_on_background():
         try:
