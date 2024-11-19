@@ -6,6 +6,8 @@ from pathlib import Path
 from typing import Any, Dict
 from uuid import uuid4
 
+from google.auth import compute_engine, default
+from google.auth.transport import requests
 from google.cloud import storage
 from pydub import AudioSegment
 
@@ -100,8 +102,24 @@ class StorageManager:
         if not blob.exists():
             raise Exception(f"Blob {blobname} does not exist")
 
-        return blob.generate_signed_url(
-            version="v4",
-            expiration=expiration,
-            method="GET",
-        )
+        if os.environ.get("ENV", "dev") == "prod":
+            credentials, _ = default()
+            auth_request = requests.Request()
+            credentials.refresh(auth_request)
+
+            signing_credentials = compute_engine.IDTokenCredentials(
+                auth_request, "", service_account_email=credentials.service_account_email
+            )
+
+            return blob.generate_signed_url(
+                version="v4",
+                expiration=expiration,
+                method="GET",
+                credentials=signing_credentials,
+            )
+        else:
+            return blob.generate_signed_url(
+                version="v4",
+                expiration=expiration,
+                method="GET",
+            )
