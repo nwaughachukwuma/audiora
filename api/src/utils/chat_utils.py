@@ -44,7 +44,7 @@ category_qualifiers: Dict[ContentCategory, str] = {
     "commentary": "a analytical, insightful, and critical commentary",
     "voicenote": "a personal, authentic, and concise voicenote",
     "interview": "a conversational, revealing, and dynamic interview",
-    "soundbite": "an impactful, memorable, and succinct soundbite",
+    "soundbite": "an impactful, memorable, and informative soundbite",
 }
 
 

@@ -25,12 +25,12 @@ async def test_generate_source_content(category: ContentCategory, preference_sum
 
 if __name__ == "__main__":
     query = "What is neuroscience?"
-    preference_summary = "You want to listen to a 10-minute audiocast summarizing cutting-edge technologies in modern neuroscience and their real-world applications."
+    preference_summary = "You want to listen to an audiocast that provides an overview of the history of blockchain, covering its origin, key milestones, and recent developments."
     # ===========================================================================
-    result = asyncio.run(test_web_search(query))
+    # result = asyncio.run(test_web_search(query))
     # ===========================================================================
     # result = asyncio.run(test_additional_context(preference_summary))
     # ===========================================================================
-    # result = asyncio.run(test_generate_source_content("interview", preference_summary))
+    result = asyncio.run(test_generate_source_content("interview", preference_summary))
     # ===========================================================================
     print(f"Result: {result}")

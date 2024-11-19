@@ -9,21 +9,24 @@ def generate_source_content_prompt(category: ContentCategory, summary: str, addi
 
     Primary Objectives:
     1. Develop content that precisely matches the specified {category} format
-    2. Maintain unwavering focus on the user preferences
-    3. Ensure every element of the content serves the core purpose
-    4. Leverage the additional context to enhance the content quality, authenticity and depth
+    2. Leverage the additional context to enhance the content quality, authenticity and depth
+    3. Maintain unwavering focus on the user preferences
+    4. Ensure every element of the content serves the user's preferences
 
     Content Development Guidelines:
-    1. Blend elements from these sources while maintaining veracity and relevance:
+    1. Blend elements from the following sources while maintaining veracity and relevance:
         - Historical references and classical works
         - Contemporary examples and modern context
         - Timeless principles and current applications
+        - Theoretical frameworks and practical insights
+        - Alternative perspectives and diverse viewpoints
 
     Quality Control Parameters:
     1. Length: Create content that is:
-        - Comprehensive enough to fulfill the user preferences exhaustively
-        - Long enough to maintain engagement
+        - Comprehensive enough to exhaustively fulfill the user preferences
+        - Long enough to maintain engagement, while preserving consistency and coherence
         - Without unnecessary elaboration or tangents
+        - Between 5 and 10 pages, and based on category: {category}
 
     2. Engagement Criteria:
         - Maintain consistent quality throughout
@@ -38,12 +41,12 @@ def generate_source_content_prompt(category: ContentCategory, summary: str, addi
 
     4. Content Augmentation Rules:
         - Only add information that directly supports the main topic
-        - Verify each addition provides clear value, without any false or misleading information
+        - Verify each section provides clear value, without any false or misleading information
         - Maintain thematic consistency throughout
         - explicitly reference the user's preferences in the content
-        - leverage the additional context to enhance for improved depth
+        - leverage the additional context for enhanced depth
 
     Remember:
-    - Ignore the additional context if it does not align with or add value to the user preferences.
+    - Only use the additional context if it align with or add value to the user preferences.
     - If in doubt, prioritize relevance over creativity.
     """
