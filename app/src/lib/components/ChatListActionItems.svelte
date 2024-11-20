@@ -11,7 +11,7 @@
 	import { toast } from 'svelte-sonner';
 	import { Button } from './ui/button';
 	import { getSessionContext } from '@/stores/sessionContext.svelte';
-	import RenderAudioSource from '@/components/RenderAudioSource.svelte';
+	import RenderAudioSource from '@/components/custom-source/RenderAudioSource.svelte';
 	import { streamingResponse } from '@/utils/streamingResponse';
 	import { Share2Icon } from 'lucide-svelte';
 	import ShareModal from './share/ShareModal.svelte';

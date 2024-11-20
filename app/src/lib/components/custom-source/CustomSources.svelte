@@ -1,5 +1,5 @@
 <script>
-	import * as Accordion from './ui/accordion';
+	import * as Accordion from '../ui/accordion';
 
 	const customSources = [
 		{

@@ -1,5 +1,4 @@
 <script>
-	import { cn } from '@/utils/ui.utils';
 	export let show = false;
 </script>
 
