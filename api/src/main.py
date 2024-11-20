@@ -13,6 +13,7 @@ from src.utils.chat_utils import (
     SessionChatItem,
     SessionChatRequest,
 )
+from src.utils.extract_url_content import ExtractURLContent, ExtractURLContentRequest, URLContent
 from src.utils.generate_audiocast import (
     GenerateAudioCastRequest,
     GenerateAudioCastResponse,
@@ -135,3 +136,10 @@ async def get_signed_url_endpoint(blobname: str):
 async def get_session_title_endpoint(request: GetSessionTitleModel, background_tasks: BackgroundTasks):
     source_content = await get_session_title(request, background_tasks)
     return source_content
+
+
+@app.post("/extract-url-content", response_model=URLContent)
+async def extract_url_content_endpoint(request: ExtractURLContentRequest):
+    extractor = ExtractURLContent()
+    page_content = await extractor._extract(request.url)
+    return page_content
