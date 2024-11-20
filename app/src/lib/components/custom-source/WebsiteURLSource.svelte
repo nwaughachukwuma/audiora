@@ -5,7 +5,8 @@
 	import { Card, CardContent, CardHeader } from '../ui/card';
 	import { Input } from '../ui/input';
 
-	const dispatch = createEventDispatcher<{ closeWebsiteURL: void }>();
+	const dispatch = createEventDispatcher<{ closeWebsiteURL: void; submitURL: { url: string } }>();
+	let url = '';
 </script>
 
 <Card class="max-w-2xl mx-auto bg-gray-900 border-gray-800">
@@ -40,7 +41,9 @@
 			<label for="url" class="text-blue-400">Paste URL*</label>
 			<Input
 				id="url"
+				bind:value={url}
 				placeholder="https://"
+				autocomplete="off"
 				class="bg-gray-900 focus:ring-0 focus-visible:ring-0 border-blue-400 text-white placeholder:text-gray-600"
 			/>
 		</div>
@@ -56,7 +59,18 @@
 		</div>
 
 		<div class="flex justify-end">
-			<Button class="bg-blue-500 text-base px-8 text-blue-100 hover:bg-blue-600">Insert</Button>
+			<Button
+				on:click={() => {
+					dispatch('submitURL', { url });
+					requestAnimationFrame(() => {
+						dispatch('closeWebsiteURL');
+					});
+				}}
+				disabled={!url}
+				class="bg-blue-500 text-base px-8 text-blue-100 hover:bg-blue-600"
+			>
+				Insert
+			</Button>
 		</div>
 	</CardContent>
 </Card>

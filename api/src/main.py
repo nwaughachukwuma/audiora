@@ -142,4 +142,4 @@ async def get_session_title_endpoint(request: GetSessionTitleModel, background_t
 async def extract_url_content_endpoint(request: ExtractURLContentRequest):
     extractor = ExtractURLContent()
     page_content = await extractor._extract(request.url)
-    return page_content
+    return page_content.model_dump()

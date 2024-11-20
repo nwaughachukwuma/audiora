@@ -1,56 +1,32 @@
-<script lang="ts" context="module">
-	export type LinkSources = {
-		type: 'link';
-		url: string;
-	};
-
-	export type CopyPasteSources = {
-		type: 'copy/paste';
-	};
-
-	export type CustomSources = (LinkSources | CopyPasteSources) & {
-		id: string;
-		title: string;
-		content_type: 'text/plain' | 'text/html' | 'application/pdf';
-		content: string;
-	};
-
-	const customSources: CustomSources[] = [
-		{
-			id: '1',
-			type: 'copy/paste',
-			content_type: 'text/html',
-			title: 'Custom Source 1',
-			content: 'AI-generated Source content goes here'
-		},
-		{
-			id: '2',
-			title: 'Custom Source 2',
-			content_type: 'text/plain',
-			type: 'link',
-			content: 'Custom Souce content goes here',
-			url: 'https://www.google.com'
-		},
-		{
-			id: '3',
-			type: 'link',
-			content_type: 'application/pdf',
-			title: 'Custom Source 3',
-			content: 'Custom Souce content goes here',
-			url: 'https://www.wikipedia.org'
-		}
-	];
-</script>
-
 <script lang="ts">
+	import { getCustomSources } from '@/stores/customSources.svelte';
 	import * as Accordion from '../ui/accordion';
 	import RenderPdfContent from './RenderPDFContent.svelte';
-	export let sources = customSources;
+
+	const { sources$ } = getCustomSources();
+
+	$: sources = $sources$;
+
+	function truncate(str: string, n: number) {
+		return str.length > n ? str.substr(0, n - 1) + '...' : str;
+	}
 </script>
 
-{#each sources as source (source.id)}
+{#each sources as source, idx (source.id)}
 	<Accordion.Item value={source.id} class="border-gray-800">
-		<Accordion.Trigger>{source.title}</Accordion.Trigger>
+		<Accordion.Trigger>
+			<div class="inline-flex break-words text-wrap">
+				<span class="shrink-0 inline-flex">
+					Custom Source {idx + 1}
+				</span>
+				{#if source.type === 'link'}
+					{':'}
+					<span class="text-gray-400 text-start ml-1">
+						{truncate(source.url, 45)}
+					</span>
+				{/if}
+			</div>
+		</Accordion.Trigger>
 		<Accordion.Content>
 			<div class="flex w-full flex-col gap-y-3 p-2 bg-gray-900/70 text-gray-300">
 				{#if source.content_type === 'application/pdf'}
