@@ -1,6 +1,7 @@
 import re
 from io import BytesIO
 from urllib.parse import urlparse
+from uuid import uuid4
 
 import httpx
 from bs4 import BeautifulSoup, Tag
@@ -15,6 +16,7 @@ class ExtractURLContentRequest(BaseModel):
 
 
 class URLContent(BaseModel):
+    id: str
     content: str
     content_type: str
     metadata: dict = {}
@@ -81,6 +83,7 @@ class ExtractURLContent:
                 content_type = "text/html"
 
             return URLContent(
+                id=str(uuid4()),
                 content=text,
                 content_type=content_type,
                 metadata=metadata,
