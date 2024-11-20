@@ -5,7 +5,7 @@
 	import { parse } from 'marked';
 	import { PlusIcon } from 'lucide-svelte';
 	import CustomSources from './CustomSources.svelte';
-	import AddCustomSourceForm from './AddCustomSourceForm.svelte';
+	import AddCustomSource from './AddCustomSource.svelte';
 
 	export let audioSource: string;
 
@@ -53,7 +53,7 @@
 								</span>
 							</Accordion.Trigger>
 							<Accordion.Content class="accordion-content">
-								<AddCustomSourceForm />
+								<AddCustomSource />
 							</Accordion.Content>
 						</Accordion.Item>
 
