@@ -8,6 +8,8 @@ export default defineConfig({
 		include: ['src/**/*.{test,spec}.{js,ts}']
 	},
 	define: {
+		'process.env.USE_EMULATORS': `'${process.env.USE_EMULATORS || false}'`,
+		'process.env.FIREBASE_CONFIG': `'${process.env.FIREBASE_CONFIG || {}}'`,
 		...defineEnv()
 	},
 	build: {
