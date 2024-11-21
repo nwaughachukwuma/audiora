@@ -11,11 +11,11 @@
 	import { toast } from 'svelte-sonner';
 	import { Button } from './ui/button';
 	import { getSessionContext } from '@/stores/sessionContext.svelte';
-	import RenderAudioSource from '@/components/custom-source/RenderAudioSource.svelte';
 	import { streamingResponse } from '@/utils/streamingResponse';
 	import { Share2Icon } from 'lucide-svelte';
 	import ShareModal from './share/ShareModal.svelte';
 	import { getShareableLink, getShareTitle } from '@/utils/shareMeta';
+	import ManageAudioSourceDrawer from './ManageAudioSourceDrawer.svelte';
 
 	export let sessionId: string;
 	export let category: ContentCategory;
@@ -133,7 +133,7 @@
 			>
 
 			{#if $audioSource$}
-				<RenderAudioSource audioSource={$audioSource$} />
+				<ManageAudioSourceDrawer aiSource={$audioSource$} />
 			{:else}
 				<Button
 					variant="ghost"

@@ -1,15 +1,14 @@
 <script lang="ts">
-	import * as Drawer from '../ui/drawer';
-	import { Button } from '../ui/button';
-	import * as Accordion from '../ui/accordion';
-	import { parse } from 'marked';
+	import * as Drawer from './ui/drawer';
+	import { Button } from './ui/button';
+	import * as Accordion from './ui/accordion';
 	import { PlusIcon } from 'lucide-svelte';
-	import CustomSources from './CustomSources.svelte';
-	import AddCustomSource from './AddCustomSource.svelte';
+	import AddCustomSource from './custom-source/AddCustomSource.svelte';
 	import { getCustomSources, type Sources } from '@/stores/customSources.svelte';
 	import { env } from '@env';
+	import RenderAudioSources from './RenderAudioSources.svelte';
 
-	export let audioSource: string;
+	export let aiSource: string;
 
 	const { addSource } = getCustomSources();
 
@@ -97,20 +96,7 @@
 								</Accordion.Content>
 							</Accordion.Item>
 
-							<Accordion.Item value="item-0" class="border-gray-800">
-								<Accordion.Trigger>AI-generated Source</Accordion.Trigger>
-								<Accordion.Content>
-									<article
-										class="prose leading-relaxed max-h-96 overflow-y-auto text-gray-300 flex p-2 flex-col gap-y-3 bg-gray-900/70 text-gray-30"
-									>
-										{#await parse(audioSource) then parsedContent}
-											{@html parsedContent}
-										{/await}
-									</article>
-								</Accordion.Content>
-							</Accordion.Item>
-
-							<CustomSources />
+							<RenderAudioSources {aiSource} />
 						</Accordion.Root>
 					{/key}
 				</div>
@@ -119,12 +105,9 @@
 	</Drawer.Portal>
 </Drawer.Root>
 
-<style lang="postcss">
+<style>
 	:global(.accordion-content div) {
 		padding-bottom: 4px;
 		max-height: 100%;
-	}
-	article :global(p) {
-		@apply text-sm;
 	}
 </style>
