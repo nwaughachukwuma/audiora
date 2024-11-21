@@ -19,6 +19,13 @@ export default defineConfig({
 		noExternal: ['ramda', 'bits-ui']
 	},
 	optimizeDeps: {
-		include: ['copy-to-clipboard']
+		include: [
+			'copy-to-clipboard',
+			'firebase/app',
+			'firebase/analytics',
+			'firebase/firestore',
+			'firebase/auth',
+			'firebase/storage'
+		]
 	}
 });
