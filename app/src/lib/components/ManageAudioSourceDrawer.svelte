@@ -7,9 +7,11 @@
 	import { getCustomSources, type Sources } from '@/stores/customSources.svelte';
 	import { env } from '@env';
 	import RenderAudioSources from './RenderAudioSources.svelte';
+	import { getSessionContext } from '@/stores/sessionContext.svelte';
 
 	export let aiSource: string;
 
+	const { sessionId$ } = getSessionContext();
 	const { addSource } = getCustomSources();
 
 	let snapPoints = [0.75, 0.95];
@@ -17,6 +19,8 @@
 	let fetchingSource = false;
 
 	let accordionResetKey = {};
+
+	$: sessionId = $sessionId$;
 
 	function accordionValueChanged(v: string | string[] | undefined) {
 		if (v === 'item-x') {
@@ -36,9 +40,9 @@
 	}
 
 	async function fetchURLContent(url: string): Promise<Sources> {
-		return fetch(`${env.API_BASE_URL}/extract-url-content`, {
+		return fetch(`${env.API_BASE_URL}/generate-custom-source`, {
 			method: 'POST',
-			body: JSON.stringify({ url }),
+			body: JSON.stringify({ url, sessionId }),
 			headers: { 'Content-Type': 'application/json' }
 		})
 			.then<{

@@ -11,12 +11,15 @@
 	import { page } from '$app/stores';
 	import Spinner from '@/components/Spinner.svelte';
 	import { setAppContext } from '@/stores/appContext.svelte';
+	import { setCustomSources } from '@/stores/customSources.svelte';
 
 	export let data;
 
-	$: setAppContext();
 	$: sessionId = $page.params.sessionId || data.sessionId;
+
+	$: setAppContext();
 	$: setSessionContext(sessionId);
+	$: setCustomSources(sessionId);
 </script>
 
 <svelte:head>

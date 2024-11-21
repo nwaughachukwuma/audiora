@@ -18,7 +18,7 @@ export type Sources = (LinkSources | CopyPasteSources) & {
 
 const CONTEXT_KEY = {};
 
-export const setCustomSources = () => {
+export const setCustomSources = (_sessionId: string) => {
 	const sources$ = writable<Sources[]>([]);
 
 	return setContext(CONTEXT_KEY, {
@@ -31,5 +31,4 @@ export const setCustomSources = () => {
 };
 
 export type CustomSourcesType = ReturnType<typeof setCustomSources>;
-export const getCustomSources = () =>
-	getContext<CustomSourcesType>(CONTEXT_KEY) || setCustomSources();
+export const getCustomSources = () => getContext<CustomSourcesType>(CONTEXT_KEY);
