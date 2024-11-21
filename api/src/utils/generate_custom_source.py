@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, cast
 
 from fastapi import BackgroundTasks
 from pydantic import BaseModel
@@ -13,6 +13,10 @@ from src.utils.extract_url_content import ExtractURLContent, URLContent
 
 class GenerateCustomSourceRequest(BaseModel):
     url: str
+    sessionId: str
+
+
+class GetCustomSourcesRequest(BaseModel):
     sessionId: str
 
 
@@ -46,7 +50,7 @@ class CustomSourceManager(DBManager):
             .set({**(data.model_dump()), "created_at": self._timestamp, "updated_at": self._timestamp})
         )
 
-    def _get_custom_source(self, source_id: str):
+    def _get_custom_source(self, source_id: str) -> CustomSourceModel:
         self._check_document()
         return (
             self._get_collection(self.collection)
@@ -55,9 +59,17 @@ class CustomSourceManager(DBManager):
             .document(source_id)
             .get()
         )
-        # what about
-        # doc_path = f"{self.collection}/{self.doc_id}/{self.sub_collection}"
-        # return self._get_document(doc_path, source_id).get()
+
+    def _get_custom_sources(self):
+        self._check_document()
+
+        try:
+            doc_ref = self._get_collection(self.collection).document(self.doc_id)
+            snap = doc_ref.collection(self.sub_collection).get()
+            return [cast(CustomSourceModel, doc.to_dict()) for doc in snap.docs if doc.exists]
+        except Exception as e:
+            print(f"Error getting custom sources for Session: {self.doc_id}", e)
+            return []
 
 
 async def generate_custom_source(request: GenerateCustomSourceRequest, background_tasks: BackgroundTasks):

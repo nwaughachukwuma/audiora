@@ -20,7 +20,13 @@ from src.utils.generate_audiocast import (
     generate_audiocast,
 )
 from src.utils.generate_audiocast_source import GenerateAudiocastSource, generate_audiocast_source
-from src.utils.generate_custom_source import GenerateCustomSourceRequest, generate_custom_source
+from src.utils.generate_custom_source import (
+    CustomSourceManager,
+    CustomSourceModel,
+    GenerateCustomSourceRequest,
+    GetCustomSourcesRequest,
+    generate_custom_source,
+)
 from src.utils.get_audiocast import get_audiocast
 from src.utils.get_session_title import GetSessionTitleModel, get_session_title
 from src.utils.session_manager import SessionManager
@@ -61,7 +67,11 @@ async def root():
 
 
 @app.post("/chat/{session_id}", response_model=Generator[str, Any, None])
-async def chat_endpoint(session_id: str, request: SessionChatRequest, background_tasks: BackgroundTasks):
+async def chat_endpoint(
+    session_id: str,
+    request: SessionChatRequest,
+    background_tasks: BackgroundTasks,
+):
     """Chat endpoint"""
     category = request.contentCategory
     db = SessionManager(session_id, category)
@@ -97,7 +107,10 @@ async def get_audiocast_endpoint(session_id: str):
 
 
 @app.post("/generate-audiocast-source", response_model=str)
-async def generate_audiocast_source_endpoint(request: GenerateAudiocastSource, background_tasks: BackgroundTasks):
+async def generate_audiocast_source_endpoint(
+    request: GenerateAudiocastSource,
+    background_tasks: BackgroundTasks,
+):
     source_content = await generate_audiocast_source(request, background_tasks)
     if not source_content:
         raise HTTPException(status_code=500, detail="Failed to generate source content")
@@ -133,7 +146,10 @@ async def get_signed_url_endpoint(blobname: str):
 
 
 @app.post("/get-session-title", response_model=str)
-async def get_session_title_endpoint(request: GetSessionTitleModel, background_tasks: BackgroundTasks):
+async def get_session_title_endpoint(
+    request: GetSessionTitleModel,
+    background_tasks: BackgroundTasks,
+):
     return await get_session_title(request, background_tasks)
 
 
@@ -145,5 +161,13 @@ async def extract_url_content_endpoint(request: ExtractURLContentRequest):
 
 
 @app.post("/generate-custom-source", response_model=URLContent)
-async def generate_custom_source_endpoint(request: GenerateCustomSourceRequest, background_tasks: BackgroundTasks):
+async def generate_custom_source_endpoint(
+    request: GenerateCustomSourceRequest,
+    background_tasks: BackgroundTasks,
+):
     return await generate_custom_source(request, background_tasks)
+
+
+@app.post("/get-custom-sources", response_model=list[CustomSourceModel])
+async def get_custom_sources_endpoint(request: GetCustomSourcesRequest):
+    return CustomSourceManager(request.sessionId)._get_custom_sources()
