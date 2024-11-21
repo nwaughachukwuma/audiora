@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Dict, Literal
 
 from firebase_admin.firestore import client, firestore
@@ -48,3 +49,16 @@ class DBManager:
 
     def _get_documents(self, collection: Collection):
         return self._get_collection(collection).stream()
+
+    @classmethod
+    def _safe_to_dict(cls, data: dict):
+        """
+        safely parse firestore data by converting convert all timestamp to string
+        """
+
+        def _safe_to_str(value: dict | str | datetime):
+            if isinstance(value, datetime):
+                return value.strftime("%Y-%m-%d %H:%M:%S")
+            return value
+
+        return {k: _safe_to_str(v) for k, v in data.items()}

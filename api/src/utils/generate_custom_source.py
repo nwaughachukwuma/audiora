@@ -65,8 +65,13 @@ class CustomSourceManager(DBManager):
 
         try:
             doc_ref = self._get_collection(self.collection).document(self.doc_id)
-            snap = doc_ref.collection(self.sub_collection).get()
-            return [cast(CustomSourceModel, doc.to_dict()) for doc in snap.docs if doc.exists]
+            docs = doc_ref.collection(self.sub_collection).get()
+            return [
+                cast(CustomSourceModel, self._safe_to_dict(doc.to_dict()))
+                for doc in docs
+                if doc.exists and doc.to_dict()
+            ]
+
         except Exception as e:
             print(f"Error getting custom sources for Session: {self.doc_id}", e)
             return []
