@@ -14,17 +14,18 @@ export type Sources = (LinkSources | CopyPasteSources) & {
 	id: string;
 	content_type: 'text/plain' | 'text/html' | 'application/pdf';
 	content: string;
+	created_at: string;
 };
 
 const CONTEXT_KEY = {};
 
 export const setCustomSources = (_sessionId: string) => {
-	const sources$ = writable<Sources[]>([]);
+	const sources$ = writable<Sources[] | null>(null);
 
 	return setContext(CONTEXT_KEY, {
 		sources$,
 		addSource: (source: Sources) => {
-			sources$.update((sources) => [...sources, source]);
+			sources$.update((sources) => (!sources ? sources : [...sources, source]));
 			return sources$;
 		}
 	});
