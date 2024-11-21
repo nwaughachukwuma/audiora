@@ -20,6 +20,7 @@ from src.utils.generate_audiocast import (
     generate_audiocast,
 )
 from src.utils.generate_audiocast_source import GenerateAudiocastSource, generate_audiocast_source
+from src.utils.generate_custom_source import GenerateCustomSourceRequest, generate_custom_source
 from src.utils.get_audiocast import get_audiocast
 from src.utils.get_session_title import GetSessionTitleModel, get_session_title
 from src.utils.session_manager import SessionManager
@@ -86,8 +87,7 @@ async def generate_audiocast_endpoint(
     request: GenerateAudioCastRequest,
     background_tasks: BackgroundTasks,
 ):
-    result = await generate_audiocast(request, background_tasks)
-    return result
+    return await generate_audiocast(request, background_tasks)
 
 
 @app.get("/audiocast/{session_id}", response_model=GenerateAudioCastResponse)
@@ -134,8 +134,7 @@ async def get_signed_url_endpoint(blobname: str):
 
 @app.post("/get-session-title", response_model=str)
 async def get_session_title_endpoint(request: GetSessionTitleModel, background_tasks: BackgroundTasks):
-    source_content = await get_session_title(request, background_tasks)
-    return source_content
+    return await get_session_title(request, background_tasks)
 
 
 @app.post("/extract-url-content", response_model=URLContent)
@@ -143,3 +142,8 @@ async def extract_url_content_endpoint(request: ExtractURLContentRequest):
     extractor = ExtractURLContent()
     page_content = await extractor._extract(request.url)
     return page_content.model_dump()
+
+
+@app.post("/generate-custom-source", response_model=URLContent)
+async def generate_custom_source_endpoint(request: GenerateCustomSourceRequest, background_tasks: BackgroundTasks):
+    return await generate_custom_source(request, background_tasks)
