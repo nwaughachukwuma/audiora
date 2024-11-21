@@ -13,7 +13,7 @@
 
 	const { addSource } = getCustomSources();
 
-	let snapPoints = [0.75, 0.9];
+	let snapPoints = [0.75, 0.95];
 	let activeSnapPoint = snapPoints[0];
 	let fetchingSource = false;
 
@@ -101,7 +101,7 @@
 								<Accordion.Trigger>AI-generated Source</Accordion.Trigger>
 								<Accordion.Content>
 									<article
-										class="prose text-gray-300 flex p-2 flex-col gap-y-3 bg-gray-900/70 text-gray-30"
+										class="prose max-h-96 overflow-y-auto text-gray-300 flex p-2 flex-col gap-y-3 bg-gray-900/70 text-gray-30"
 									>
 										{#await parse(audioSource) then parsedContent}
 											{@html parsedContent}

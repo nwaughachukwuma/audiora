@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { getCustomSources } from '@/stores/customSources.svelte';
 	import * as Accordion from '../ui/accordion';
-	import RenderPdfContent from './RenderPDFContent.svelte';
+	import RenderWebContent from './RenderWebContent.svelte';
 
 	const { sources$ } = getCustomSources();
 
 	$: sources = $sources$;
 
 	function truncate(str: string, n: number) {
-		return str.length > n ? str.substr(0, n - 1) + '...' : str;
+		return str.length > n ? str.substring(0, n - 1) + '...' : str;
 	}
 </script>
 
@@ -28,12 +28,10 @@
 			</div>
 		</Accordion.Trigger>
 		<Accordion.Content>
-			<div class="flex w-full flex-col gap-y-3 p-2 bg-gray-900/70 text-gray-300">
-				{#if source.content_type === 'application/pdf'}
-					<RenderPdfContent content={source.content} />
-				{:else}
-					{source.content}
-				{/if}
+			<div
+				class="flex w-full max-h-96 overflow-y-auto flex-col gap-y-3 p-2 bg-gray-900/70 text-gray-300"
+			>
+				<RenderWebContent content={source.content} />
 			</div>
 		</Accordion.Content>
 	</Accordion.Item>

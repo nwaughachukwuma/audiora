@@ -1,4 +1,3 @@
-import re
 from io import BytesIO
 from urllib.parse import urlparse
 from uuid import uuid4
@@ -40,22 +39,28 @@ class ExtractURLContent:
         return await self.__exit__()
 
     def _clean_text(self, text: str) -> str:
-        """replace all whitespace sequences with a single space"""
-        return re.compile(r"\s+").sub(" ", text).strip()
+        """TODO: write text cleaning logic"""
+        return text.strip()
 
     async def _extract_pdf(self, content: bytes) -> tuple[str, dict]:
         pdf_reader = PdfReader(BytesIO(content))
-        text_content = " ".join(page.extract_text() for page in pdf_reader.pages)
-        metadata = {"pages": len(pdf_reader.pages), "info": pdf_reader.metadata or {}}
 
-        return self._clean_text(text_content), metadata
+        pages: list[str] = []
+        for page in pdf_reader.pages:
+            text = page.extract_text()
+            # Split into paragraphs and clean
+            paragraphs = [p.strip() for p in text.split("\n\n") if p.strip()]
+            pages.append("\n\n".join(paragraphs))
+
+        metadata = {**(pdf_reader.metadata or {}), "pages": pdf_reader.get_num_pages()}
+        return self._clean_text("\n\n".join(pages)), metadata
 
     async def _extract_html(self, content: bytes) -> tuple[str, dict]:
         soup = BeautifulSoup(content, "lxml")
         for element in soup(["script", "style", "nav", "footer"]):
             element.decompose()
 
-        text_content = soup.get_text(separator=" ", strip=True)
+        text_content = soup.get_text(separator="\n\n", strip=True)
         descr_tag = soup.find("meta", {"name": "description"})
         metadata = {
             "title": soup.title.string if soup.title else "",
