@@ -101,7 +101,7 @@
 								<Accordion.Trigger>AI-generated Source</Accordion.Trigger>
 								<Accordion.Content>
 									<article
-										class="prose max-h-96 overflow-y-auto text-gray-300 flex p-2 flex-col gap-y-3 bg-gray-900/70 text-gray-30"
+										class="prose leading-relaxed max-h-96 overflow-y-auto text-gray-300 flex p-2 flex-col gap-y-3 bg-gray-900/70 text-gray-30"
 									>
 										{#await parse(audioSource) then parsedContent}
 											{@html parsedContent}
@@ -119,9 +119,12 @@
 	</Drawer.Portal>
 </Drawer.Root>
 
-<style>
+<style lang="postcss">
 	:global(.accordion-content div) {
 		padding-bottom: 4px;
 		max-height: 100%;
+	}
+	article :global(p) {
+		@apply text-sm;
 	}
 </style>

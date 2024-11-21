@@ -3,13 +3,11 @@
 	$: paragraphs = content.split('\n\n').filter((p) => p.trim());
 </script>
 
-<section class="w-full flex flex-col gap-y-3">
-	{#each paragraphs as paragraph, idx (idx)}
-		<article class="pb-2 border-b leading-relaxed border-b-gray-500/10">
-			{paragraph}
-		</article>
-	{/each}
-</section>
+{#each paragraphs as paragraph, idx (idx)}
+	<article class="pb-2 border-b leading-relaxed border-b-gray-500/10">
+		{paragraph}
+	</article>
+{/each}
 
 <style>
 	article :global(code) {
