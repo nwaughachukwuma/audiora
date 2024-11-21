@@ -1,5 +1,5 @@
+import { getCustomSources$ } from '@/db/db.customSources';
 import { setContext, getContext } from 'svelte';
-import { writable } from 'svelte/store';
 
 export type LinkSources = {
 	type: 'link';
@@ -19,15 +19,10 @@ export type Sources = (LinkSources | CopyPasteSources) & {
 
 const CONTEXT_KEY = {};
 
-export const setCustomSources = (_sessionId: string) => {
-	const sources$ = writable<Sources[] | null>(null);
-
+export const setCustomSources = (sessionId: string) => {
+	const sources$ = getCustomSources$(sessionId);
 	return setContext(CONTEXT_KEY, {
-		sources$,
-		addSource: (source: Sources) => {
-			sources$.update((sources) => (!sources ? sources : [...sources, source]));
-			return sources$;
-		}
+		sources$
 	});
 };
 

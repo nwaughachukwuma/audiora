@@ -2,36 +2,15 @@
 	import { getCustomSources } from '@/stores/customSources.svelte';
 	import * as Accordion from '../ui/accordion';
 	import RenderWebContent from './RenderWebContent.svelte';
-	import { env } from '@env';
-	import type { Sources } from '@/stores/customSources.svelte';
-	import { getSessionContext } from '@/stores/sessionContext.svelte';
-	import { browser } from '$app/environment';
 
-	const { sessionId$ } = getSessionContext();
 	const { sources$ } = getCustomSources();
 
-	$: sessionId = $sessionId$;
 	$: sources = $sources$?.sort((a, b) => {
 		if (a.created_at && b.created_at) {
 			return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
 		}
 		return 0;
 	});
-
-	$: if (browser) getCustomSource(sessionId).then((d) => sources$.set(d));
-
-	async function getCustomSource(sessionId: string) {
-		return fetch(`${env.API_BASE_URL}/get-custom-sources`, {
-			method: 'POST',
-			body: JSON.stringify({ sessionId }),
-			headers: { 'Content-Type': 'application/json' }
-		})
-			.then<Sources[]>((res) => {
-				if (res.ok) return res.json();
-				throw new Error('Error fetching custom sources');
-			})
-			.catch(() => [] as Sources[]);
-	}
 
 	function truncate(str: string, n: number) {
 		return str.length > n ? str.substring(0, n - 1) + '...' : str;
