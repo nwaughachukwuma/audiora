@@ -2,7 +2,6 @@ import asyncio
 from time import time
 from typing import Any, Callable, Generator
 
-from src.utils.custom_sources.extract_url_content import ExtractURLContent, ExtractURLContentRequest, URLContent
 from fastapi import BackgroundTasks, FastAPI, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
@@ -14,6 +13,7 @@ from src.utils.chat_utils import (
     SessionChatItem,
     SessionChatRequest,
 )
+from src.utils.custom_sources.extract_url_content import ExtractURLContent, ExtractURLContentRequest, URLContent
 from src.utils.custom_sources.generate_url_source import (
     CustomSourceManager,
     CustomSourceModel,
@@ -23,6 +23,7 @@ from src.utils.custom_sources.generate_url_source import (
     generate_custom_source,
 )
 from src.utils.custom_sources.save_copied_source import CopiedPasteSourceRequest, save_copied_source
+from src.utils.custom_sources.save_uploaded_sources import UploadedFiles
 from src.utils.generate_audiocast import (
     GenerateAudioCastRequest,
     GenerateAudioCastResponse,
@@ -193,9 +194,5 @@ async def save_uploaded_files_endpoint(files: list[UploadFile], sessionId: str =
     """
     Save sources uploaded from the frontend
     """
-    print(f"Session ID: {sessionId}")
-    for file in files:
-        file_bytes = await file.read()
-        print(f"File INFO: {file.filename}, Size: {len(file_bytes)} bytes")
-        # Process the file as needed
-    return "Files saved successfully"
+    result = await UploadedFiles(session_id=sessionId)._save_sources(files)
+    return result
