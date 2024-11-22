@@ -1,15 +1,9 @@
-from typing import Literal, Optional, cast
-
 from fastapi import BackgroundTasks
-from google.cloud.firestore_v1 import DocumentReference
 from pydantic import BaseModel
 
-from src.services.firestore_sdk import (
-    Collection,
-    DBManager,
-    collections,
-)
-from src.utils.extract_url_content import ExtractURLContent, URLContent
+from src.utils.custom_sources.extract_url_content import ExtractURLContent
+
+from .base_utils import CustomSourceManager, CustomSourceModel
 
 
 class GenerateCustomSourceRequest(BaseModel):
@@ -26,77 +20,11 @@ class DeleteCustomSourcesRequest(BaseModel):
     sourceId: str
 
 
-class CustomSourceModel(URLContent):
-    source_type: Literal["link", "copy/paste"]
-    url: Optional[str] = None
-    created_at: Optional[str] = None
-    updated_at: Optional[str] = None
-
-
-class CustomSourceManager(DBManager):
-    collection: Collection = collections["audiora_sessions"]
-    sub_collection = "custom_sources"
-
-    def __init__(self, session_id: str):
-        super().__init__()
-        self.doc_id = session_id
-
-    def _check_document(self):
-        """if the collection does not exist, create it"""
-        doc = self._get_document(self.collection, self.doc_id)
-        if not doc.exists:
-            raise Exception("Session not found")
-        return doc
-
-    def _get_doc_ref(self, source_id: str) -> DocumentReference:
-        self._check_document()
-        return (
-            self._get_collection(self.collection)
-            .document(self.doc_id)
-            .collection(self.sub_collection)
-            .document(source_id)
-        )
-
-    def _set_custom_source(self, data: CustomSourceModel):
-        return self._get_doc_ref(data.id).set(
-            {
-                **(data.model_dump()),
-                "created_at": self._timestamp,
-                "updated_at": self._timestamp,
-            }
-        )
-
-    def _get_custom_source(self, source_id: str) -> CustomSourceModel | None:
-        doc = self._get_doc_ref(source_id).get()
-        data = doc.to_dict()
-        if doc.exists and data:
-            return cast(CustomSourceModel, self._safe_to_dict(data))
-
-    def _get_custom_sources(self):
-        self._check_document()
-
-        try:
-            session_ref = self._get_collection(self.collection).document(self.doc_id)
-            docs = session_ref.collection(self.sub_collection).get()
-            return [
-                cast(CustomSourceModel, self._safe_to_dict(doc.to_dict()))
-                for doc in docs
-                if doc.exists and doc.to_dict()
-            ]
-
-        except Exception as e:
-            print(f"Error getting custom sources for Session: {self.doc_id}", e)
-            return []
-
-    def _delete_custom_source(self, source_id: str):
-        return self._get_doc_ref(source_id).delete()
-
-
-async def generate_custom_source(request: GenerateCustomSourceRequest, background_tasks: BackgroundTasks):
+def generate_custom_source(request: GenerateCustomSourceRequest, background_tasks: BackgroundTasks):
     extractor = ExtractURLContent()
-    page_content = await extractor._extract(request.url)
+    page_content = extractor._extract(request.url)
 
-    async def save_to_firestore():
+    def save_to_firestore():
         custom_source = CustomSourceModel(
             **page_content.model_dump(),
             url=request.url,

@@ -2,7 +2,8 @@ import asyncio
 from time import time
 from typing import Any, Callable, Generator
 
-from fastapi import BackgroundTasks, FastAPI, HTTPException, Request
+from api.src.utils.custom_sources.extract_url_content import ExtractURLContent, ExtractURLContentRequest, URLContent
+from fastapi import BackgroundTasks, FastAPI, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi_utilities import add_timer_middleware
@@ -22,7 +23,6 @@ from src.utils.custom_sources.generate_custom_source import (
     generate_custom_source,
 )
 from src.utils.custom_sources.save_copied_source import CopiedPasteSourceRequest, save_copied_source
-from src.utils.extract_url_content import ExtractURLContent, ExtractURLContentRequest, URLContent
 from src.utils.generate_audiocast import (
     GenerateAudioCastRequest,
     GenerateAudioCastResponse,
@@ -64,12 +64,12 @@ async def log_request_headers(request: Request, call_next: Callable):
 
 
 @app.get("/")
-async def root():
+def root():
     return {"message": "Hello World"}
 
 
 @app.post("/chat/{session_id}", response_model=Generator[str, Any, None])
-async def chat_endpoint(
+def chat_endpoint(
     session_id: str,
     request: SessionChatRequest,
     background_tasks: BackgroundTasks,
@@ -103,7 +103,7 @@ async def generate_audiocast_endpoint(
 
 
 @app.get("/audiocast/{session_id}", response_model=GenerateAudioCastResponse)
-async def get_audiocast_endpoint(session_id: str):
+def get_audiocast_endpoint(session_id: str):
     result = get_audiocast(session_id)
     return result
 
@@ -120,7 +120,7 @@ async def generate_audiocast_source_endpoint(
 
 
 @app.get("/get-signed-url", response_model=str)
-async def get_signed_url_endpoint(blobname: str):
+def get_signed_url_endpoint(blobname: str):
     """
     Get signed URL for generated audiocast
     """
@@ -156,18 +156,18 @@ async def get_session_title_endpoint(
 
 
 @app.post("/extract-url-content", response_model=URLContent)
-async def extract_url_content_endpoint(request: ExtractURLContentRequest):
+def extract_url_content_endpoint(request: ExtractURLContentRequest):
     extractor = ExtractURLContent()
-    page_content = await extractor._extract(request.url)
+    page_content = extractor._extract(request.url)
     return page_content.model_dump()
 
 
 @app.post("/generate-custom-source", response_model=URLContent)
-async def generate_custom_source_endpoint(
+def generate_custom_source_endpoint(
     request: GenerateCustomSourceRequest,
     background_tasks: BackgroundTasks,
 ):
-    return await generate_custom_source(request, background_tasks)
+    return generate_custom_source(request, background_tasks)
 
 
 @app.post("/get-custom-sources", response_model=list[CustomSourceModel])
@@ -176,13 +176,26 @@ async def get_custom_sources_endpoint(request: GetCustomSourcesRequest):
 
 
 @app.post("/delete-custom-source", response_model=list[CustomSourceModel])
-async def delete_custom_source_endpoint(request: DeleteCustomSourcesRequest):
+def delete_custom_source_endpoint(request: DeleteCustomSourcesRequest):
     manager = CustomSourceManager(request.sessionId)
     manager._delete_custom_source(request.sourceId)
     return "Deleted"
 
 
 @app.post("/save-copied-source", response_model=str)
-async def save_copied_source_endpoint(request: CopiedPasteSourceRequest):
+def save_copied_source_endpoint(request: CopiedPasteSourceRequest):
     result = save_copied_source(request)
     return result
+
+
+@app.post("/save-uploaded-sources", response_model=str)
+async def save_uploaded_files_endpoint(files: list[UploadFile], sessionId: str = Form(...)):
+    """
+    Save sources uploaded from the frontend
+    """
+    print(f"Session ID: {sessionId}")
+    for file in files:
+        file_bytes = await file.read()
+        print(f"File INFO: {file.filename}, Size: {len(file_bytes)} bytes")
+        # Process the file as needed
+    return "Files saved successfully"
