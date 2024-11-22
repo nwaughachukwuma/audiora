@@ -21,6 +21,7 @@ export type Sources = (LinkSource | CopyPasteSource | UploadSource) & {
 	id: string;
 	content_type: 'text/plain' | 'text/html' | 'application/pdf';
 	content: string;
+	title?: string;
 	created_at?: string;
 };
 

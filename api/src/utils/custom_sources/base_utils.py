@@ -15,9 +15,13 @@ class SourceContent(BaseModel):
     content: str
     content_type: str
     metadata: dict = {}
+    title: Optional[str] = None
 
     def __str__(self):
-        return f"Content: {self.content}"
+        result = f"Content: {self.content}"
+        if self.title:
+            return f"Title: {self.title}\n{result}"
+        return result
 
 
 class CustomSourceModel(SourceContent):

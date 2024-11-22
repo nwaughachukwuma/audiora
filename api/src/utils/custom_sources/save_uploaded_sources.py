@@ -15,8 +15,6 @@ class UploadedFiles:
 
     async def _extract_content(self, file: UploadFile):
         file_bytes = await file.read()
-        print(f"FILE_INFO>>>: {file.filename}, Size: {len(file_bytes)} bytes")
-
         # ensure file size is less than 10MB
         if len(file_bytes) > TEN_MB:
             return None
@@ -39,6 +37,7 @@ class UploadedFiles:
             content=text_content,
             content_type=content_type,
             metadata=metadata,
+            title=file.filename,
         )
 
     async def _save_sources(self, files: list[UploadFile]):

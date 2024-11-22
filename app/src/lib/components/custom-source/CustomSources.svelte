@@ -30,12 +30,15 @@
 					<span class="shrink-0 inline-flex">
 						Custom Source {idx + 1}
 					</span>
-					{#if source.source_type === 'link'}
-						{':'}
-						<span class="text-gray-400 text-start ml-1">
+					{':'}
+					<span class="text-gray-400 text-start ml-1">
+						{#if source.source_type === 'link'}
 							{truncate(source.url, 45)}
-						</span>
-					{/if}
+						{:else}
+							{@const label = source.title || source.id}
+							{truncate(label, 45)}
+						{/if}
+					</span>
 				</div>
 			</Accordion.Trigger>
 			<Accordion.Content>
