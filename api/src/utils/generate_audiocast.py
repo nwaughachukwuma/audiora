@@ -9,9 +9,38 @@ from src.utils.audiocast_utils import (
     GenerateAudioCastRequest,
     GenerateAudioCastResponse,
 )
+from src.utils.chat_utils import ContentCategory
+from src.utils.custom_sources.base_utils import CustomSourceManager
 from src.utils.generate_audiocast_source import GenerateAudiocastSource, generate_audiocast_source
 from src.utils.session_manager import SessionManager
 from src.utils.waveform_utils import WaveformUtils
+
+
+def compile_custom_sources(session_id: str):
+    sources = CustomSourceManager(session_id)._get_custom_sources()
+    return "\n\n".join([str(source) for source in sources if source.content])
+
+
+def post_generate_audio(
+    session_id: str,
+    category: ContentCategory,
+    audio_path: str,
+    audio_script: str,
+):
+    try:
+        # Store audio
+        storage_manager = StorageManager()
+        storage_manager.upload_audio_to_gcs(audio_path, session_id)
+
+        # Update session metadata
+        db = SessionManager(session_id, category)
+        db._update_transcript(audio_script)
+
+        # Generate and save audio waveform as mp4
+        waveform_utils = WaveformUtils(session_id, audio_path)
+        waveform_utils.run_all()
+    except Exception as e:
+        print(f"Error in generate_audiocast background_tasks: {str(e)}")
 
 
 async def generate_audiocast(request: GenerateAudioCastRequest, background_tasks: BackgroundTasks):
@@ -21,34 +50,42 @@ async def generate_audiocast(request: GenerateAudioCastRequest, background_tasks
     1. Generate source content
     2. Generate audio script
     3. Generate audio
-    4a. Store audio
-    4b. Store the audio waveform on GCS
+    4. a) Store audio. b) Store the audio waveform on GCS
     5. Update session
     """
     summary = request.summary
     category = request.category
     session_id = request.sessionId
 
-    source_content = await generate_audiocast_source(
-        GenerateAudiocastSource(
-            sessionId=session_id,
-            category=category,
-            preferenceSummary=summary,
-        ),
-        background_tasks,
-    )
-
     db = SessionManager(session_id, category)
 
     def update_session_info(info: str):
         background_tasks.add_task(db._update_info, info)
 
+    session_data = SessionManager.data(session_id)
+    source_content = session_data.metadata.source if session_data and session_data.metadata else None
+
+    if not source_content:
+        update_session_info("Generating source content...")
+        source_content = await generate_audiocast_source(
+            GenerateAudiocastSource(
+                sessionId=session_id,
+                category=category,
+                preferenceSummary=summary,
+            ),
+            background_tasks,
+        )
+
     if not source_content:
         raise HTTPException(status_code=500, detail="Failed to generate source content")
 
+    # get custom sources
+    update_session_info("Checking for custom sources...")
+    compiled_custom_sources = compile_custom_sources(session_id)
+
     # Generate audio script
     update_session_info("Generating audio script...")
-    script_maker = AudioScriptMaker(category, source_content)
+    script_maker = AudioScriptMaker(category, source_content, compiled_custom_sources)
     audio_script = script_maker.create(provider="gemini")
 
     if not audio_script:
@@ -59,24 +96,13 @@ async def generate_audiocast(request: GenerateAudioCastRequest, background_tasks
     audio_manager = AudioManager(custom_config=AudioManagerConfig(tts_provider="openai"))
     audio_path = await audio_manager.generate_speech(audio_script)
 
-    def _run_on_background():
-        try:
-            # Store audio
-            storage_manager = StorageManager()
-            storage_manager.upload_audio_to_gcs(audio_path, session_id)
-
-            # Update session metadata
-            db._update_source(source_content)
-            db._update_transcript(audio_script)
-            # TODO: add one to update title
-
-            # Generate and save audio waveform as mp4
-            waveform_utils = WaveformUtils(session_id, audio_path)
-            waveform_utils.run_all()
-        except Exception as e:
-            print(f"Error in generate_audiocast background_tasks: {str(e)}")
-
-    background_tasks.add_task(_run_on_background)
+    background_tasks.add_task(
+        post_generate_audio,
+        session_id,
+        category,
+        audio_path,
+        audio_script,
+    )
 
     session_data = SessionManager.data(session_id)
     if not session_data:

@@ -19,15 +19,17 @@ class TTSPromptMaker:
         """Get connection tags based on the number of speakers."""
         return [f"<Speaker{i}>" for i in range(1, 10)]
 
-    def get_system_prompt(self, source_content: str) -> str:
+    def get_system_prompt(self, source_content: str, compiled_custom_sources: str | None = None) -> str:
         """
         Generate an optimized system prompt for converting a source content into the appropriate format.
         """
-        return f"""You're a super-intelligent AI who generates different forms, styles and genres of audiocast script.
+        return f"""You're a super-intelligent AI that can generate different forms, styles and genres of audiocast script.
 
-        Your task is to transform the following source content into an engaging {self.category} TTS-optimized audiocast script.
+        Your task is to transform the following source contents into an engaging {self.category} TTS-optimized audiocast script.
 
-        Source Content: {source_content}
+        Source Contents:
+        - AI-generated: {source_content}
+        {"- User-provided: " + compiled_custom_sources if compiled_custom_sources else ""}
 
         Content Parameters:
         1. Format: Create {category_qualifiers[self.category]} in TTS-optomized audiocast flow
