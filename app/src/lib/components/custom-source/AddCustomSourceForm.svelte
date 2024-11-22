@@ -20,6 +20,7 @@
 	const { customSources$ } = getSessionContext();
 
 	let dragActive = false;
+	let fileuploadEl: HTMLInputElement;
 
 	function handleDrag(e: DragEvent) {
 		e.preventDefault();
@@ -36,7 +37,10 @@
 		e.stopPropagation();
 		dragActive = false;
 
-		const files = e.dataTransfer?.files;
+		handleFiles(e.dataTransfer?.files);
+	}
+
+	async function handleFiles(files?: FileList | null) {
 		if (!files) return toast.error('No files found');
 
 		const validFiles = getValidFiles(files);
@@ -100,7 +104,19 @@
 					<h3 class="text-xl">Upload sources</h3>
 					<p class="text-gray-400">
 						Drag & drop or{' '}
-						<button class="text-blue-400 hover:text-blue-300">choose file</button> to upload
+						<button class="text-blue-400 hover:text-blue-300" on:click={() => fileuploadEl.click()}
+							>choose file
+						</button>
+						to upload
+
+						<input
+							type="file"
+							class="hidden"
+							multiple
+							accept=".pdf,.txt"
+							bind:this={fileuploadEl}
+							on:change={(e) => handleFiles(e.currentTarget.files)}
+						/>
 					</p>
 				</div>
 				<p class="text-sm text-gray-500">
