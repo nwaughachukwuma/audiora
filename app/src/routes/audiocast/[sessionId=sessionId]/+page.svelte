@@ -120,7 +120,9 @@
 				<Accordion.Item value="item-1" class="border-gray-800">
 					<Accordion.Trigger>Audio Transcript</Accordion.Trigger>
 					<Accordion.Content>
-						<article class="flex w-full flex-col gap-y-3 p-2 bg-gray-900/70 text-gray-300">
+						<article
+							class="flex max-h-96 overflow-y-auto w-full flex-col gap-y-3 p-2 bg-gray-900/70 text-gray-300"
+						>
 							{#await parse(parseScript(data.script)) then parsedContent}
 								{@html parsedContent}
 							{/await}

@@ -15,7 +15,7 @@
 
 	let snapPoints = [0.75, 0.95];
 	let activeSnapPoint = snapPoints[0];
-	let fetchingSource = false;
+	let generatingSource = false;
 
 	let accordionResetKey = {};
 
@@ -27,23 +27,23 @@
 		}
 	}
 
-	async function getURLContent(url: string) {
-		if (fetchingSource) return;
+	async function createURLContent(url: string) {
+		if (generatingSource) return;
 
-		fetchingSource = true;
-		return fetchURLContent(url)
+		generatingSource = true;
+		return generateURLSource(url)
 			.then(() => toast.success('Custom source added successfully'))
 			.catch((e) => {
 				console.error(e);
 				toast.error('Failed to add custom source', { description: e.message });
 			})
 			.finally(() => {
-				fetchingSource = false;
+				generatingSource = false;
 				accordionResetKey = {};
 			});
 	}
 
-	async function fetchURLContent(url: string) {
+	async function generateURLSource(url: string) {
 		return fetch(`${env.API_BASE_URL}/generate-custom-source`, {
 			method: 'POST',
 			body: JSON.stringify({ url, sessionId }),
@@ -52,6 +52,11 @@
 			if (res.ok) return res.json();
 			throw new Error('Failed to fetch');
 		});
+	}
+
+	async function createCopyPasteContent(text: string) {
+		if (generatingSource) return;
+		generatingSource = true;
 	}
 </script>
 
@@ -91,8 +96,9 @@
 								</Accordion.Trigger>
 								<Accordion.Content class="accordion-content">
 									<AddCustomSource
-										{fetchingSource}
-										on:submitURL={({ detail }) => getURLContent(detail.url)}
+										{generatingSource}
+										on:submitURL={({ detail }) => createURLContent(detail.url)}
+										on:submitCopyPaste={({ detail }) => createCopyPasteContent(detail.text)}
 									/>
 								</Accordion.Content>
 							</Accordion.Item>

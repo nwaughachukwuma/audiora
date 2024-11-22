@@ -4,9 +4,13 @@
 	import { Button } from '../ui/button';
 	import { Card, CardContent, CardHeader } from '../ui/card';
 	import { Textarea } from '../ui/textarea';
-	import { Input } from '../ui/input';
 
-	const dispatch = createEventDispatcher<{ closeCopyPaste: void }>();
+	const dispatch = createEventDispatcher<{
+		submitCopyPaste: { text: string };
+		closeCopyPaste: void;
+	}>();
+
+	let text = '';
 </script>
 
 <Card class="max-w-2xl mx-auto bg-gray-900 border-gray-800">
@@ -43,6 +47,7 @@
 			<div class="relative">
 				<Textarea
 					id="text"
+					bind:value={text}
 					class="min-h-56 ring-0 focus:ring-0 focus-visible:ring-0 text-base bg-gray-900 border-blue-400/50 focus:border-blue-400 text-white resize-none"
 					placeholder=""
 				/>
@@ -58,7 +63,17 @@
 			</div>
 
 			<div class="flex justify-end">
-				<Button class="bg-blue-500 text-base px-8 text-blue-100 hover:bg-blue-600">Insert</Button>
+				<Button
+					on:click={() => {
+						dispatch('submitCopyPaste', { text });
+						requestAnimationFrame(() => {
+							dispatch('closeCopyPaste');
+						});
+					}}
+					disabled={!text}
+					class="bg-blue-500 text-base px-8 text-blue-100 hover:bg-blue-600"
+					>Insert
+				</Button>
 			</div>
 		</div></CardContent
 	>
