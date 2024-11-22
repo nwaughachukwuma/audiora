@@ -109,7 +109,7 @@
 										<span class="capitalize font-medium text-gray-400"> Add custom source </span>
 										{#if overMaxSources}
 											<span class="text-sm text-red-300">
-												You've reached a max of {MAX_ALLOWABLE_SOURCES} sources
+												You've reached a max of {MAX_ALLOWABLE_SOURCES} custom sources
 											</span>
 										{/if}
 									</div>
