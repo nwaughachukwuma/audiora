@@ -24,6 +24,7 @@ env:
   CONFIG_FILE: "app/app.yaml"
   SERVICE: audiora-app
   API_BASE_URL: ${{ secrets.API_BASE_URL }}
+  FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}
 
 jobs:
   prepare:
@@ -118,6 +119,7 @@ jobs:
             BUCKET_NAME=${{ secrets.BUCKET_NAME }}
             CLOUD_STORAGE_BUCKET=${{ secrets.BUCKET_NAME }}
             API_BASE_URL=${{ secrets.API_BASE_URL }}
+            FIREBASE_CONFIG=${{ secrets.FIREBASE_CONFIG }}
 
       - run: curl -f "${{ steps.deploy.outputs.url }}"
       - uses: marocchino/sticky-pull-request-comment@v2
