@@ -13,7 +13,8 @@ from src.utils.chat_utils import (
     SessionChatItem,
     SessionChatRequest,
 )
-from src.utils.custom_sources.extract_url_content import ExtractURLContent, ExtractURLContentRequest, URLContent
+from src.utils.custom_sources.base_utils import SourceContent
+from src.utils.custom_sources.extract_url_content import ExtractURLContent, ExtractURLContentRequest
 from src.utils.custom_sources.generate_url_source import (
     CustomSourceManager,
     CustomSourceModel,
@@ -121,7 +122,7 @@ async def generate_audiocast_source_endpoint(
 
 
 @app.get("/get-signed-url", response_model=str)
-def get_signed_url_endpoint(blobname: str):
+async def get_signed_url_endpoint(blobname: str):
     """
     Get signed URL for generated audiocast
     """
@@ -156,14 +157,14 @@ async def get_session_title_endpoint(
     return await get_session_title(request, background_tasks)
 
 
-@app.post("/extract-url-content", response_model=URLContent)
+@app.post("/extract-url-content", response_model=SourceContent)
 def extract_url_content_endpoint(request: ExtractURLContentRequest):
     extractor = ExtractURLContent()
     page_content = extractor._extract(request.url)
     return page_content.model_dump()
 
 
-@app.post("/generate-url-source", response_model=URLContent)
+@app.post("/generate-url-source", response_model=SourceContent)
 def generate_url_source_endpoint(
     request: GenerateCustomSourceRequest,
     background_tasks: BackgroundTasks,

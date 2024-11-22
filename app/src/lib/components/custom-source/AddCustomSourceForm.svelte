@@ -1,16 +1,27 @@
+<script context="module">
+	const FIVE_MB = 5 * 1024 * 1024;
+</script>
+
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
 	import { Button } from '../ui/button';
 	import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../ui/card';
-	import { FileIcon, LinkIcon, Upload, X } from 'lucide-svelte';
+	import { FileIcon, LinkIcon, Upload } from 'lucide-svelte';
 	import cs from 'clsx';
+	import { toast } from 'svelte-sonner';
+	import { env } from '@env';
+	import { getSessionContext } from '@/stores/sessionContext.svelte';
 
 	const dispatch = createEventDispatcher<{
 		useWebsiteURL: void;
 		useCopyPaste: void;
 	}>();
 
+	const { sessionId$ } = getSessionContext();
+
 	let dragActive = false;
+
+	$: sessionId = $sessionId$;
 
 	function handleDrag(e: DragEvent) {
 		e.preventDefault();
@@ -23,11 +34,64 @@
 		}
 	}
 
-	function handleDrop(e: DragEvent) {
+	async function handleDrop(e: DragEvent) {
 		e.preventDefault();
 		e.stopPropagation();
 		dragActive = false;
+
+		const files = e.dataTransfer?.files;
+		if (!files) return toast.error('No files found');
+
+		// Validate files
+		const validFiles = getValidFiles(files);
+		if (!validFiles.length) return;
+
 		// Handle file upload here
+		return uploadValidatedFiles(validFiles);
+	}
+
+	function getValidFiles(files: FileList) {
+		// ensure max 5 files each less than 1mb
+		if (files.length > 5) {
+			return toast.error('Max 5 files allowed'), [];
+		}
+
+		const validFiles: File[] = [];
+
+		for (let i = 0; i < files.length; i++) {
+			const file = files[i];
+			if (file.size > FIVE_MB) {
+				toast.info(`File '${file.name}' exceeds 5MB. Skipping...`);
+				continue;
+			}
+
+			if (file.type !== 'application/pdf' && !file.name.endsWith('.txt')) {
+				toast.info(`Unsupported file type for ${file.name}. Skipping...`);
+				continue;
+			}
+
+			validFiles.push(file);
+		}
+
+		return validFiles;
+	}
+
+	async function uploadValidatedFiles(files: File[]) {
+		const formData = new FormData();
+		formData.append('sessionId', sessionId);
+		for (let i = 0; i < files.length; i++) {
+			formData.append('files', files[i]);
+		}
+
+		return fetch(`${env.API_BASE_URL}/save-uploaded-sources`, {
+			method: 'POST',
+			body: formData
+		})
+			.then((res) => {
+				if (res.ok) return toast.success('Files uploaded successfully');
+				throw new Error(res.statusText);
+			})
+			.catch((e) => toast.error('Failed to upload files', { description: e.message }));
 	}
 </script>
 
