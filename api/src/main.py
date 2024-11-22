@@ -13,6 +13,15 @@ from src.utils.chat_utils import (
     SessionChatItem,
     SessionChatRequest,
 )
+from src.utils.custom_sources.generate_custom_source import (
+    CustomSourceManager,
+    CustomSourceModel,
+    DeleteCustomSourcesRequest,
+    GenerateCustomSourceRequest,
+    GetCustomSourcesRequest,
+    generate_custom_source,
+)
+from src.utils.custom_sources.save_copied_source import CopiedPasteSourceRequest, save_copied_source
 from src.utils.extract_url_content import ExtractURLContent, ExtractURLContentRequest, URLContent
 from src.utils.generate_audiocast import (
     GenerateAudioCastRequest,
@@ -20,13 +29,6 @@ from src.utils.generate_audiocast import (
     generate_audiocast,
 )
 from src.utils.generate_audiocast_source import GenerateAudiocastSource, generate_audiocast_source
-from src.utils.generate_custom_source import (
-    CustomSourceManager,
-    CustomSourceModel,
-    GenerateCustomSourceRequest,
-    GetCustomSourcesRequest,
-    generate_custom_source,
-)
 from src.utils.get_audiocast import get_audiocast
 from src.utils.get_session_title import GetSessionTitleModel, get_session_title
 from src.utils.session_manager import SessionManager
@@ -171,3 +173,16 @@ async def generate_custom_source_endpoint(
 @app.post("/get-custom-sources", response_model=list[CustomSourceModel])
 async def get_custom_sources_endpoint(request: GetCustomSourcesRequest):
     return CustomSourceManager(request.sessionId)._get_custom_sources()
+
+
+@app.post("/delete-custom-source", response_model=list[CustomSourceModel])
+async def delete_custom_source_endpoint(request: DeleteCustomSourcesRequest):
+    manager = CustomSourceManager(request.sessionId)
+    manager._delete_custom_source(request.sourceId)
+    return "Deleted"
+
+
+@app.post("/save-copied-source", response_model=str)
+async def save_copied_source_endpoint(request: CopiedPasteSourceRequest):
+    result = save_copied_source(request)
+    return result

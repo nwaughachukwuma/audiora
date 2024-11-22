@@ -27,11 +27,19 @@
 		}
 	}
 
-	async function createURLContent(url: string) {
+	async function createSourceContent(endpoint: string, data: Record<string, any>) {
 		if (generatingSource) return;
-
 		generatingSource = true;
-		return generateURLSource(url)
+
+		return fetch(`${env.API_BASE_URL}/${endpoint}`, {
+			method: 'POST',
+			body: JSON.stringify(data),
+			headers: { 'Content-Type': 'application/json' }
+		})
+			.then((res) => {
+				if (res.ok) return res.json();
+				throw new Error('Failed to fetch');
+			})
 			.then(() => toast.success('Custom source added successfully'))
 			.catch((e) => {
 				console.error(e);
@@ -43,20 +51,12 @@
 			});
 	}
 
-	async function generateURLSource(url: string) {
-		return fetch(`${env.API_BASE_URL}/generate-custom-source`, {
-			method: 'POST',
-			body: JSON.stringify({ url, sessionId }),
-			headers: { 'Content-Type': 'application/json' }
-		}).then((res) => {
-			if (res.ok) return res.json();
-			throw new Error('Failed to fetch');
-		});
+	async function createURLContent(url: string) {
+		return createSourceContent('generate-custom-source', { url, sessionId });
 	}
 
 	async function createCopyPasteContent(text: string) {
-		if (generatingSource) return;
-		generatingSource = true;
+		return createSourceContent('save-copied-source', { text, sessionId });
 	}
 </script>
 

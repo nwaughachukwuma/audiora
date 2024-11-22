@@ -27,8 +27,8 @@ class DeleteCustomSourcesRequest(BaseModel):
 
 
 class CustomSourceModel(URLContent):
-    url: str
     source_type: Literal["link", "copy/paste"]
+    url: Optional[str] = None
     created_at: Optional[str] = None
     updated_at: Optional[str] = None
 
