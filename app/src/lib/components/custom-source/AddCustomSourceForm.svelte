@@ -9,12 +9,15 @@
 	import { FileIcon, LinkIcon, Upload } from 'lucide-svelte';
 	import cs from 'clsx';
 	import { toast } from 'svelte-sonner';
+	import { getSessionContext } from '@/stores/sessionContext.svelte';
 
 	const dispatch = createEventDispatcher<{
 		useWebsiteURL: void;
 		useCopyPaste: void;
 		submitFiles: { files: File[] };
 	}>();
+
+	const { customSources$ } = getSessionContext();
 
 	let dragActive = false;
 
@@ -44,7 +47,8 @@
 
 	function getValidFiles(files: FileList) {
 		// ensure max 5 files with each less than 10mb
-		if (files.length > 5) {
+		const currentFilesCount = $customSources$?.length || 0;
+		if (files.length + currentFilesCount > 5) {
 			return toast.error('Max 5 files allowed'), [];
 		}
 

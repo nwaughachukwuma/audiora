@@ -1,3 +1,7 @@
+<script context="module">
+	const MAX_ALLOWABLE_SOURCES = 5;
+</script>
+
 <script lang="ts">
 	import * as Drawer from './ui/drawer';
 	import { Button } from './ui/button';
@@ -8,10 +12,11 @@
 	import RenderAudioSources from './RenderAudioSources.svelte';
 	import { getSessionContext } from '@/stores/sessionContext.svelte';
 	import { toast } from 'svelte-sonner';
+	import { cn } from '@/utils/ui.utils';
 
 	export let aiSource: string;
 
-	const { sessionId$ } = getSessionContext();
+	const { sessionId$, customSources$ } = getSessionContext();
 
 	let snapPoints = [0.75, 0.95];
 	let activeSnapPoint = snapPoints[0];
@@ -20,6 +25,8 @@
 	let accordionResetKey = {};
 
 	$: sessionId = $sessionId$;
+	$: numSources = $customSources$?.length;
+	$: overMaxSources = numSources && numSources >= MAX_ALLOWABLE_SOURCES;
 
 	function accordionValueChanged(v: string | string[] | undefined) {
 		if (v === 'item-x') {
@@ -93,10 +100,20 @@
 						<Accordion.Root onValueChange={accordionValueChanged}>
 							<Accordion.Item value="item-x" class="mb-3 rounded-md border-none">
 								<Accordion.Trigger
-									class="no-underline hover:no-underline px-3 border-gray-700 rounded-md border border-dashed bg-gray-900/60 hover:bg-gray-900"
+									class={cn(
+										'no-underline hover:no-underline px-3 border-gray-700 rounded-md border border-dashed bg-gray-900/60 hover:bg-gray-900',
+										{ 'pointer-events-none': overMaxSources }
+									)}
 								>
-									<span class="capitalize font-medium text-gray-400"> Add custom source </span>
-									<span slot="icon" class="p-1 rounded-full border border-gray-500">
+									<div class="flex flex-col items-start gap-y-1">
+										<span class="capitalize font-medium text-gray-400"> Add custom source </span>
+										{#if overMaxSources}
+											<span class="text-sm text-red-300">
+												You've reached a max of {MAX_ALLOWABLE_SOURCES} sources
+											</span>
+										{/if}
+									</div>
+									<span slot="icon" class={'p-1 rounded-full border border-gray-500'}>
 										<PlusIcon
 											class="inline w-6 h-6 text-gray-400 hover:text-gray-200 transition-all"
 										/>
