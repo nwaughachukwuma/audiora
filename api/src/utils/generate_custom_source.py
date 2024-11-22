@@ -1,6 +1,7 @@
 from typing import Literal, Optional, cast
 
 from fastapi import BackgroundTasks
+from google.cloud.firestore_v1 import DocumentReference
 from pydantic import BaseModel
 
 from src.services.firestore_sdk import (
@@ -18,6 +19,11 @@ class GenerateCustomSourceRequest(BaseModel):
 
 class GetCustomSourcesRequest(BaseModel):
     sessionId: str
+
+
+class DeleteCustomSourcesRequest(BaseModel):
+    sessionId: str
+    sourceId: str
 
 
 class CustomSourceModel(URLContent):
@@ -42,32 +48,36 @@ class CustomSourceManager(DBManager):
             raise Exception("Session not found")
         return doc
 
-    def _set_custom_source(self, data: CustomSourceModel):
-        self._check_document()
-
-        doc_ref = self._get_collection(self.collection).document(self.doc_id)
-        return (
-            doc_ref.collection(self.sub_collection)
-            .document(data.id)
-            .set({**(data.model_dump()), "created_at": self._timestamp, "updated_at": self._timestamp})
-        )
-
-    def _get_custom_source(self, source_id: str) -> CustomSourceModel:
+    def _get_doc_ref(self, source_id: str) -> DocumentReference:
         self._check_document()
         return (
             self._get_collection(self.collection)
             .document(self.doc_id)
             .collection(self.sub_collection)
             .document(source_id)
-            .get()
         )
+
+    def _set_custom_source(self, data: CustomSourceModel):
+        return self._get_doc_ref(data.id).set(
+            {
+                **(data.model_dump()),
+                "created_at": self._timestamp,
+                "updated_at": self._timestamp,
+            }
+        )
+
+    def _get_custom_source(self, source_id: str) -> CustomSourceModel | None:
+        doc = self._get_doc_ref(source_id).get()
+        data = doc.to_dict()
+        if doc.exists and data:
+            return cast(CustomSourceModel, self._safe_to_dict(data))
 
     def _get_custom_sources(self):
         self._check_document()
 
         try:
-            doc_ref = self._get_collection(self.collection).document(self.doc_id)
-            docs = doc_ref.collection(self.sub_collection).get()
+            session_ref = self._get_collection(self.collection).document(self.doc_id)
+            docs = session_ref.collection(self.sub_collection).get()
             return [
                 cast(CustomSourceModel, self._safe_to_dict(doc.to_dict()))
                 for doc in docs
@@ -77,6 +87,9 @@ class CustomSourceManager(DBManager):
         except Exception as e:
             print(f"Error getting custom sources for Session: {self.doc_id}", e)
             return []
+
+    def _delete_custom_source(self, source_id: str):
+        return self._get_doc_ref(source_id).delete()
 
 
 async def generate_custom_source(request: GenerateCustomSourceRequest, background_tasks: BackgroundTasks):
