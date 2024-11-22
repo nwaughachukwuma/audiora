@@ -2,7 +2,7 @@ import asyncio
 from time import time
 from typing import Any, Callable, Generator
 
-from api.src.utils.custom_sources.extract_url_content import ExtractURLContent, ExtractURLContentRequest, URLContent
+from src.utils.custom_sources.extract_url_content import ExtractURLContent, ExtractURLContentRequest, URLContent
 from fastapi import BackgroundTasks, FastAPI, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
@@ -14,7 +14,7 @@ from src.utils.chat_utils import (
     SessionChatItem,
     SessionChatRequest,
 )
-from src.utils.custom_sources.generate_custom_source import (
+from src.utils.custom_sources.generate_url_source import (
     CustomSourceManager,
     CustomSourceModel,
     DeleteCustomSourcesRequest,
@@ -162,8 +162,8 @@ def extract_url_content_endpoint(request: ExtractURLContentRequest):
     return page_content.model_dump()
 
 
-@app.post("/generate-custom-source", response_model=URLContent)
-def generate_custom_source_endpoint(
+@app.post("/generate-url-source", response_model=URLContent)
+def generate_url_source_endpoint(
     request: GenerateCustomSourceRequest,
     background_tasks: BackgroundTasks,
 ):

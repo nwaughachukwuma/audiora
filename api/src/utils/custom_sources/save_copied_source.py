@@ -2,7 +2,7 @@ from uuid import uuid4
 
 from pydantic import BaseModel
 
-from .generate_custom_source import CustomSourceManager, CustomSourceModel
+from .base_utils import CustomSourceManager, CustomSourceModel
 
 
 class CopiedPasteSourceRequest(BaseModel):
