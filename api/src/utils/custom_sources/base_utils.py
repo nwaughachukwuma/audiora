@@ -1,4 +1,4 @@
-from typing import Literal, Optional, cast
+from typing import Literal, Optional, TypedDict, cast
 
 from google.cloud.firestore_v1 import DocumentReference
 from pydantic import BaseModel
@@ -29,6 +29,21 @@ class CustomSourceModel(SourceContent):
     url: Optional[str] = None
     created_at: Optional[str] = None
     updated_at: Optional[str] = None
+
+
+class SourceContentDict(TypedDict):
+    id: str
+    content: str
+    content_type: str
+    metadata: dict
+    title: Optional[str]
+
+
+class CustomSourceModelDict(SourceContentDict):
+    source_type: Literal["link", "copy/paste", "file_upload"]
+    url: Optional[str]
+    created_at: Optional[str]
+    updated_at: Optional[str]
 
 
 class CustomSourceManager(DBManager):
@@ -70,14 +85,14 @@ class CustomSourceManager(DBManager):
         if doc.exists and data:
             return cast(CustomSourceModel, self._safe_to_dict(data))
 
-    def _get_custom_sources(self) -> list[CustomSourceModel]:
+    def _get_custom_sources(self) -> list[CustomSourceModelDict]:
         self._check_document()
 
         try:
             session_ref = self._get_collection(self.collection).document(self.doc_id)
             docs = session_ref.collection(self.sub_collection).get()
             return [
-                cast(CustomSourceModel, self._safe_to_dict(doc.to_dict()))
+                cast(CustomSourceModelDict, self._safe_to_dict(doc.to_dict()))
                 for doc in docs
                 if doc.exists and doc.to_dict()
             ]

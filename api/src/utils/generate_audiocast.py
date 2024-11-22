@@ -18,7 +18,7 @@ from src.utils.waveform_utils import WaveformUtils
 
 def compile_custom_sources(session_id: str):
     sources = CustomSourceManager(session_id)._get_custom_sources()
-    return "\n\n".join([str(source) for source in sources if source.content])
+    return "\n\n".join([str(source) for source in sources if source["content"]])
 
 
 def post_generate_audio(
