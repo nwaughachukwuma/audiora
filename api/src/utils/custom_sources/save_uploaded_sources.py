@@ -5,7 +5,7 @@ from fastapi import UploadFile
 from .base_utils import CustomSourceManager, CustomSourceModel, SourceContent
 from .read_content import ReadContent
 
-FIVE_MB = 5 * 1024 * 1024
+TEN_MB = 10 * 1024 * 1024
 
 
 class UploadedFiles:
@@ -17,8 +17,8 @@ class UploadedFiles:
         file_bytes = await file.read()
         print(f"FILE_INFO>>>: {file.filename}, Size: {len(file_bytes)} bytes")
 
-        # ensure file size is less than 5MB
-        if len(file_bytes) > FIVE_MB:
+        # ensure file size is less than 10MB
+        if len(file_bytes) > TEN_MB:
             return None
 
         if file.content_type == "application/pdf":

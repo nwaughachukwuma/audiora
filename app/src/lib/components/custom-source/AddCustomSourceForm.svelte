@@ -1,5 +1,5 @@
 <script context="module">
-	const FIVE_MB = 5 * 1024 * 1024;
+	const TEN_MB = 10 * 1024 * 1024;
 </script>
 
 <script lang="ts">
@@ -9,24 +9,18 @@
 	import { FileIcon, LinkIcon, Upload } from 'lucide-svelte';
 	import cs from 'clsx';
 	import { toast } from 'svelte-sonner';
-	import { env } from '@env';
-	import { getSessionContext } from '@/stores/sessionContext.svelte';
 
 	const dispatch = createEventDispatcher<{
 		useWebsiteURL: void;
 		useCopyPaste: void;
+		submitFiles: { files: File[] };
 	}>();
 
-	const { sessionId$ } = getSessionContext();
-
 	let dragActive = false;
-
-	$: sessionId = $sessionId$;
 
 	function handleDrag(e: DragEvent) {
 		e.preventDefault();
 		e.stopPropagation();
-
 		if (e.type === 'dragenter' || e.type === 'dragover') {
 			dragActive = true;
 		} else if (e.type === 'dragleave') {
@@ -42,16 +36,14 @@
 		const files = e.dataTransfer?.files;
 		if (!files) return toast.error('No files found');
 
-		// Validate files
 		const validFiles = getValidFiles(files);
-		if (!validFiles.length) return;
-
-		// Handle file upload here
-		return uploadValidatedFiles(validFiles);
+		if (validFiles.length) {
+			dispatch('submitFiles', { files: validFiles });
+		}
 	}
 
 	function getValidFiles(files: FileList) {
-		// ensure max 5 files each less than 1mb
+		// ensure max 5 files with each less than 10mb
 		if (files.length > 5) {
 			return toast.error('Max 5 files allowed'), [];
 		}
@@ -60,8 +52,8 @@
 
 		for (let i = 0; i < files.length; i++) {
 			const file = files[i];
-			if (file.size > FIVE_MB) {
-				toast.info(`File '${file.name}' exceeds 5MB. Skipping...`);
+			if (file.size > TEN_MB) {
+				toast.info(`File '${file.name}' exceeds 10MB. Skipping...`);
 				continue;
 			}
 
@@ -69,29 +61,9 @@
 				toast.info(`Unsupported file type for ${file.name}. Skipping...`);
 				continue;
 			}
-
 			validFiles.push(file);
 		}
-
 		return validFiles;
-	}
-
-	async function uploadValidatedFiles(files: File[]) {
-		const formData = new FormData();
-		formData.append('sessionId', sessionId);
-		for (let i = 0; i < files.length; i++) {
-			formData.append('files', files[i]);
-		}
-
-		return fetch(`${env.API_BASE_URL}/save-uploaded-sources`, {
-			method: 'POST',
-			body: formData
-		})
-			.then((res) => {
-				if (res.ok) return toast.success('Files uploaded successfully');
-				throw new Error(res.statusText);
-			})
-			.catch((e) => toast.error('Failed to upload files', { description: e.message }));
 	}
 </script>
 
@@ -128,7 +100,7 @@
 					</p>
 				</div>
 				<p class="text-sm text-gray-500">
-					Supported file types: PDF, .txt, Markdown. (Max size: 1MB)
+					Supported file types: PDF, .txt, Markdown. (Max size: 10MB)
 				</p>
 			</div>
 		</div>

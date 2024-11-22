@@ -27,14 +27,16 @@
 		}
 	}
 
-	async function createSourceContent(endpoint: string, data: Record<string, any>) {
+	async function createSourceContent(endpoint: string, data: FormData | Record<string, any>) {
 		if (generatingSource) return;
 		generatingSource = true;
 
+		const isFormData = data instanceof FormData;
+
 		return fetch(`${env.API_BASE_URL}/${endpoint}`, {
 			method: 'POST',
-			body: JSON.stringify(data),
-			headers: { 'Content-Type': 'application/json' }
+			body: isFormData ? data : JSON.stringify(data),
+			headers: isFormData ? {} : { 'Content-Type': 'application/json' }
 		})
 			.then((res) => {
 				if (res.ok) return toast.success('Custom source added successfully');
@@ -53,6 +55,16 @@
 
 	async function createCopyPasteContent(text: string) {
 		return createSourceContent('save-copied-source', { text, sessionId });
+	}
+
+	async function uploadValidatedFiles(files: File[]) {
+		const formData = new FormData();
+		formData.append('sessionId', sessionId);
+		for (let i = 0; i < files.length; i++) {
+			formData.append('files', files[i]);
+		}
+
+		return createSourceContent('save-uploaded-sources', formData);
 	}
 </script>
 
@@ -95,6 +107,7 @@
 										{generatingSource}
 										on:submitURL={({ detail }) => createURLContent(detail.url)}
 										on:submitCopyPaste={({ detail }) => createCopyPasteContent(detail.text)}
+										on:submitFiles={({ detail }) => uploadValidatedFiles(detail.files)}
 									/>
 								</Accordion.Content>
 							</Accordion.Item>

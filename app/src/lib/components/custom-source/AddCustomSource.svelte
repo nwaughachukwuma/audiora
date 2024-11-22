@@ -5,7 +5,6 @@
 	import GeneratingSourceSkeleton from './GeneratingSourceSkeleton.svelte';
 
 	export let generatingSource = false;
-
 	let showWebsiteURLForm = false;
 	let showCopyPasteForm = false;
 </script>
@@ -21,6 +20,7 @@
 		<AddCustomSourceForm
 			on:useWebsiteURL={() => (showWebsiteURLForm = true)}
 			on:useCopyPaste={() => (showCopyPasteForm = true)}
+			on:submitFiles
 		/>
 	{/if}
 </div>
