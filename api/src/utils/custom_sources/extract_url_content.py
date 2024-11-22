@@ -7,7 +7,7 @@ from pydantic import BaseModel
 
 from src.utils.decorators import process_time
 
-from .base_utils import URLContent
+from .base_utils import SourceContent
 from .read_content import ReadContent
 
 
@@ -43,7 +43,7 @@ class ExtractURLContent(ReadContent):
         return self._clean_text(text_content), metadata
 
     @process_time()
-    def _extract(self, url: str) -> URLContent:
+    def _extract(self, url: str) -> SourceContent:
         parsed_url = urlparse(url)
         if not parsed_url.scheme or not parsed_url.netloc:
             raise ValueError("Invalid URL provided")
@@ -60,7 +60,7 @@ class ExtractURLContent(ReadContent):
                 text, metadata = self._extract_html(response.content)
                 content_type = "text/html"
 
-            return URLContent(
+            return SourceContent(
                 id=str(uuid4()),
                 content=text,
                 content_type=content_type,

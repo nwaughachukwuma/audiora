@@ -37,14 +37,10 @@
 			headers: { 'Content-Type': 'application/json' }
 		})
 			.then((res) => {
-				if (res.ok) return res.json();
+				if (res.ok) return toast.success('Custom source added successfully');
 				throw new Error('Failed to fetch');
 			})
-			.then(() => toast.success('Custom source added successfully'))
-			.catch((e) => {
-				console.error(e);
-				toast.error('Failed to add custom source', { description: e.message });
-			})
+			.catch((e) => toast.error('Failed to add custom source', { description: e.message }))
 			.finally(() => {
 				generatingSource = false;
 				accordionResetKey = {};
@@ -52,7 +48,7 @@
 	}
 
 	async function createURLContent(url: string) {
-		return createSourceContent('generate-custom-source', { url, sessionId });
+		return createSourceContent('generate-url-source', { url, sessionId });
 	}
 
 	async function createCopyPasteContent(text: string) {

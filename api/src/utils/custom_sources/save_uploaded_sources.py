@@ -2,14 +2,10 @@ from uuid import uuid4
 
 from fastapi import UploadFile
 
-from .base_utils import CustomSourceManager, CustomSourceModel, URLContent
+from .base_utils import CustomSourceManager, CustomSourceModel, SourceContent
 from .read_content import ReadContent
 
 FIVE_MB = 5 * 1024 * 1024
-
-
-class UploadedContent(URLContent):
-    pass
 
 
 class UploadedFiles:
@@ -38,7 +34,7 @@ class UploadedFiles:
         else:
             return None
 
-        return UploadedContent(
+        return SourceContent(
             id=str(uuid4()),
             content=text_content,
             content_type=content_type,

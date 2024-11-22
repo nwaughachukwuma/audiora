@@ -4,16 +4,20 @@ import { dbRefs } from '@/services/firebase';
 import { equals } from 'ramda';
 import { collectionData, getQueryConstraints } from './db.utils';
 
-export type LinkSources = {
+export type LinkSource = {
 	source_type: 'link';
 	url: string;
 };
 
-export type CopyPasteSources = {
+export type CopyPasteSource = {
 	source_type: 'copy/paste';
 };
 
-export type Sources = (LinkSources | CopyPasteSources) & {
+export type UploadSource = {
+	source_type: 'file_upload';
+};
+
+export type Sources = (LinkSource | CopyPasteSource | UploadSource) & {
 	id: string;
 	content_type: 'text/plain' | 'text/html' | 'application/pdf';
 	content: string;

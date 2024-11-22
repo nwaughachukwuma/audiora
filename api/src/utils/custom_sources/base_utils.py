@@ -10,7 +10,7 @@ from src.services.firestore_sdk import (
 )
 
 
-class URLContent(BaseModel):
+class SourceContent(BaseModel):
     id: str
     content: str
     content_type: str
@@ -20,7 +20,7 @@ class URLContent(BaseModel):
         return f"Content: {self.content}"
 
 
-class CustomSourceModel(URLContent):
+class CustomSourceModel(SourceContent):
     source_type: Literal["link", "copy/paste", "file_upload"]
     url: Optional[str] = None
     created_at: Optional[str] = None
