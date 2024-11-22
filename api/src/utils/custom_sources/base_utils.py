@@ -70,7 +70,7 @@ class CustomSourceManager(DBManager):
         if doc.exists and data:
             return cast(CustomSourceModel, self._safe_to_dict(data))
 
-    def _get_custom_sources(self):
+    def _get_custom_sources(self) -> list[CustomSourceModel]:
         self._check_document()
 
         try:

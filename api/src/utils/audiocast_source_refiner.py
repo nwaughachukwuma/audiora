@@ -10,7 +10,7 @@ class SourceContentRefiner:
         self.category = category
         self.preference_summary = preference_summary
 
-    def _refine(self, content):
+    def _refine(self, content: str):
         """
         Moderate and augment the source content to ensure it aligns with the user's preferences.
         """

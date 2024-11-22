@@ -21,21 +21,19 @@ class GenerateSourceContent(SourceContext, SourceContentRefiner):
         Returns:
             str: The audiocast source content
         """
-        source_content = await self.__use_openai(self.category, self.preference_summary)
+        additional_ctx = await self.get_context(self.preference_summary)
+        source_content = await self.__use_openai(self.category, self.preference_summary, additional_ctx)
         if not source_content:
             raise ValueError("Failed to generate audiocast source content")
 
         return self._refine(source_content)
 
-    async def __use_openai(self, category: ContentCategory, preference_summary: str):
+    async def __use_openai(self, category: ContentCategory, preference_summary: str, additional_ctx: str):
         """
         Generate audiocast source content using OpenAI.
         """
         refined_summary = re.sub("You want", "A user who wants", preference_summary, flags=re.IGNORECASE)
         refined_summary = re.sub("You", "A user", refined_summary, flags=re.IGNORECASE)
-
-        additional_context = await self.get_context(self.preference_summary)
-        print(f">>> Additional context: {additional_context}")
 
         response = get_openai().chat.completions.create(
             model="gpt-4o",
@@ -45,7 +43,7 @@ class GenerateSourceContent(SourceContext, SourceContentRefiner):
                     "content": generate_source_content_prompt(
                         category,
                         refined_summary,
-                        additional_context,
+                        additional_ctx,
                     ),
                 },
                 {
