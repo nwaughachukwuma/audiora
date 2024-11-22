@@ -2,19 +2,19 @@ import { getCustomSources$ } from '@/db/db.customSources';
 import { setContext, getContext } from 'svelte';
 
 export type LinkSources = {
-	type: 'link';
+	source_type: 'link';
 	url: string;
 };
 
 export type CopyPasteSources = {
-	type: 'copy/paste';
+	source_type: 'copy/paste';
 };
 
 export type Sources = (LinkSources | CopyPasteSources) & {
 	id: string;
 	content_type: 'text/plain' | 'text/html' | 'application/pdf';
 	content: string;
-	created_at: string;
+	created_at?: string;
 };
 
 const CONTEXT_KEY = {};

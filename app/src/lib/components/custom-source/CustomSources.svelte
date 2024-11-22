@@ -30,7 +30,7 @@
 					<span class="shrink-0 inline-flex">
 						Custom Source {idx + 1}
 					</span>
-					{#if source.type === 'link'}
+					{#if source.source_type === 'link'}
 						{':'}
 						<span class="text-gray-400 text-start ml-1">
 							{truncate(source.url, 45)}

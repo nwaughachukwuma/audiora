@@ -1,4 +1,4 @@
-from typing import Optional, cast
+from typing import Literal, Optional, cast
 
 from fastapi import BackgroundTasks
 from pydantic import BaseModel
@@ -21,6 +21,8 @@ class GetCustomSourcesRequest(BaseModel):
 
 
 class CustomSourceModel(URLContent):
+    url: str
+    source_type: Literal["link", "copy/paste"]
     created_at: Optional[str] = None
     updated_at: Optional[str] = None
 
@@ -82,7 +84,11 @@ async def generate_custom_source(request: GenerateCustomSourceRequest, backgroun
     page_content = await extractor._extract(request.url)
 
     async def save_to_firestore():
-        custom_source = CustomSourceModel(**page_content.model_dump())
+        custom_source = CustomSourceModel(
+            **page_content.model_dump(),
+            url=request.url,
+            source_type="link",
+        )
         manager = CustomSourceManager(request.sessionId)
         manager._set_custom_source(custom_source)
 

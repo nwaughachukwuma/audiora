@@ -4,15 +4,14 @@
 	import * as Accordion from './ui/accordion';
 	import { PlusIcon } from 'lucide-svelte';
 	import AddCustomSource from './custom-source/AddCustomSource.svelte';
-	import { getCustomSources, type Sources } from '@/stores/customSources.svelte';
 	import { env } from '@env';
 	import RenderAudioSources from './RenderAudioSources.svelte';
 	import { getSessionContext } from '@/stores/sessionContext.svelte';
+	import { toast } from 'svelte-sonner';
 
 	export let aiSource: string;
 
 	const { sessionId$ } = getSessionContext();
-	const { addSource } = getCustomSources();
 
 	let snapPoints = [0.75, 0.95];
 	let activeSnapPoint = snapPoints[0];
@@ -32,29 +31,27 @@
 		if (fetchingSource) return;
 
 		fetchingSource = true;
-		const result = await fetchURLContent(url).catch(console.error);
-		fetchingSource = false;
-
-		accordionResetKey = {};
-		if (result) addSource(result);
+		return fetchURLContent(url)
+			.then(() => toast.success('Custom source added successfully'))
+			.catch((e) => {
+				console.error(e);
+				toast.error('Failed to add custom source', { description: e.message });
+			})
+			.finally(() => {
+				fetchingSource = false;
+				accordionResetKey = {};
+			});
 	}
 
-	async function fetchURLContent(url: string): Promise<Sources> {
+	async function fetchURLContent(url: string) {
 		return fetch(`${env.API_BASE_URL}/generate-custom-source`, {
 			method: 'POST',
 			body: JSON.stringify({ url, sessionId }),
 			headers: { 'Content-Type': 'application/json' }
-		})
-			.then<{
-				id: string;
-				content: string;
-				content_type: Sources['content_type'];
-				metadata: Record<string, any>;
-			}>((res) => {
-				if (res.ok) return res.json();
-				throw new Error('Failed to fetch');
-			})
-			.then((data) => ({ ...data, type: 'link', url }));
+		}).then((res) => {
+			if (res.ok) return res.json();
+			throw new Error('Failed to fetch');
+		});
 	}
 </script>
 

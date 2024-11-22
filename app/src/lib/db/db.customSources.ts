@@ -1,4 +1,4 @@
-import { orderBy, where, type CollectionReference } from 'firebase/firestore';
+import { orderBy, type CollectionReference } from 'firebase/firestore';
 import { distinctUntilChanged, shareReplay, of, catchError, switchMap, startWith } from 'rxjs';
 import { dbRefs } from '@/services/firebase';
 import { equals } from 'ramda';
@@ -10,9 +10,7 @@ export const getCustomSources$ = (sessionId: string) => {
 		`audiora_sessions/${sessionId}/custom_sources`
 	) as CollectionReference<Sources>;
 
-	const colData = collectionData(
-		getQueryConstraints(colRef, where('sessionId', '==', sessionId), orderBy('created_at', 'asc'))
-	);
+	const colData = collectionData(getQueryConstraints(colRef, orderBy('created_at', 'asc')));
 
 	return colData.pipe(
 		switchMap((v) => of(v)),
