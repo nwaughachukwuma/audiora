@@ -34,11 +34,13 @@
 	import AudiocastPageSkeletonLoader from '@/components/AudiocastPageSkeletonLoader.svelte';
 	import RenderAudioSources from '@/components/RenderAudioSources.svelte';
 
-	const { session$ } = getSessionContext();
+	const { session$, customSources$ } = getSessionContext();
 
 	let generating = false;
 
 	$: sessionId = $page.params.sessionId;
+
+	$: $customSources$;
 
 	async function generateAudiocast(sessionId: string, category: ContentCategory, summary: string) {
 		if (generating) return;

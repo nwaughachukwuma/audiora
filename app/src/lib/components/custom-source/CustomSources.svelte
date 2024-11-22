@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { getCustomSources } from '@/stores/customSources.svelte';
 	import * as Accordion from '../ui/accordion';
 	import RenderWebContent from './RenderWebContent.svelte';
+	import { getSessionContext } from '@/stores/sessionContext.svelte';
 
-	const { sources$ } = getCustomSources();
+	const { customSources$ } = getSessionContext();
 
-	$: sources = $sources$?.sort((a, b) => {
+	$: customSources = $customSources$?.sort((a, b) => {
 		if (a.created_at && b.created_at) {
 			return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
 		}
@@ -17,13 +17,13 @@
 	}
 </script>
 
-{#if sources == null}
+{#if customSources == null}
 	<div class="flex flex-col gap-y-0.5 pt-0.5 w-full">
 		<div class="h-14 w-full bg-gray-800 animate-pulse" />
 		<div class="h-14 w-full bg-gray-800 animate-pulse" />
 	</div>
 {:else}
-	{#each sources as source, idx (source.id)}
+	{#each customSources as source, idx (source.id)}
 		<Accordion.Item value={source.id} class="border-gray-800">
 			<Accordion.Trigger>
 				<div class="inline-flex break-words text-wrap">
