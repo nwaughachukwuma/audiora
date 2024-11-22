@@ -31,3 +31,7 @@ uvloop
 redis[hiredis]
 
 async-web-search
+
+lxml 
+beautifulsoup4 
+pypdf[crypto]

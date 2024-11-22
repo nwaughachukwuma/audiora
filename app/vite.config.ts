@@ -8,6 +8,7 @@ export default defineConfig({
 		include: ['src/**/*.{test,spec}.{js,ts}']
 	},
 	define: {
+		'process.env.FIREBASE_CONFIG': process.env.FIREBASE_CONFIG,
 		...defineEnv()
 	},
 	build: {
@@ -17,6 +18,13 @@ export default defineConfig({
 		noExternal: ['ramda', 'bits-ui']
 	},
 	optimizeDeps: {
-		include: ['copy-to-clipboard']
+		include: [
+			'copy-to-clipboard',
+			'firebase/app',
+			'firebase/analytics',
+			'firebase/firestore',
+			'firebase/auth',
+			'firebase/storage'
+		]
 	}
 });

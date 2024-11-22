@@ -32,12 +32,15 @@
 	import AudiocastPageAction from '@/components/AudiocastPageAction.svelte';
 	import AudiocastPageChat from '@/components/AudiocastPageChat.svelte';
 	import AudiocastPageSkeletonLoader from '@/components/AudiocastPageSkeletonLoader.svelte';
+	import RenderAudioSources from '@/components/RenderAudioSources.svelte';
 
-	const { session$ } = getSessionContext();
+	const { session$, customSources$ } = getSessionContext();
 
 	let generating = false;
 
 	$: sessionId = $page.params.sessionId;
+
+	$: $customSources$;
 
 	async function generateAudiocast(sessionId: string, category: ContentCategory, summary: string) {
 		if (generating) return;
@@ -117,24 +120,17 @@
 				<Accordion.Item value="item-1" class="border-gray-800">
 					<Accordion.Trigger>Audio Transcript</Accordion.Trigger>
 					<Accordion.Content>
-						<div class="flex w-full flex-col gap-y-3 p-2 bg-gray-900/70 text-gray-300">
+						<article
+							class="flex max-h-96 overflow-y-auto w-full flex-col gap-y-3 p-2 bg-gray-900/70 text-gray-300"
+						>
 							{#await parse(parseScript(data.script)) then parsedContent}
 								{@html parsedContent}
 							{/await}
-						</div>
+						</article>
 					</Accordion.Content>
 				</Accordion.Item>
 
-				<Accordion.Item value="item-2" class="border-gray-800">
-					<Accordion.Trigger>Source Content</Accordion.Trigger>
-					<Accordion.Content>
-						<div class="flex w-full flex-col gap-y-3 bg-gray-900/70 text-gray-300 p-2">
-							{#await parse(data.source_content) then parsedContent}
-								{@html parsedContent}
-							{/await}
-						</div>
-					</Accordion.Content>
-				</Accordion.Item>
+				<RenderAudioSources aiSource={data.source_content} />
 			</Accordion.Root>
 
 			<AudiocastPageAction {sessionId} sessionTitle={data.title || 'Untitled'} on:showChats>
@@ -145,3 +141,9 @@
 		<div>Error: {String(error)}</div>
 	{/await}
 </div>
+
+<style lang="postcss">
+	article :global(p) {
+		@apply text-sm;
+	}
+</style>

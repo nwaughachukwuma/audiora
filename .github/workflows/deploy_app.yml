@@ -24,6 +24,7 @@ env:
   CONFIG_FILE: "app/app.yaml"
   SERVICE: audiora-app
   API_BASE_URL: ${{ secrets.API_BASE_URL }}
+  FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}
 
 jobs:
   prepare:

@@ -19,15 +19,17 @@ class TTSPromptMaker:
         """Get connection tags based on the number of speakers."""
         return [f"<Speaker{i}>" for i in range(1, 10)]
 
-    def get_system_prompt(self, source_content: str) -> str:
+    def get_system_prompt(self, source_content: str, compiled_custom_sources: str | None = None) -> str:
         """
-        Generate an optimized system prompt for converting a source content into the appropriate format.
+        Generate an optimized system prompt for converting source contents into the appropriate format.
         """
-        return f"""You're a super-intelligent AI who generates different forms, styles and genres of audiocast script.
+        return f"""You're a super-intelligent AI that can generate different forms, styles and genres of audiocast script.
 
-        Your task is to transform the following source content into an engaging {self.category} TTS-optimized audiocast script.
+        Your task is to transform the following source contents into a single, engaging {self.category} TTS-optimized audiocast script.
 
-        Source Content: {source_content}
+        Source Contents:
+        - AI-generated: {source_content}
+        {"- User-provided: " + compiled_custom_sources if compiled_custom_sources else ""}
 
         Content Parameters:
         1. Format: Create {category_qualifiers[self.category]} in TTS-optomized audiocast flow
@@ -77,15 +79,20 @@ class TTSPromptMaker:
         - Verify SSML tag accuracy, opening and closure
         - Check speaker tag consistency
         - Clear, accessible language
-        - Maintain accurate representation of source content, don't deviate
+        - Maintain accurate representation of the source contents, don't deviate
         - Appropriate word counnt for {self.category} format
         - Generate only the audiocast transcript
         - Ensure all SSML tags are properly formatted and within the speaker tags
+
+        6. Using the Source Contents:
+        - Treat the source contents as complimentary, transitioning smoothly between sections and segments
+        - Exclude any unnecessary or incompatible details or information
+        - Prioritize sections that greatly support the overall discussion/narrative
 
         Output Format Example for 2 speakers:
         <Speaker1>Hello there! [Content Intro & Overview].</Speaker1>
         <Speaker2>I'm particularly excited about [Specific Aspect]. What caught your attention about this?</Speaker2>
         <Speaker1>Well <break time="0.2s"/> what really stands out is [Key Point]...</Speaker1>
 
-        Remember: Focus solely on conveying the source content in an engaging audio format while optimizing for audio delivery.
+        Remember: Keep the final output engaging and optimized for audio delivery.
         """

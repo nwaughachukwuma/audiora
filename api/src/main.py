@@ -2,7 +2,7 @@ import asyncio
 from time import time
 from typing import Any, Callable, Generator
 
-from fastapi import BackgroundTasks, FastAPI, HTTPException, Request
+from fastapi import BackgroundTasks, FastAPI, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi_utilities import add_timer_middleware
@@ -13,6 +13,18 @@ from src.utils.chat_utils import (
     SessionChatItem,
     SessionChatRequest,
 )
+from src.utils.custom_sources.base_utils import SourceContent
+from src.utils.custom_sources.extract_url_content import ExtractURLContent, ExtractURLContentRequest
+from src.utils.custom_sources.generate_url_source import (
+    CustomSourceManager,
+    CustomSourceModel,
+    DeleteCustomSourcesRequest,
+    GenerateCustomSourceRequest,
+    GetCustomSourcesRequest,
+    generate_custom_source,
+)
+from src.utils.custom_sources.save_copied_source import CopiedPasteSourceRequest, save_copied_source
+from src.utils.custom_sources.save_uploaded_sources import UploadedFiles
 from src.utils.generate_audiocast import (
     GenerateAudioCastRequest,
     GenerateAudioCastResponse,
@@ -54,12 +66,16 @@ async def log_request_headers(request: Request, call_next: Callable):
 
 
 @app.get("/")
-async def root():
+def root():
     return {"message": "Hello World"}
 
 
 @app.post("/chat/{session_id}", response_model=Generator[str, Any, None])
-async def chat_endpoint(session_id: str, request: SessionChatRequest, background_tasks: BackgroundTasks):
+def chat_endpoint(
+    session_id: str,
+    request: SessionChatRequest,
+    background_tasks: BackgroundTasks,
+):
     """Chat endpoint"""
     category = request.contentCategory
     db = SessionManager(session_id, category)
@@ -85,18 +101,20 @@ async def generate_audiocast_endpoint(
     request: GenerateAudioCastRequest,
     background_tasks: BackgroundTasks,
 ):
-    result = await generate_audiocast(request, background_tasks)
-    return result
+    return await generate_audiocast(request, background_tasks)
 
 
 @app.get("/audiocast/{session_id}", response_model=GenerateAudioCastResponse)
-async def get_audiocast_endpoint(session_id: str):
+def get_audiocast_endpoint(session_id: str):
     result = get_audiocast(session_id)
     return result
 
 
 @app.post("/generate-audiocast-source", response_model=str)
-async def generate_audiocast_source_endpoint(request: GenerateAudiocastSource, background_tasks: BackgroundTasks):
+async def generate_audiocast_source_endpoint(
+    request: GenerateAudiocastSource,
+    background_tasks: BackgroundTasks,
+):
     source_content = await generate_audiocast_source(request, background_tasks)
     if not source_content:
         raise HTTPException(status_code=500, detail="Failed to generate source content")
@@ -132,6 +150,50 @@ async def get_signed_url_endpoint(blobname: str):
 
 
 @app.post("/get-session-title", response_model=str)
-async def get_session_title_endpoint(request: GetSessionTitleModel, background_tasks: BackgroundTasks):
-    source_content = await get_session_title(request, background_tasks)
-    return source_content
+async def get_session_title_endpoint(
+    request: GetSessionTitleModel,
+    background_tasks: BackgroundTasks,
+):
+    return await get_session_title(request, background_tasks)
+
+
+@app.post("/extract-url-content", response_model=SourceContent)
+def extract_url_content_endpoint(request: ExtractURLContentRequest):
+    extractor = ExtractURLContent()
+    page_content = extractor._extract(request.url)
+    return page_content.model_dump()
+
+
+@app.post("/generate-url-source", response_model=SourceContent)
+def generate_url_source_endpoint(
+    request: GenerateCustomSourceRequest,
+    background_tasks: BackgroundTasks,
+):
+    return generate_custom_source(request, background_tasks)
+
+
+@app.post("/get-custom-sources", response_model=list[CustomSourceModel])
+async def get_custom_sources_endpoint(request: GetCustomSourcesRequest):
+    return CustomSourceManager(request.sessionId)._get_custom_sources()
+
+
+@app.post("/delete-custom-source", response_model=list[CustomSourceModel])
+def delete_custom_source_endpoint(request: DeleteCustomSourcesRequest):
+    manager = CustomSourceManager(request.sessionId)
+    manager._delete_custom_source(request.sourceId)
+    return "Deleted"
+
+
+@app.post("/save-copied-source", response_model=str)
+def save_copied_source_endpoint(request: CopiedPasteSourceRequest):
+    result = save_copied_source(request)
+    return result
+
+
+@app.post("/save-uploaded-sources", response_model=str)
+async def save_uploaded_files_endpoint(files: list[UploadFile], sessionId: str = Form(...)):
+    """
+    Save sources uploaded from the frontend
+    """
+    result = await UploadedFiles(session_id=sessionId)._save_sources(files)
+    return result

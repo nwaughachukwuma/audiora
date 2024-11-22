@@ -14,8 +14,9 @@
 
 	export let data;
 
-	$: setAppContext();
 	$: sessionId = $page.params.sessionId || data.sessionId;
+
+	$: setAppContext();
 	$: setSessionContext(sessionId);
 </script>
 

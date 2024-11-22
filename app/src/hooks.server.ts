@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import type { HandleServerError, Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
 import ejs from 'ejs';
