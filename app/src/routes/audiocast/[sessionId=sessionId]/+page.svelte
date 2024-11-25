@@ -19,7 +19,7 @@
 </script>
 
 <script lang="ts">
-	import { getSessionContext, type ChatItem } from '@/stores/sessionContext.svelte';
+	import { getSessionContext } from '@/stores/sessionContext.svelte';
 	import type { ContentCategory } from '@/utils/types';
 	import { env } from '@env';
 	import { parse } from 'marked';
