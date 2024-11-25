@@ -58,12 +58,7 @@
 	}
 
 	async function chatRequest(uItem: ChatItem) {
-		const aItem = addChatItem({
-			id: uuid(),
-			content: '',
-			role: 'assistant',
-			loading: true
-		});
+		const aItem = addChatItem({ id: uuid(), content: '', role: 'assistant', loading: true });
 
 		return fetch(`${env.API_BASE_URL}/chat/${sessionId}`, {
 			method: 'POST',

@@ -23,7 +23,9 @@
 
 	function continueChat(category: ContentCategory) {
 		startSession(category);
-		addChatItem({ id: uuid(), content: selectContent, role: 'user', loading: false });
+		
+		const content = `${selectContent}\nCategory: ${category} `;
+		addChatItem({ id: uuid(), content, role: 'user', loading: false });
 
 		const href = `/chat/${sessionId}?category=${category}`;
 		goto(href);
