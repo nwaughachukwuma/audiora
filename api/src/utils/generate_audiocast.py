@@ -75,6 +75,19 @@ async def generate_audiocast(request: GenerateAudioCastRequest, background_tasks
             ),
         )
 
+    session_data = SessionManager.data(session_id)
+    source_content = session_data.metadata.source if session_data and session_data.metadata else None
+
+    if not source_content:
+        update_session_info("Generating source content...")
+        source_content = await generate_audiocast_source(
+            GenerateAudiocastSource(
+                sessionId=session_id,
+                category=category,
+                preferenceSummary=summary,
+            ),
+        )
+
     if not source_content:
         raise HTTPException(status_code=500, detail="Failed to generate source content")
 
