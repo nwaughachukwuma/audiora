@@ -1,4 +1,5 @@
 import { getCustomSources$ } from '@/db/db.customSources';
+import { getSession$ } from '@/db/db.session';
 import type { ContentCategory } from '@/utils/types';
 import { setContext, getContext } from 'svelte';
 import { persisted } from 'svelte-persisted-store';
@@ -39,6 +40,7 @@ export function setSessionContext(sessionId: string) {
 		fetchingSource$,
 		audioSource$,
 		customSources$: getCustomSources$(sessionId),
+		sessionModel$: getSession$(sessionId),
 		startSession: (category: ContentCategory) => {
 			session$.set({
 				id: sessionId,
