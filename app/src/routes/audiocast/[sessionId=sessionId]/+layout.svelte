@@ -1,9 +1,10 @@
 <script>
 	import { getSessionContext } from '@/stores/sessionContext.svelte';
 	import { Button } from '@/components/ui/button';
-	const { session$ } = getSessionContext();
+	const { session$, sessionModel$ } = getSessionContext();
 </script>
 
+<!-- TODO: Use only the DB references -->
 {#if $session$ && !$session$.completed}
 	<div
 		class="w-full mx-auto px-4 md:max-w-xl h-full flex flex-col gap-3 items-center justify-center"
@@ -18,6 +19,6 @@
 			>Generate Audiocast</Button
 		>
 	</div>
-{:else}
+{:else if $sessionModel$}
 	<slot />
 {/if}
