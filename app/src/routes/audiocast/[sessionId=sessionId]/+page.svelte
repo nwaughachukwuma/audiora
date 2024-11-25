@@ -9,9 +9,6 @@
 	type GenerateAudiocastResponse = {
 		script: string;
 		source_content: string;
-		chats: Array<Omit<ChatItem, 'loading'>>;
-		category: ContentCategory;
-		title: ChatMetadata['title'];
 		created_at?: string;
 	};
 
@@ -136,9 +133,12 @@
 				<RenderAudioSources aiSource={data.source_content} />
 			</Accordion.Root>
 
-			<AudiocastPageAction {sessionId} sessionTitle={data.title || 'Untitled'} on:showChats>
-				<AudiocastPageChat slot="chats-button" chats={data.chats} />
-			</AudiocastPageAction>
+			{#if sessionModel}
+				{@const sessionTitle = sessionModel.metadata?.title || 'Untitled'}
+				<AudiocastPageAction {sessionId} {sessionTitle} on:showChats>
+					<AudiocastPageChat slot="chats-button" chats={sessionModel.chats} />
+				</AudiocastPageAction>
+			{/if}
 		</div>
 	{:catch error}
 		<div>Error: {String(error)}</div>

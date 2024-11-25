@@ -60,7 +60,7 @@ async def generate_audiocast(request: GenerateAudioCastRequest, background_tasks
     db = SessionManager(session_id, category)
 
     def update_session_info(info: str):
-        background_tasks.add_task(db._update_info, info)
+        db._update_info(info)
 
     session_data = SessionManager.data(session_id)
     source_content = session_data.metadata.source if session_data and session_data.metadata else None
@@ -73,7 +73,6 @@ async def generate_audiocast(request: GenerateAudioCastRequest, background_tasks
                 category=category,
                 preferenceSummary=summary,
             ),
-            background_tasks,
         )
 
     if not source_content:
@@ -104,20 +103,8 @@ async def generate_audiocast(request: GenerateAudioCastRequest, background_tasks
         audio_script,
     )
 
-    session_data = SessionManager.data(session_id)
-    if not session_data:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Failed to get audiocast from the DB for session_id: {session_id}",
-        )
-
-    title = session_data.metadata.title if session_data.metadata and session_data.metadata.title else "Untitled"
-
     return GenerateAudioCastResponse(
         script=audio_script,
         source_content=source_content,
         created_at=datetime.now().strftime("%Y-%m-%d %H:%M"),
-        chats=session_data.chats,
-        title=title,
-        category=session_data.category,
     )

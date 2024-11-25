@@ -35,11 +35,4 @@ def get_audiocast(session_id: str):
     if session_data.created_at:
         created_at = datetime.fromisoformat(session_data.created_at).strftime("%Y-%m-%d %H:%M")
 
-    return GenerateAudioCastResponse(
-        script=transcript,
-        source_content=source,
-        created_at=created_at,
-        chats=session_data.chats,
-        title=title,
-        category=session_data.category,
-    )
+    return GenerateAudioCastResponse(script=transcript, source_content=source, created_at=created_at)
