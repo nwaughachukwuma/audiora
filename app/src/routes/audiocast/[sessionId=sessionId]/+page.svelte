@@ -9,9 +9,6 @@
 	type GenerateAudiocastResponse = {
 		script: string;
 		source_content: string;
-		chats: Array<Omit<ChatItem, 'loading'>>;
-		category: ContentCategory;
-		title: ChatMetadata['title'];
 		created_at?: string;
 	};
 
@@ -22,7 +19,7 @@
 </script>
 
 <script lang="ts">
-	import { getSessionContext, type ChatItem } from '@/stores/sessionContext.svelte';
+	import { getSessionContext } from '@/stores/sessionContext.svelte';
 	import type { ContentCategory } from '@/utils/types';
 	import { env } from '@env';
 	import { parse } from 'marked';
@@ -33,12 +30,15 @@
 	import AudiocastPageChat from '@/components/AudiocastPageChat.svelte';
 	import AudiocastPageSkeletonLoader from '@/components/AudiocastPageSkeletonLoader.svelte';
 	import RenderAudioSources from '@/components/RenderAudioSources.svelte';
+	import AudiocastPageHeader from '@/components/AudiocastPageHeader.svelte';
 
-	const { session$, customSources$ } = getSessionContext();
+	const { customSources$, session$, sessionModel$ } = getSessionContext();
 
 	let generating = false;
 
 	$: sessionId = $page.params.sessionId;
+	$: sessionModel = $sessionModel$;
+	$: $customSources$;
 
 	$: $customSources$;
 
@@ -73,28 +73,30 @@
 </script>
 
 <div class="mx-auto flex h-full w-full pb-40 overflow-auto mt-6 flex-col items-center px-2 sm:px-1">
+	{#if sessionModel}
+		<AudiocastPageHeader session={sessionModel} />
+	{/if}
+
 	{#await getAudiocast(sessionId)}
 		<div class="flex flex-col w-full items-center justify-center -mt-6">
 			<AudiocastPageSkeletonLoader />
 
 			{#if generating}
-				<p class="mt-4 py-2 px-4 bg-sky-600/20 animate-pulse text-sky-300 rounded-sm">
-					Generating your audiocast...Please wait
-				</p>
+				<div class="flex mt-4 flex-col gap-y-3 w-full items-center">
+					<p class="py-2 px-4 bg-sky-600/20 animate-pulse text-sky-300 rounded-sm">
+						Generating your audiocast...Please wait
+					</p>
+
+					{#if sessionModel?.metadata?.info}
+						<p class="py-2 px-4 animate-pulse text-gray-400 rounded-sm">
+							Status: {sessionModel.metadata.info}
+						</p>
+					{/if}
+				</div>
 			{/if}
 		</div>
 	{:then data}
 		<div class="flex w-full px-4 flex-col gap-y-3 sm:max-w-xl lg:max-w-3xl max-w-full">
-			<div class="mb-4 flex flex-col gap-y-2">
-				<span class="capitalize bg-gray-800 text-gray-300 w-fit py-1 px-3 rounded-md">
-					{data.category}
-				</span>
-
-				{#if data.title}
-					<h1 class="text-2xl font-semibold text-sky-200">{data.title}</h1>
-				{/if}
-			</div>
-
 			<RenderMedia filename={sessionId} let:uri>
 				<audio controls class="w-full animate-fade-in block">
 					<source src={uri} type="audio/mpeg" />
@@ -133,9 +135,12 @@
 				<RenderAudioSources aiSource={data.source_content} />
 			</Accordion.Root>
 
-			<AudiocastPageAction {sessionId} sessionTitle={data.title || 'Untitled'} on:showChats>
-				<AudiocastPageChat slot="chats-button" chats={data.chats} />
-			</AudiocastPageAction>
+			{#if sessionModel}
+				{@const sessionTitle = sessionModel.metadata?.title || 'Untitled'}
+				<AudiocastPageAction {sessionId} {sessionTitle} on:showChats>
+					<AudiocastPageChat slot="chats-button" chats={sessionModel.chats} />
+				</AudiocastPageAction>
+			{/if}
 		</div>
 	{:catch error}
 		<div>Error: {String(error)}</div>

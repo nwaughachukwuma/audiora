@@ -1,4 +1,3 @@
-from fastapi import BackgroundTasks
 from pydantic import BaseModel
 
 from src.utils.audiocast_request import GenerateSourceContent
@@ -14,7 +13,7 @@ class GenerateAudiocastSource(BaseModel):
     preferenceSummary: str
 
 
-async def generate_audiocast_source(request: GenerateAudiocastSource, background_tasks: BackgroundTasks):
+async def generate_audiocast_source(request: GenerateAudiocastSource):
     """
     Generate audiocast source material based on user preferences.
     """
@@ -28,11 +27,10 @@ async def generate_audiocast_source(request: GenerateAudiocastSource, background
     @use_cache_manager(cache_key)
     async def _handler():
         db = SessionManager(session_id, category)
-        background_tasks.add_task(db._update_info, "Generating source content...")
-
+        db._update_info("Generating source content...")
         generator = GenerateSourceContent(category, preference_summary)
         source_content = await generator._run()
-        background_tasks.add_task(db._update_source, source_content)
+        db._update_source(source_content)
 
         return source_content
 

@@ -111,11 +111,8 @@ def get_audiocast_endpoint(session_id: str):
 
 
 @app.post("/generate-audiocast-source", response_model=str)
-async def generate_audiocast_source_endpoint(
-    request: GenerateAudiocastSource,
-    background_tasks: BackgroundTasks,
-):
-    source_content = await generate_audiocast_source(request, background_tasks)
+async def generate_audiocast_source_endpoint(request: GenerateAudiocastSource):
+    source_content = await generate_audiocast_source(request)
     if not source_content:
         raise HTTPException(status_code=500, detail="Failed to generate source content")
     return source_content
