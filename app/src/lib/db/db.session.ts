@@ -12,6 +12,6 @@ export const getSession$ = (sessionId: string) => {
 		distinctUntilChanged((a, b) => equals(a, b)),
 		shareReplay(1),
 		catchError(() => of(null)),
-		startWith(null)
+		// startWith(null)
 	);
 };
