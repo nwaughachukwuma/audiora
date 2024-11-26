@@ -1,5 +1,4 @@
-<div class="w-full max-w-3xl mx-auto p-6 px-4">
-
+<div class="w-full max-w-3xl mx-auto">
 	<!-- {/* Player container */} -->
 	<div class="w-full rounded-lg bg-gray-800 p-4 mb-4">
 		<!-- {/* Player controls and progress row */} -->

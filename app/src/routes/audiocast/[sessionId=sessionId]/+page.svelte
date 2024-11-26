@@ -6,12 +6,6 @@
 		title?: string;
 	};
 
-	type GenerateAudiocastResponse = {
-		script: string;
-		source_content: string;
-		created_at?: string;
-	};
-
 	function parseScript(script: string) {
 		const matches = [...script.matchAll(/<(Speaker\d+)>(.*?)<\/Speaker\d+>/gs)];
 		return matches.map(([, speaker, content]) => `**${speaker}**: ${content}`).join('\n\n');
@@ -20,7 +14,7 @@
 
 <script lang="ts">
 	import { getSessionContext } from '@/stores/sessionContext.svelte';
-	import type { ContentCategory } from '@/utils/types';
+	import type { ContentCategory, SessionModel } from '@/utils/types';
 	import { env } from '@env';
 	import { parse } from 'marked';
 	import * as Accordion from '@/components/ui/accordion';
@@ -32,15 +26,17 @@
 	import RenderAudioSources from '@/components/RenderAudioSources.svelte';
 	import AudiocastPageHeader from '@/components/AudiocastPageHeader.svelte';
 
+	export let data;
+
 	const { customSources$, session$, sessionModel$ } = getSessionContext();
 
 	let generating = false;
 
 	$: sessionId = $page.params.sessionId;
-	$: sessionModel = $sessionModel$;
 	$: $customSources$;
 
-	$: $customSources$;
+	$: sessionModel = $sessionModel$ || data.sessionModel;
+	$: sessionTitle = sessionModel.metadata?.title || 'Untitled';
 
 	async function generateAudiocast(sessionId: string, category: ContentCategory, summary: string) {
 		if (generating) return;
@@ -51,34 +47,32 @@
 			body: JSON.stringify({ sessionId, summary, category }),
 			headers: { 'Content-Type': 'application/json' }
 		})
-			.then<GenerateAudiocastResponse>((res) => {
+			.then<string>((res) => {
 				if (res.ok) return res.json();
 				throw new Error('Failed to generate audiocast');
 			})
 			.finally(() => (generating = false));
 	}
 
-	async function getAudiocast(sessionId: string) {
-		return fetch(`${env.API_BASE_URL}/audiocast/${sessionId}`).then<GenerateAudiocastResponse>(
-			(res) => {
-				if (res.status === 404 && $session$?.summary) {
-					const { summary, category } = $session$;
-					return generateAudiocast(sessionId, category, summary);
-				} else if (res.ok) return res.json();
-
-				throw new Error('Failed to get audiocast');
+	async function getAudiocast(sessionId: string): Promise<SessionModel | string | undefined> {
+		return fetch(`${env.API_BASE_URL}/audiocast/${sessionId}`).then<SessionModel>((res) => {
+			if (res.ok) return res.json();
+			else if (res.status === 404 && $session$?.summary) {
+				return generateAudiocast(sessionId, sessionModel.category, $session$.summary);
 			}
-		);
+
+			throw new Error('Failed to get audiocast');
+		});
 	}
 </script>
 
-<div class="mx-auto flex h-full w-full pb-40 overflow-auto mt-6 flex-col items-center px-2 sm:px-1">
-	{#if sessionModel}
-		<AudiocastPageHeader session={sessionModel} />
-	{/if}
+<div
+	class="mx-auto sm:max-w-xl lg:max-w-3xl max-w-full flex h-full w-full pb-40 overflow-auto flex-col items-center max-sm:px-4"
+>
+	<AudiocastPageHeader category={sessionModel.category} title={sessionModel.metadata?.title} />
 
 	{#await getAudiocast(sessionId)}
-		<div class="flex flex-col w-full items-center justify-center -mt-6">
+		<div class="flex flex-col w-full">
 			<AudiocastPageSkeletonLoader />
 
 			{#if generating}
@@ -95,8 +89,8 @@
 				</div>
 			{/if}
 		</div>
-	{:then data}
-		<div class="flex w-full px-4 flex-col gap-y-3 sm:max-w-xl lg:max-w-3xl max-w-full">
+	{:then}
+		<div class="flex w-full mt-4 flex-col gap-y-3">
 			<RenderMedia filename={sessionId} let:uri>
 				<audio controls class="w-full animate-fade-in block">
 					<source src={uri} type="audio/mpeg" />
@@ -105,6 +99,25 @@
 			</RenderMedia>
 
 			<Accordion.Root>
+				{#if sessionModel.metadata?.transcript}
+					<Accordion.Item value="item-1" class="border-gray-800">
+						<Accordion.Trigger>Audio Transcript</Accordion.Trigger>
+						<Accordion.Content>
+							<article
+								class="flex max-h-96 overflow-y-auto w-full flex-col gap-y-3 p-2 bg-gray-900/70 text-gray-300"
+							>
+								{#await parse(parseScript(sessionModel.metadata.transcript)) then parsedContent}
+									{@html parsedContent}
+								{/await}
+							</article>
+						</Accordion.Content>
+					</Accordion.Item>
+				{/if}
+
+				{#if sessionModel.metadata?.source}
+					<RenderAudioSources aiSource={sessionModel.metadata.source} />
+				{/if}
+
 				<Accordion.Item value="item-0" class="border-gray-800">
 					<Accordion.Trigger>Show Waveform</Accordion.Trigger>
 					<Accordion.Content>
@@ -118,29 +131,11 @@
 						</RenderMedia>
 					</Accordion.Content>
 				</Accordion.Item>
-
-				<Accordion.Item value="item-1" class="border-gray-800">
-					<Accordion.Trigger>Audio Transcript</Accordion.Trigger>
-					<Accordion.Content>
-						<article
-							class="flex max-h-96 overflow-y-auto w-full flex-col gap-y-3 p-2 bg-gray-900/70 text-gray-300"
-						>
-							{#await parse(parseScript(data.script)) then parsedContent}
-								{@html parsedContent}
-							{/await}
-						</article>
-					</Accordion.Content>
-				</Accordion.Item>
-
-				<RenderAudioSources aiSource={data.source_content} />
 			</Accordion.Root>
 
-			{#if sessionModel}
-				{@const sessionTitle = sessionModel.metadata?.title || 'Untitled'}
-				<AudiocastPageAction {sessionId} {sessionTitle} on:showChats>
-					<AudiocastPageChat slot="chats-button" chats={sessionModel.chats} />
-				</AudiocastPageAction>
-			{/if}
+			<AudiocastPageAction {sessionId} {sessionTitle} on:showChats>
+				<AudiocastPageChat slot="chats-button" chats={sessionModel.chats} />
+			</AudiocastPageAction>
 		</div>
 	{:catch error}
 		<div>Error: {String(error)}</div>

@@ -1,13 +1,10 @@
 <script lang="ts">
-	import { page } from '$app/stores';
 	import Logo from './Logo.svelte';
-	import { PlusIcon } from 'lucide-svelte';
-	import * as Tooltip from './ui/tooltip';
 	import SearchSlideSheet from './SlideSheet.svelte';
 	import SearchSidebar from './Sidebar.svelte';
 	import { Button } from './ui/button';
 	import { getAppContext } from '$lib/stores/appContext.svelte';
-	import { goto, invalidateAll } from '$app/navigation';
+	import { invalidateAll } from '$app/navigation';
 	import { mediaBreakPoints$ } from '@/utils/mediaBreakpoints';
 
 	export let sessionId: string;
@@ -15,11 +12,6 @@
 	const { openSettingsDrawer$ } = getAppContext();
 
 	const mdAndUp = mediaBreakPoints$('md');
-
-	$: pathname = $page.url.pathname;
-	function generateNew() {
-		goto('/', { invalidateAll: true, replaceState: true });
-	}
 </script>
 
 <nav class="relative flex h-16 w-full items-center">
@@ -56,22 +48,5 @@
 		<a class="block shrink-0" href="/" on:click={invalidateAll}>
 			<Logo />
 		</a>
-	</div>
-
-	<div class="ml-12 w-full flex h-full max-h-full items-center justify-between px-3">
-		{#if pathname.match(/chat\/\S+/g)}
-			<Tooltip.Root>
-				<Tooltip.Trigger>
-					<Button
-						on:click={generateNew}
-						variant="ghost"
-						class="flex h-7 items-center justify-center rounded-md border border-gray-600 p-1 px-1.5 text-gray-500 transition-colors duration-200 hover:border-gray-500"
-					>
-						<PlusIcon class="h-4 w-4" />
-					</Button>
-				</Tooltip.Trigger>
-				<Tooltip.Content class="bg-gray-600 border-none">New Audiocast</Tooltip.Content>
-			</Tooltip.Root>
-		{/if}
 	</div>
 </nav>

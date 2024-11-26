@@ -11,6 +11,8 @@
 	import { page } from '$app/stores';
 	import Spinner from '@/components/Spinner.svelte';
 	import { setAppContext } from '@/stores/appContext.svelte';
+	import { onMount } from 'svelte';
+	import { getAnalytics, logEvent } from 'firebase/analytics';
 
 	export let data;
 
@@ -18,6 +20,13 @@
 
 	$: setAppContext();
 	$: setSessionContext(sessionId);
+
+	onMount(() => {
+		logEvent(getAnalytics(), 'page_view', {
+			page_title: 'Welcome',
+			page_path: '/'
+		});
+	});
 </script>
 
 <svelte:head>
@@ -28,22 +37,20 @@
 	<RootNav {sessionId} />
 
 	<div class="relative flex h-full w-full gap-x-2">
-		<span class="hidden md:block">
-			{#if browser}
+		{#if browser}
+			<span class="hidden md:block">
 				{#key sessionId}
 					<SearchSidebar />
 				{/key}
-			{/if}
-		</span>
+			</span>
 
-		{#if !browser}
-			<div class="-mt-16 flex h-full w-full items-center justify-center sm:-mt-24">
-				<Spinner />
-			</div>
-		{:else}
 			{#key sessionId}
 				<slot />
 			{/key}
+		{:else}
+			<div class="-mt-16 flex h-full w-full items-center justify-center sm:-mt-24">
+				<Spinner />
+			</div>
 		{/if}
 	</div>
 </div>

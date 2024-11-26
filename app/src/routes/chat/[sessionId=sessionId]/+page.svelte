@@ -1,3 +1,15 @@
+<script lang="ts" context="module">
+	export const FINAL_RESPONSE_PREFIX = 'Ok, thanks for clarifying!';
+	export const FINAL_RESPONSE_SUFFIX =
+		'Please click the button below to start generating the audiocast.';
+
+	export function getSummary(content: string) {
+		const replacePrefixRegex = new RegExp(FINAL_RESPONSE_PREFIX, 'gi');
+		const replaceSuffixRegex = new RegExp(FINAL_RESPONSE_SUFFIX, 'gi');
+		return content.replace(replacePrefixRegex, '').replace(replaceSuffixRegex, '').trim();
+	}
+</script>
+
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import ChatContainer from '@/components/ChatContainer.svelte';
@@ -6,10 +18,9 @@
 	import { env } from '@env';
 	import { uuid } from '@/utils/uuid';
 	import { streamingResponse } from '$lib/utils/streamingResponse';
-	import ChatListActionItems, {
-		FINAL_RESPONSE_SUFFIX
-	} from '@/components/ChatListActionItems.svelte';
+	import ChatListActionItems from '@/components/ChatListActionItems.svelte';
 	import { debounce } from 'throttle-debounce';
+	import AudiocastPageHeader from '@/components/AudiocastPageHeader.svelte';
 
 	export let data;
 
@@ -84,41 +95,30 @@
 
 <ChatContainer bind:searchTerm on:click={handleSearch} on:keypress={handleSearch}>
 	<div slot="content" class="block w-full">
-		<div class="mb-4 flex flex-col gap-y-2">
-			<span class="capitalize bg-gray-800 text-gray-300 w-fit py-1 px-3 rounded-md">
-				{data.category}
-			</span>
+		<AudiocastPageHeader category={data.category} title={$session$?.title} />
 
-			{#if $session$?.title}
-				<h1 class="text-2xl font-semibold text-sky-200 mb-4">{$session$.title}</h1>
-			{/if}
-		</div>
-		<p class="mt-6 p-3 bg-sky-950/70 text-sky-200 rounded-md mb-4 w-full">
+		<p class="mt-4 p-3 bg-sky-950/70 text-sky-200 rounded-md mb-4 w-full">
 			Help us understand your preferences to curate the best audiocast for you.
 		</p>
 
 		<div class="flex flex-col gap-y-3 h-full">
-			{#key sessionChats}
-				{#each sessionChats as item (item.id)}
-					{@const finalResponse = item.content.includes(FINAL_RESPONSE_SUFFIX)}
-					<ChatListItem type={item.role} content={item.content} loading={item.loading} />
+			{#each sessionChats as item (item.id)}
+				{@const finalResponse = item.content.includes(FINAL_RESPONSE_SUFFIX)}
+				<ChatListItem type={item.role} content={item.content} loading={item.loading} />
 
-					{#if finalResponse && $fetchingSource$}
-						<div
-							class="py-2 px-4 mx-auto w-fit bg-sky-600/20 animate-pulse text-sky-300 rounded-sm"
-						>
-							Generating Source Material...Please wait
-						</div>
-					{:else if finalResponse}
-						<ChatListActionItems
-							title={$session$?.title || 'Untitled'}
-							{sessionId}
-							{category}
-							content={item.content}
-						/>
-					{/if}
-				{/each}
-			{/key}
+				{#if finalResponse && $fetchingSource$}
+					<div class="py-2 px-4 mx-auto w-fit bg-sky-600/20 animate-pulse text-sky-300 rounded-sm">
+						Generating Source Material...Please wait
+					</div>
+				{:else if finalResponse}
+					<ChatListActionItems
+						title={$session$?.title || 'Untitled'}
+						{sessionId}
+						{category}
+						summary={getSummary(item.content)}
+					/>
+				{/if}
+			{/each}
 		</div>
 		<div class="h-24"></div>
 	</div>

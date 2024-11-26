@@ -1,14 +1,9 @@
-from datetime import datetime
-
 from fastapi import BackgroundTasks, HTTPException
 
 from src.services.storage import StorageManager
 from src.utils.audio_manager import AudioManager, AudioManagerConfig
 from src.utils.audiocast_script_maker import AudioScriptMaker
-from src.utils.audiocast_utils import (
-    GenerateAudioCastRequest,
-    GenerateAudioCastResponse,
-)
+from src.utils.audiocast_utils import GenerateAudioCastRequest
 from src.utils.chat_utils import ContentCategory
 from src.utils.custom_sources.base_utils import CustomSourceManager
 from src.utils.generate_audiocast_source import GenerateAudiocastSource, generate_audiocast_source
@@ -75,19 +70,6 @@ async def generate_audiocast(request: GenerateAudioCastRequest, background_tasks
             ),
         )
 
-    session_data = SessionManager.data(session_id)
-    source_content = session_data.metadata.source if session_data and session_data.metadata else None
-
-    if not source_content:
-        update_session_info("Generating source content...")
-        source_content = await generate_audiocast_source(
-            GenerateAudiocastSource(
-                sessionId=session_id,
-                category=category,
-                preferenceSummary=summary,
-            ),
-        )
-
     if not source_content:
         raise HTTPException(status_code=500, detail="Failed to generate source content")
 
@@ -116,8 +98,4 @@ async def generate_audiocast(request: GenerateAudioCastRequest, background_tasks
         audio_script,
     )
 
-    return GenerateAudioCastResponse(
-        script=audio_script,
-        source_content=source_content,
-        created_at=datetime.now().strftime("%Y-%m-%d %H:%M"),
-    )
+    return "Audiocast generated successfully!"

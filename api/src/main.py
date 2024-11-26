@@ -7,15 +7,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi_utilities import add_timer_middleware
 
-from src.services.storage import StorageManager
-from src.utils.chat_request import chat_request
-from src.utils.chat_utils import (
+from .services.storage import StorageManager
+from .utils.chat_request import chat_request
+from .utils.chat_utils import (
     SessionChatItem,
     SessionChatRequest,
 )
-from src.utils.custom_sources.base_utils import SourceContent
-from src.utils.custom_sources.extract_url_content import ExtractURLContent, ExtractURLContentRequest
-from src.utils.custom_sources.generate_url_source import (
+from .utils.custom_sources.base_utils import SourceContent
+from .utils.custom_sources.extract_url_content import ExtractURLContent, ExtractURLContentRequest
+from .utils.custom_sources.generate_url_source import (
     CustomSourceManager,
     CustomSourceModel,
     DeleteCustomSourcesRequest,
@@ -23,17 +23,13 @@ from src.utils.custom_sources.generate_url_source import (
     GetCustomSourcesRequest,
     generate_custom_source,
 )
-from src.utils.custom_sources.save_copied_source import CopiedPasteSourceRequest, save_copied_source
-from src.utils.custom_sources.save_uploaded_sources import UploadedFiles
-from src.utils.generate_audiocast import (
-    GenerateAudioCastRequest,
-    GenerateAudioCastResponse,
-    generate_audiocast,
-)
-from src.utils.generate_audiocast_source import GenerateAudiocastSource, generate_audiocast_source
-from src.utils.get_audiocast import get_audiocast
-from src.utils.get_session_title import GetSessionTitleModel, get_session_title
-from src.utils.session_manager import SessionManager
+from .utils.custom_sources.save_copied_source import CopiedPasteSourceRequest, save_copied_source
+from .utils.custom_sources.save_uploaded_sources import UploadedFiles
+from .utils.generate_audiocast import GenerateAudioCastRequest, generate_audiocast
+from .utils.generate_audiocast_source import GenerateAudiocastSource, generate_audiocast_source
+from .utils.get_audiocast import get_audiocast
+from .utils.get_session_title import GetSessionTitleModel, get_session_title
+from .utils.session_manager import SessionManager, SessionModel
 
 app = FastAPI(title="Audiora", version="1.0.0")
 
@@ -96,7 +92,7 @@ def chat_endpoint(
     return StreamingResponse(response, media_type="text/event-stream")
 
 
-@app.post("/audiocast/generate", response_model=GenerateAudioCastResponse)
+@app.post("/audiocast/generate", response_model=str)
 async def generate_audiocast_endpoint(
     request: GenerateAudioCastRequest,
     background_tasks: BackgroundTasks,
@@ -104,7 +100,7 @@ async def generate_audiocast_endpoint(
     return await generate_audiocast(request, background_tasks)
 
 
-@app.get("/audiocast/{session_id}", response_model=GenerateAudioCastResponse)
+@app.get("/audiocast/{session_id}", response_model=SessionModel)
 def get_audiocast_endpoint(session_id: str):
     result = get_audiocast(session_id)
     return result
