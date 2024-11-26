@@ -1,15 +1,3 @@
-<script lang="ts" context="module">
-	export const FINAL_RESPONSE_PREFIX = 'Ok, thanks for clarifying!';
-	export const FINAL_RESPONSE_SUFFIX =
-		'Please click the button below to start generating the audiocast.';
-
-	export function getSummary(content: string) {
-		const replacePrefixRegex = new RegExp(FINAL_RESPONSE_PREFIX, 'gi');
-		const replaceSuffixRegex = new RegExp(FINAL_RESPONSE_SUFFIX, 'gi');
-		return content.replace(replacePrefixRegex, '').replace(replaceSuffixRegex, '').trim();
-	}
-</script>
-
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import ChatContainer from '@/components/ChatContainer.svelte';
@@ -21,6 +9,7 @@
 	import ChatListActionItems from '@/components/ChatListActionItems.svelte';
 	import { debounce } from 'throttle-debounce';
 	import AudiocastPageHeader from '@/components/AudiocastPageHeader.svelte';
+	import { getSummary, isfinalResponse } from '@/utils/session.utils';
 
 	export let data;
 
@@ -103,7 +92,7 @@
 
 		<div class="flex flex-col gap-y-3 h-full">
 			{#each sessionChats as item (item.id)}
-				{@const finalResponse = item.content.includes(FINAL_RESPONSE_SUFFIX)}
+				{@const finalResponse = isfinalResponse(item)}
 				<ChatListItem type={item.role} content={item.content} loading={item.loading} />
 
 				{#if finalResponse && $fetchingSource$}

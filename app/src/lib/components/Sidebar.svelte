@@ -63,7 +63,7 @@
 	style="transition: width 0.3s cubic-bezier(0.34, 1.47, 0.64, 1), padding 0.3s ease;"
 >
 	<nav
-		class={cs('flex w-full flex-col gap-x-2 lg:gap-x-0 lg:gap-y-1', {
+		class={cs('flex w-full flex-col gap-x-2 pt-2 lg:gap-x-0 lg:gap-y-1', {
 			'opacity-100': $openSettingsDrawer$,
 			'opacity-0': !$openSettingsDrawer$
 		})}

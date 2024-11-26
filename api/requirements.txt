@@ -1,37 +1,37 @@
-anthropic
-
-asyncio
-elevenlabs
 fastapi
+uvicorn
+gunicorn
+uvloop
 fastapi-utilities
-ffmpeg-python
 
 firebase-admin
 google-api-python-client
 google-auth
 google-cloud-storage
 google-generativeai
-gunicorn
-httpx
 
+asyncio
+httpx
+redis[hiredis]
+
+anthropic
+elevenlabs
 openai
 
 pycairo
 pydantic
 pydub
+pypdf[crypto]
 python-dotenv
+ffmpeg-python
 python-multipart
 python-slugify
 
 ruff
 seewav
 setuptools
-uvicorn
-uvloop
-redis[hiredis]
 
-async-web-search
 
 lxml 
 beautifulsoup4 
-pypdf[crypto]
+async-web-search
