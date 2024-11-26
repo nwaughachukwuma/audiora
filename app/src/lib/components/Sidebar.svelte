@@ -8,7 +8,7 @@
 	import { createEventDispatcher } from 'svelte';
 	import { browser } from '$app/environment';
 	import { type Session, SESSION_KEY, getSessionContext } from '../stores/sessionContext.svelte';
-	import SearchSidebarItem from './SidebarItem.svelte';
+	import SidebarItem from './SidebarItem.svelte';
 	import { getAppContext } from '../stores/appContext.svelte';
 	import HeadphoneOff from 'lucide-svelte/icons/headphone-off';
 	import cs from 'clsx';
@@ -86,21 +86,21 @@
 		<div class="flex w-full flex-col gap-y-1.5 pt-2" class:hidden={!inLast24Hrs.length}>
 			<div class="px-2 text-sm font-medium">Today</div>
 			{#each inLast24Hrs as item}
-				<SearchSidebarItem {item} on:click={dispatchClickItem} />
+				<SidebarItem {item} on:click={dispatchClickItem} />
 			{/each}
 		</div>
 
 		<div class="flex w-full flex-col gap-y-1.5 pt-6" class:hidden={!inLast7Days.length}>
 			<div class="px-2 text-sm font-medium">Last 7 days</div>
 			{#each inLast7Days as item}
-				<SearchSidebarItem {item} on:click={dispatchClickItem} />
+				<SidebarItem {item} on:click={dispatchClickItem} />
 			{/each}
 		</div>
 
 		<div class="flex w-full flex-col gap-y-1.5 pt-6" class:hidden={!inLast30Days.length}>
 			<div class="px-2 text-sm font-medium">Last month</div>
 			{#each inLast30Days as item}
-				<SearchSidebarItem {item} on:click={dispatchClickItem} />
+				<SidebarItem {item} on:click={dispatchClickItem} />
 			{/each}
 		</div>
 		<div class="block h-20"></div>

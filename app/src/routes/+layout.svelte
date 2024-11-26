@@ -7,7 +7,7 @@
 	import { Toaster } from '$lib/components/ui/sonner';
 	import { setSessionContext } from '@/stores/sessionContext.svelte';
 	import RootNav from '@/components/RootNav.svelte';
-	import SearchSidebar from '@/components/Sidebar.svelte';
+	import Sidebar from '@/components/Sidebar.svelte';
 	import { page } from '$app/stores';
 	import Spinner from '@/components/Spinner.svelte';
 	import { setAppContext } from '@/stores/appContext.svelte';
@@ -39,9 +39,7 @@
 	<div class="relative flex h-full w-full gap-x-2">
 		{#if browser}
 			<span class="hidden md:block">
-				{#key sessionId}
-					<SearchSidebar />
-				{/key}
+				<Sidebar />
 			</span>
 
 			{#key sessionId}

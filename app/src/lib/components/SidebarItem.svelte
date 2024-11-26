@@ -1,6 +1,6 @@
 <script lang="ts" context="module">
 	import type { ContentCategory } from '@/utils/types';
-	export type SearchSidebarItem = {
+	export type SidebarItemModel = {
 		title: string;
 		nonce: number;
 		sessionId: string;
@@ -16,7 +16,7 @@
 	import { Button } from './ui/button';
 	import { cn } from '@/utils/ui.utils';
 
-	export let item: SearchSidebarItem;
+	export let item: SidebarItemModel;
 
 	const [send, receive] = crossfade({
 		duration: 250,
