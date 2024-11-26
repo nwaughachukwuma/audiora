@@ -1,14 +1,27 @@
+import asyncio
+
 from fastapi import BackgroundTasks, HTTPException
 
 from src.services.storage import StorageManager
-from src.utils.audio_manager import AudioManager, AudioManagerConfig
-from src.utils.audiocast_script_maker import AudioScriptMaker
-from src.utils.audiocast_utils import GenerateAudioCastRequest
-from src.utils.chat_utils import ContentCategory
-from src.utils.custom_sources.base_utils import CustomSourceManager
-from src.utils.generate_audiocast_source import GenerateAudiocastSource, generate_audiocast_source
-from src.utils.session_manager import SessionManager
-from src.utils.waveform_utils import WaveformUtils
+
+from .audio_manager import AudioManager, AudioManagerConfig
+from .audiocast_script_maker import AudioScriptMaker
+from .audiocast_utils import GenerateAudioCastRequest
+from .chat_utils import ContentCategory
+from .custom_sources.base_utils import CustomSourceManager
+from .generate_audiocast_source import GenerateAudiocastSource, generate_audiocast_source
+from .session_manager import SessionManager
+from .waveform_utils import WaveformUtils
+
+
+class GenerateAudiocastException(HTTPException):
+    name = "GenerateAudiocastException"
+
+    def __init__(self, detail: str, session_id: str, category: ContentCategory, status_code=500):
+        self.detail = detail
+        self.status_code = status_code
+        self.session_id = session_id
+        self.category = category
 
 
 def compile_custom_sources(session_id: str):
@@ -39,25 +52,36 @@ def post_generate_audio(
 
 
 async def generate_audiocast(request: GenerateAudioCastRequest, background_tasks: BackgroundTasks):
-    """## Generate audiocast based on a summary of user's request
-
-    ### Steps:
-    1. Generate source content
-    2. Generate audio script
-    3. Generate audio
-    4. a) Store audio. b) Store the audio waveform on GCS
-    5. Update session
-    """
+    """## Generate audiocast based on a summary of user's request"""
     summary = request.summary
     category = request.category
     session_id = request.sessionId
 
     db = SessionManager(session_id, category)
+    session_data = SessionManager.data(session_id)
+
+    if not session_data:
+        raise GenerateAudiocastException(
+            status_code=404,
+            detail=f"Audiocast data not found for session_id: {session_id}",
+            session_id=session_id,
+            category=category,
+        )
+
+    if session_data.status == "completed":
+        return "Audiocast already generated!"
+    elif session_data.status == "generating":
+        print(f"Queueing the current audio generation request>>>>\n\nSessionId: {session_id}")
+
+        background_tasks.add_task(generate_audiocast, request, background_tasks)
+        await asyncio.sleep(5)
+        return "Audiocast generation already in progress!"
+
+    db._update({"status": "generating"})
 
     def update_session_info(info: str):
         db._update_info(info)
 
-    session_data = SessionManager.data(session_id)
     source_content = session_data.metadata.source if session_data and session_data.metadata else None
 
     if not source_content:
@@ -71,7 +95,12 @@ async def generate_audiocast(request: GenerateAudioCastRequest, background_tasks
         )
 
     if not source_content:
-        raise HTTPException(status_code=500, detail="Failed to generate source content")
+        raise GenerateAudiocastException(
+            status_code=500,
+            detail="Failed to generate source content",
+            session_id=session_id,
+            category=category,
+        )
 
     # get custom sources
     update_session_info("Checking for custom sources...")
@@ -83,7 +112,12 @@ async def generate_audiocast(request: GenerateAudioCastRequest, background_tasks
     audio_script = script_maker.create(provider="gemini")
 
     if not audio_script:
-        raise HTTPException(status_code=500, detail="Failed to generate audio script")
+        raise GenerateAudiocastException(
+            status_code=500,
+            detail="Failed to generate audio script",
+            session_id=session_id,
+            category=category,
+        )
 
     # Generate audio
     update_session_info("Generating audio...")
@@ -97,6 +131,7 @@ async def generate_audiocast(request: GenerateAudioCastRequest, background_tasks
         audio_path,
         audio_script,
     )
-    db._update({"completed": True})
+
+    db._update({"status": "completed"})
 
     return "Audiocast generated successfully!"
