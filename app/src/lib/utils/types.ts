@@ -25,6 +25,7 @@ export interface SessionModel {
 	id: string;
 	category: ContentCategory;
 	chats: Array<SessionChatItem>;
+	completed?: boolean;
 	metadata?: ChatMetadata;
 	created_at?: string;
 }

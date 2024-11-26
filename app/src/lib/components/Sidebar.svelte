@@ -25,11 +25,12 @@
 
 	$: sidebarItems = sessionItems
 		.filter(([_, item]) => item.chats.length)
-		.map(([sessionId, item]) => ({
+		.map(([sessionId, session]) => ({
 			sessionId,
-			title: item.title || 'Untitled',
-			nonce: item.nonce,
-			category: item.category
+			title: session.title || 'Untitled',
+			nonce: session.nonce,
+			category: session.category,
+			completed: session.completed
 		}))
 		.sort((a, b) => b.nonce - a.nonce);
 

@@ -26,6 +26,7 @@ class SessionModel:
     chats: List[SessionChatItem]
     metadata: Optional[ChatMetadata]
     created_at: Optional[str] = None
+    completed: Optional[bool] = None
 
 
 class SessionManager(DBManager):

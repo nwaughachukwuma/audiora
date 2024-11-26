@@ -5,6 +5,7 @@
 		nonce: number;
 		sessionId: string;
 		category: ContentCategory;
+		completed?: boolean;
 	};
 </script>
 
@@ -22,7 +23,9 @@
 		easing: cubicInOut
 	});
 
-	$: href = `/chat/${item.sessionId}?category=${item.category}`;
+	$: href = item.completed
+		? `/audiocast/${item.sessionId}`
+		: `/chat/${item.sessionId}?category=${item.category}`;
 	$: isActive = $page.url.href.includes(item.sessionId);
 </script>
 

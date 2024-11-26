@@ -97,5 +97,6 @@ async def generate_audiocast(request: GenerateAudioCastRequest, background_tasks
         audio_path,
         audio_script,
     )
+    db._update({"completed": True})
 
     return "Audiocast generated successfully!"
