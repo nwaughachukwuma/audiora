@@ -25,7 +25,6 @@
 	import AudiocastPageSkeletonLoader from '@/components/AudiocastPageSkeletonLoader.svelte';
 	import RenderAudioSources from '@/components/RenderAudioSources.svelte';
 	import AudiocastPageHeader from '@/components/AudiocastPageHeader.svelte';
-	import { startWith, tap, switchMap, of } from 'rxjs';
 
 	export let data;
 
@@ -36,12 +35,7 @@
 	$: sessionId = $page.params.sessionId;
 	$: $customSources$;
 
-	$: sessionModel = data.sessionModel;
-	$: sessionModel$.pipe(
-		switchMap((v) => of(v)),
-		tap((v) => v && (sessionModel = v)),
-		startWith(data.sessionModel)
-	);
+	$: sessionModel = $sessionModel$ || data.sessionModel;
 	$: sessionTitle = sessionModel.metadata?.title || 'Untitled';
 
 	async function generateAudiocast(sessionId: string, category: ContentCategory, summary: string) {
@@ -105,20 +99,6 @@
 			</RenderMedia>
 
 			<Accordion.Root>
-				<Accordion.Item value="item-0" class="border-gray-800">
-					<Accordion.Trigger>Show Waveform</Accordion.Trigger>
-					<Accordion.Content>
-						<RenderMedia filename="{sessionId}.mp4" let:uri>
-							<video controls class="w-full h-64 animate-fade-in block">
-								<source src={uri} type="video/mp4" />
-								Your browser does not support the video element.
-
-								<track kind="captions" />
-							</video>
-						</RenderMedia>
-					</Accordion.Content>
-				</Accordion.Item>
-
 				{#if sessionModel.metadata?.transcript}
 					<Accordion.Item value="item-1" class="border-gray-800">
 						<Accordion.Trigger>Audio Transcript</Accordion.Trigger>
@@ -137,6 +117,20 @@
 				{#if sessionModel.metadata?.source}
 					<RenderAudioSources aiSource={sessionModel.metadata.source} />
 				{/if}
+
+				<Accordion.Item value="item-0" class="border-gray-800">
+					<Accordion.Trigger>Show Waveform</Accordion.Trigger>
+					<Accordion.Content>
+						<RenderMedia filename="{sessionId}.mp4" let:uri>
+							<video controls class="w-full h-64 animate-fade-in block">
+								<source src={uri} type="video/mp4" />
+								Your browser does not support the video element.
+
+								<track kind="captions" />
+							</video>
+						</RenderMedia>
+					</Accordion.Content>
+				</Accordion.Item>
 			</Accordion.Root>
 
 			<AudiocastPageAction {sessionId} {sessionTitle} on:showChats>
