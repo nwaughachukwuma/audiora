@@ -12,6 +12,8 @@
 	import { getAppContext } from '../stores/appContext.svelte';
 	import HeadphoneOff from 'lucide-svelte/icons/headphone-off';
 	import cs from 'clsx';
+	import { page } from '$app/stores';
+	import NewAudiocastButton from './NewAudiocastButton.svelte';
 
 	const dispatch = createEventDispatcher<{ clickItem: void }>();
 
@@ -48,6 +50,8 @@
 	function dispatchClickItem() {
 		dispatch('clickItem');
 	}
+
+	$: rootPath = $page.url.pathname === '/';
 </script>
 
 <div
@@ -65,15 +69,17 @@
 		style="transition: opacity 0.1s ease"
 		data-sveltekit-preload-data
 	>
-		{#if $openSettingsDrawer$}
-			{#if !inLast24Hrs.length && !inLast7Days.length && !inLast30Days.length}
-				<div class="flex w-full h-screen items-center animate-fade-in">
-					<div class="-mt-16 flex flex-col text-gray-300 items-center">
-						<HeadphoneOff class="w-14 h-14" />
-						<span class="px-2 mt-3 font-medium">Your audiocasts will appear here</span>
-					</div>
+		{#if !rootPath}
+			<NewAudiocastButton />
+		{/if}
+
+		{#if !inLast24Hrs.length && !inLast7Days.length && !inLast30Days.length}
+			<div class="flex w-full h-screen items-center animate-fade-in">
+				<div class="-mt-16 flex flex-col text-gray-300 items-center">
+					<HeadphoneOff class="w-14 h-14" />
+					<span class="px-2 mt-3 font-medium">Your audiocasts will appear here</span>
 				</div>
-			{/if}
+			</div>
 		{/if}
 
 		<div class="flex w-full flex-col gap-y-1.5 pt-2" class:hidden={!inLast24Hrs.length}>

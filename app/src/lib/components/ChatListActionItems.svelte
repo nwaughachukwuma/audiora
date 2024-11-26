@@ -1,9 +1,3 @@
-<script context="module">
-	export const FINAL_RESPONSE_PREFIX = 'Ok, thanks for clarifying!';
-	export const FINAL_RESPONSE_SUFFIX =
-		'Please click the button below to start generating the audiocast.';
-</script>
-
 <script lang="ts">
 	import { goto } from '$app/navigation';
 	import type { ContentCategory } from '@/utils/types';
@@ -19,28 +13,26 @@
 
 	export let sessionId: string;
 	export let category: ContentCategory;
-	export let content: string;
+	export let summary: string;
 	export let title: string;
 
 	const { session$, audioSource$, fetchingSource$, sessionId$, sessionCompleted$ } =
 		getSessionContext();
 
-	function getSummary() {
-		const replacePrefixRegex = new RegExp(FINAL_RESPONSE_PREFIX, 'gi');
-		const replaceSuffixRegex = new RegExp(FINAL_RESPONSE_SUFFIX, 'gi');
-		return content.replace(replacePrefixRegex, '').replace(replaceSuffixRegex, '').trim();
-	}
-
 	async function ongenerate(summary: string) {
 		session$.update((session) => {
 			if (!session) throw new Error('Session not found');
-
-			session.completed = true;
 			session.summary = summary;
 			return session;
 		});
 
-		return goto(`/audiocast/${sessionId}`, { replaceState: true });
+		return goto(`/audiocast/${sessionId}`, { replaceState: true }).then(() => {
+			session$.update((session) => {
+				if (!session) throw new Error('Session not found');
+				session.completed = true;
+				return session;
+			});
+		});
 	}
 
 	async function onreviewSource(category: ContentCategory, summary: string) {
@@ -77,7 +69,7 @@
 			body: JSON.stringify({
 				sessionId,
 				category,
-				summary: getSummary()
+				summary
 			}),
 			headers: { 'Content-Type': 'application/json' }
 		})
@@ -129,7 +121,7 @@
 		<div class="animate-fade-in grid sm:grid-cols-2 gap-3">
 			<Button
 				class="bg-emerald-600 text-emerald-100 text-base py-6 hover:bg-emerald-700"
-				on:click={() => ongenerate(getSummary())}>Generate Audiocast</Button
+				on:click={() => ongenerate(summary)}>Generate Audiocast</Button
 			>
 
 			{#if $audioSource$}
@@ -138,7 +130,7 @@
 				<Button
 					variant="ghost"
 					class="bg-gray-800 py-6 text-base hover:bg-gray-700 text-emerald-600 hover:text-emerald-600"
-					on:click={() => onreviewSource(category, getSummary())}
+					on:click={() => onreviewSource(category, summary)}
 				>
 					Review Source
 				</Button>
