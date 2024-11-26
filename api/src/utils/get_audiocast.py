@@ -1,11 +1,8 @@
-from datetime import datetime
-
 from fastapi import HTTPException
 
 from src.services.storage import StorageManager
 
 from .decorators import process_time
-from .generate_audiocast import GenerateAudioCastResponse
 from .session_manager import SessionManager
 
 
@@ -31,8 +28,4 @@ def get_audiocast(session_id: str):
             detail=f"Audiocast not found for session_id: {session_id}",
         )
 
-    created_at = None
-    if session_data.created_at:
-        created_at = datetime.fromisoformat(session_data.created_at).strftime("%Y-%m-%d %H:%M")
-
-    return GenerateAudioCastResponse(created_at=created_at)
+    return session_data.__dict__

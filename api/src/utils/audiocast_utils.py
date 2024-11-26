@@ -11,10 +11,6 @@ class GenerateAudioCastRequest(BaseModel):
     category: ContentCategory
 
 
-class GenerateAudioCastResponse(BaseModel):
-    created_at: str | None
-
-
 class GenerateAudiocastDict(TypedDict):
     url: str
     script: str
