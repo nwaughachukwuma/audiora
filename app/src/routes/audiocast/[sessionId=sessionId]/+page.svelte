@@ -7,8 +7,6 @@
 	};
 
 	type GenerateAudiocastResponse = {
-		script: string;
-		source_content: string;
 		created_at?: string;
 	};
 
@@ -59,10 +57,10 @@
 	async function getAudiocast(sessionId: string) {
 		return fetch(`${env.API_BASE_URL}/audiocast/${sessionId}`).then<GenerateAudiocastResponse>(
 			(res) => {
-				if (res.status === 404 && $session$?.summary) {
-					const { summary, category } = $session$;
-					return generateAudiocast(sessionId, category, summary);
-				} else if (res.ok) return res.json();
+				if (res.ok) return res.json();
+				else if (res.status === 404 && $session$?.summary) {
+					return generateAudiocast(sessionId, $session$.category, $session$.summary);
+				}
 
 				throw new Error('Failed to get audiocast');
 			}
@@ -117,20 +115,22 @@
 					</Accordion.Content>
 				</Accordion.Item>
 
-				<Accordion.Item value="item-1" class="border-gray-800">
-					<Accordion.Trigger>Audio Transcript</Accordion.Trigger>
-					<Accordion.Content>
-						<article
-							class="flex max-h-96 overflow-y-auto w-full flex-col gap-y-3 p-2 bg-gray-900/70 text-gray-300"
-						>
-							{#await parse(parseScript(data.script)) then parsedContent}
-								{@html parsedContent}
-							{/await}
-						</article>
-					</Accordion.Content>
-				</Accordion.Item>
+				{#if sessionModel?.metadata}
+					<Accordion.Item value="item-1" class="border-gray-800">
+						<Accordion.Trigger>Audio Transcript</Accordion.Trigger>
+						<Accordion.Content>
+							<article
+								class="flex max-h-96 overflow-y-auto w-full flex-col gap-y-3 p-2 bg-gray-900/70 text-gray-300"
+							>
+								{#await parse(parseScript(sessionModel.metadata.transcript)) then parsedContent}
+									{@html parsedContent}
+								{/await}
+							</article>
+						</Accordion.Content>
+					</Accordion.Item>
 
-				<RenderAudioSources aiSource={data.source_content} />
+					<RenderAudioSources aiSource={sessionModel.metadata.source} />
+				{/if}
 			</Accordion.Root>
 
 			{#if sessionModel}

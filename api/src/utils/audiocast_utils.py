@@ -12,8 +12,6 @@ class GenerateAudioCastRequest(BaseModel):
 
 
 class GenerateAudioCastResponse(BaseModel):
-    script: str
-    source_content: str
     created_at: str | None
 
 

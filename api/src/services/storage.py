@@ -31,7 +31,7 @@ class UploadItemParams:
 
 
 class StorageManager:
-    def check_blob_exists(self, root_path: str, filename: str):
+    def check_blob_exists(self, filename: str, root_path=BLOB_BASE_URI):
         """check if a file exists in the bucket"""
         blobname = f"{root_path}/{filename}"
         blobs = listBlobs(prefix=root_path)

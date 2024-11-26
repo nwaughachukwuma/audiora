@@ -103,8 +103,4 @@ async def generate_audiocast(request: GenerateAudioCastRequest, background_tasks
         audio_script,
     )
 
-    return GenerateAudioCastResponse(
-        script=audio_script,
-        source_content=source_content,
-        created_at=datetime.now().strftime("%Y-%m-%d %H:%M"),
-    )
+    return GenerateAudioCastResponse(created_at=datetime.now().strftime("%Y-%m-%d %H:%M"))
