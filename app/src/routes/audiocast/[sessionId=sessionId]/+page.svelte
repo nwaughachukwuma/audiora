@@ -25,7 +25,7 @@
 	import AudiocastPageSkeletonLoader from '@/components/AudiocastPageSkeletonLoader.svelte';
 	import RenderAudioSources from '@/components/RenderAudioSources.svelte';
 	import AudiocastPageHeader from '@/components/AudiocastPageHeader.svelte';
-	import { startWith, tap } from 'rxjs';
+	import { startWith, tap, switchMap, of } from 'rxjs';
 
 	export let data;
 
@@ -38,6 +38,7 @@
 
 	$: sessionModel = data.sessionModel;
 	$: sessionModel$.pipe(
+		switchMap((v) => of(v)),
 		tap((v) => v && (sessionModel = v)),
 		startWith(data.sessionModel)
 	);
@@ -63,7 +64,7 @@
 		return fetch(`${env.API_BASE_URL}/audiocast/${sessionId}`).then<SessionModel>((res) => {
 			if (res.ok) return res.json();
 			else if (res.status === 404 && $session$?.summary) {
-				return generateAudiocast(sessionId, $session$.category, $session$.summary);
+				return generateAudiocast(sessionId, sessionModel.category, $session$.summary);
 			}
 
 			throw new Error('Failed to get audiocast');
@@ -71,11 +72,13 @@
 	}
 </script>
 
-<div class="mx-auto flex h-full w-full pb-40 overflow-auto mt-6 flex-col items-center px-2 sm:px-1">
-	<AudiocastPageHeader session={sessionModel} />
+<div
+	class="mx-auto sm:max-w-xl lg:max-w-3xl max-w-full flex h-full w-full pb-40 overflow-auto flex-col items-center max-sm:px-4"
+>
+	<AudiocastPageHeader category={sessionModel.category} title={sessionModel.metadata?.title} />
 
 	{#await getAudiocast(sessionId)}
-		<div class="flex flex-col w-full items-center justify-center -mt-6">
+		<div class="flex flex-col w-full">
 			<AudiocastPageSkeletonLoader />
 
 			{#if generating}
@@ -93,7 +96,7 @@
 			{/if}
 		</div>
 	{:then}
-		<div class="flex w-full px-4 flex-col gap-y-3 sm:max-w-xl lg:max-w-3xl max-w-full">
+		<div class="flex w-full mt-4 flex-col gap-y-3">
 			<RenderMedia filename={sessionId} let:uri>
 				<audio controls class="w-full animate-fade-in block">
 					<source src={uri} type="audio/mpeg" />
@@ -116,7 +119,7 @@
 					</Accordion.Content>
 				</Accordion.Item>
 
-				{#if sessionModel.metadata}
+				{#if sessionModel.metadata?.transcript}
 					<Accordion.Item value="item-1" class="border-gray-800">
 						<Accordion.Trigger>Audio Transcript</Accordion.Trigger>
 						<Accordion.Content>
@@ -129,7 +132,9 @@
 							</article>
 						</Accordion.Content>
 					</Accordion.Item>
+				{/if}
 
+				{#if sessionModel.metadata?.source}
 					<RenderAudioSources aiSource={sessionModel.metadata.source} />
 				{/if}
 			</Accordion.Root>

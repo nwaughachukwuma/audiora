@@ -20,6 +20,7 @@
 	import { streamingResponse } from '$lib/utils/streamingResponse';
 	import ChatListActionItems from '@/components/ChatListActionItems.svelte';
 	import { debounce } from 'throttle-debounce';
+	import AudiocastPageHeader from '@/components/AudiocastPageHeader.svelte';
 
 	export let data;
 
@@ -94,16 +95,9 @@
 
 <ChatContainer bind:searchTerm on:click={handleSearch} on:keypress={handleSearch}>
 	<div slot="content" class="block w-full">
-		<div class="mb-4 flex flex-col gap-y-2">
-			<span class="capitalize bg-gray-800 text-gray-300 w-fit py-1 px-3 rounded-md">
-				{data.category}
-			</span>
+		<AudiocastPageHeader category={data.category} title={$session$?.title} />
 
-			{#if $session$?.title}
-				<h1 class="text-2xl font-semibold text-sky-200 mb-4">{$session$.title}</h1>
-			{/if}
-		</div>
-		<p class="mt-6 p-3 bg-sky-950/70 text-sky-200 rounded-md mb-4 w-full">
+		<p class="mt-4 p-3 bg-sky-950/70 text-sky-200 rounded-md mb-4 w-full">
 			Help us understand your preferences to curate the best audiocast for you.
 		</p>
 
