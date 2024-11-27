@@ -1,3 +1,4 @@
+import { browser } from '$app/environment';
 import { getCustomSources$ } from '@/db/db.customSources';
 import { getSession$ } from '@/db/db.session';
 import type { ContentCategory } from '@/utils/types';
@@ -25,6 +26,15 @@ export type Session = {
 	summary?: string;
 };
 
+export function getSessionItems() {
+	return Object.entries(localStorage)
+		.filter(([key]) => key.startsWith(SESSION_KEY))
+		.map(
+			([key, value]) => [key.replace(`${SESSION_KEY}_`, ''), JSON.parse(value) as Session] as const
+		)
+		.filter(([_, v]) => Boolean(v));
+}
+
 export function setSessionContext(sessionId: string) {
 	const session$ = persisted<Session | null>(`${SESSION_KEY}_${sessionId}`, null);
 	const sessionId$ = writable(sessionId);
@@ -32,6 +42,8 @@ export function setSessionContext(sessionId: string) {
 
 	const fetchingSource$ = writable(false);
 	const audioSource$ = persisted<string>(`AUDIOCAST_SOURCE_${sessionId}`, '');
+
+	const sessionItems$ = derived(session$, (v) => (browser || v ? getSessionItems() : []));
 
 	return setContext(CONTEXT_KEY, {
 		session$,
@@ -41,6 +53,7 @@ export function setSessionContext(sessionId: string) {
 		audioSource$,
 		customSources$: getCustomSources$(sessionId),
 		sessionModel$: getSession$(sessionId),
+		sessionItems$,
 		startSession: (category: ContentCategory) => {
 			session$.set({
 				id: sessionId,

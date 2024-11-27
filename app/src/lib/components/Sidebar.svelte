@@ -6,8 +6,7 @@
 
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
-	import { browser } from '$app/environment';
-	import { type Session, SESSION_KEY, getSessionContext } from '../stores/sessionContext.svelte';
+	import { getSessionContext } from '../stores/sessionContext.svelte';
 	import SidebarItem from './SidebarItem.svelte';
 	import { getAppContext } from '../stores/appContext.svelte';
 	import HeadphoneOff from 'lucide-svelte/icons/headphone-off';
@@ -18,12 +17,9 @@
 	const dispatch = createEventDispatcher<{ clickItem: void }>();
 
 	const { openSettingsDrawer$ } = getAppContext();
+	const { sessionItems$ } = getSessionContext();
 
-	$: ({ session$ } = getSessionContext());
-
-	$: sessionItems = browser || $session$ ? getSessionItems() : [];
-
-	$: sidebarItems = sessionItems
+	$: sidebarItems = $sessionItems$
 		.filter(([_, item]) => item.chats.length)
 		.map(([sessionId, session]) => ({
 			sessionId,
@@ -37,16 +33,6 @@
 	$: inLast24Hrs = sidebarItems.filter((i) => i.nonce > last24Hrs);
 	$: inLast7Days = sidebarItems.filter((i) => i.nonce < last24Hrs && i.nonce > last7Days);
 	$: inLast30Days = sidebarItems.filter((i) => i.nonce < last24Hrs && i.nonce < last7Days);
-
-	function getSessionItems() {
-		return Object.entries(localStorage)
-			.filter(([key]) => key.startsWith(SESSION_KEY))
-			.map(
-				([key, value]) =>
-					[key.replace(`${SESSION_KEY}_`, ''), JSON.parse(value) as Session] as const
-			)
-			.filter(([_, v]) => Boolean(v));
-	}
 
 	function dispatchClickItem() {
 		dispatch('clickItem');
