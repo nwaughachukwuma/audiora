@@ -21,14 +21,14 @@
 		searchTerm = '';
 	}
 
-	function continueChat(category: ContentCategory) {
+	async function continueChat(category: ContentCategory) {
 		startSession(category);
 		
 		const content = `${selectContent}\nCategory: ${category} `;
 		addChatItem({ id: uuid(), content, role: 'user', loading: false });
 
-		const href = `/chat/${sessionId}?category=${category}`;
-		goto(href);
+		const href = `/chat/${sessionId}?category=${category}&chat`;
+		return goto(href, { invalidateAll: true, replaceState: true });
 	}
 </script>
 

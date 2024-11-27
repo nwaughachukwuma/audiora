@@ -1,23 +1,15 @@
 <script lang="ts">
 	import * as AlertDialog from './ui/alert-dialog';
 	import { Trash } from 'lucide-svelte';
-	import { goto } from '$app/navigation';
-	import { SESSION_KEY } from '@/stores/sessionContext.svelte';
-	import { env } from '@env';
+	import { createEventDispatcher } from 'svelte';
 
-	export let sessionId: string;
+	const dispatch = createEventDispatcher<{ deleteSession: void }>();
 
 	let openDialog = false;
 
-	async function deleteSession() {
-		localStorage.removeItem(`${SESSION_KEY}_${sessionId}`);
-
-		void fetch(`${env.API_BASE_URL}/delete-session/${sessionId}`, {
-			method: 'DELETE'
-		}).catch(() => {});
-
+	function dispatchDeleteSession() {
+		dispatch('deleteSession');
 		openDialog = false;
-		return goto('/', { invalidateAll: true, replaceState: true });
 	}
 </script>
 
@@ -44,7 +36,7 @@
 				<AlertDialog.Cancel on:click={() => (openDialog = false)}>Cancel</AlertDialog.Cancel>
 				<AlertDialog.Action
 					class="bg-red-700 text-red-100 hover:bg-red-600"
-					on:click={deleteSession}
+					on:click={dispatchDeleteSession}
 				>
 					Continue
 				</AlertDialog.Action>

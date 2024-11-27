@@ -54,5 +54,5 @@
 		{item.category}
 	</div>
 
-	<SidebarItemActions sessionId={item.sessionId} />
+	<SidebarItemActions on:deleteSession />
 </Button>
