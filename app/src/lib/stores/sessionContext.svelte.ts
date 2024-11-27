@@ -1,9 +1,11 @@
+import { browser } from '$app/environment';
+import { page } from '$app/stores';
 import { getCustomSources$ } from '@/db/db.customSources';
 import { getSession$ } from '@/db/db.session';
 import type { ContentCategory } from '@/utils/types';
 import { setContext, getContext } from 'svelte';
 import { persisted } from 'svelte-persisted-store';
-import { derived, writable } from 'svelte/store';
+import { derived, get, writable } from 'svelte/store';
 
 const CONTEXT_KEY = {};
 export const SESSION_KEY = 'AUDIOCAST_SESSION';
@@ -26,12 +28,14 @@ export type Session = {
 };
 
 export function setSessionContext(sessionId: string) {
-	const session$ = persisted<Session | null>(`${SESSION_KEY}_${sessionId}`, null);
 	const sessionId$ = writable(sessionId);
+	const session$ = persisted<Session | null>(`${SESSION_KEY}_${sessionId}`, null);
 	const sessionCompleted$ = derived(session$, ($session) => !!$session?.completed);
 
 	const fetchingSource$ = writable(false);
 	const audioSource$ = persisted<string>(`AUDIOCAST_SOURCE_${sessionId}`, '');
+
+	const refreshSidebar$ = derived(page, ({ url }) => browser && url.searchParams.has('chat'));
 
 	return setContext(CONTEXT_KEY, {
 		session$,
@@ -41,6 +45,7 @@ export function setSessionContext(sessionId: string) {
 		audioSource$,
 		customSources$: getCustomSources$(sessionId),
 		sessionModel$: getSession$(sessionId),
+		refreshSidebar$,
 		startSession: (category: ContentCategory) => {
 			session$.set({
 				id: sessionId,

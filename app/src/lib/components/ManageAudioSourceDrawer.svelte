@@ -77,8 +77,8 @@
 
 <Drawer.Root {snapPoints} bind:activeSnapPoint direction="bottom" dismissible shouldScaleBackground>
 	<Drawer.Trigger>
-		<Button variant="ghost" class="bg-gray-800 text-base py-6 w-full hover:bg-gray-700 text-white"
-			>Manage Audiocast Sources
+		<Button variant="ghost" class="bg-gray-800 text-base py-6 w-full hover:bg-gray-700 text-white">
+			Manage Sources
 		</Button>
 	</Drawer.Trigger>
 

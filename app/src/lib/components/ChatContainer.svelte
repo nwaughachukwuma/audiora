@@ -1,11 +1,17 @@
 <script>
 	import { getSessionContext } from '@/stores/sessionContext.svelte';
 	import ChatBoxContainer from './ChatBoxContainer.svelte';
+	import { isfinalResponse } from '@/utils/session.utils';
 
 	export let searchTerm = '';
 	export let disableTextInput = false;
-	const { sessionCompleted$, fetchingSource$, audioSource$ } = getSessionContext();
+
+	const { sessionCompleted$, fetchingSource$, audioSource$, session$ } = getSessionContext();
+
 	let navLoading = false;
+
+	$: chats = $session$?.chats || [];
+	$: hasFinalResponse = chats.some(isfinalResponse);
 </script>
 
 <div
@@ -18,7 +24,7 @@
 			<div class="h-24"></div>
 		</div>
 
-		{#if !$sessionCompleted$ && !$fetchingSource$ && !$audioSource$}
+		{#if !hasFinalResponse && !$sessionCompleted$ && !$fetchingSource$ && !$audioSource$}
 			<ChatBoxContainer
 				bind:searchTerm
 				loading={navLoading}

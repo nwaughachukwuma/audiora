@@ -190,3 +190,12 @@ async def save_uploaded_files_endpoint(files: list[UploadFile], sessionId: str =
     """
     result = await UploadedFiles(session_id=sessionId)._save_sources(files)
     return result
+
+
+@app.delete("/delete-session/{sessionId}")
+def delete_session_endpoint(sessionId: str):
+    """
+    Delete audiocast session
+    """
+    SessionManager._delete_session(sessionId)
+    return "Deleted"

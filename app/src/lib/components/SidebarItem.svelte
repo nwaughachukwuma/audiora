@@ -1,6 +1,6 @@
 <script lang="ts" context="module">
 	import type { ContentCategory } from '@/utils/types';
-	export type SearchSidebarItem = {
+	export type SidebarItemModel = {
 		title: string;
 		nonce: number;
 		sessionId: string;
@@ -15,13 +15,11 @@
 	import { page } from '$app/stores';
 	import { Button } from './ui/button';
 	import { cn } from '@/utils/ui.utils';
+	import SidebarItemActions from './SidebarItemActions.svelte';
 
-	export let item: SearchSidebarItem;
+	export let item: SidebarItemModel;
 
-	const [send, receive] = crossfade({
-		duration: 250,
-		easing: cubicInOut
-	});
+	const [send, receive] = crossfade({ duration: 250, easing: cubicInOut });
 
 	$: href = item.completed
 		? `/audiocast/${item.sessionId}`
@@ -32,7 +30,7 @@
 <Button
 	{href}
 	variant="ghost"
-	class="relative no-underline group hover:no-underline justify-start py-6 flex items-center px-2 hover:bg-gray-700 bg-gray-900"
+	class="relative no-underline group justify-between hover:no-underline py-6 flex items-center px-2 hover:bg-gray-700 bg-gray-900"
 	data-sveltekit-noscroll
 	on:click
 >
@@ -52,7 +50,9 @@
 		{item.title}
 	</div>
 
-	<div class="text-[10px] px-2 hidden group-hover:block absolute bottom-0 right-0 text-sky-200">
+	<div class="text-[10px] px-2 hidden group-hover:block absolute bottom-0 left-0 text-sky-200">
 		{item.category}
 	</div>
+
+	<SidebarItemActions on:deleteSession />
 </Button>

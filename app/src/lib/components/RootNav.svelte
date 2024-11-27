@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Logo from './Logo.svelte';
 	import SearchSlideSheet from './SlideSheet.svelte';
-	import SearchSidebar from './Sidebar.svelte';
+	import Sidebar from './Sidebar.svelte';
 	import { Button } from './ui/button';
 	import { getAppContext } from '$lib/stores/appContext.svelte';
 	import { invalidateAll } from '$app/navigation';
@@ -22,7 +22,7 @@
 					<svelte-fragment>
 						{#if $openSettingsDrawer$}
 							{#key sessionId}
-								<SearchSidebar on:clickItem={() => ($openSettingsDrawer$ = false)} />
+								<Sidebar on:clickItem={() => ($openSettingsDrawer$ = false)} />
 							{/key}
 						{/if}
 					</svelte-fragment>
