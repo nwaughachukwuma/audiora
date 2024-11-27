@@ -1,4 +1,5 @@
 import asyncio
+import os
 
 from fastapi import BackgroundTasks, HTTPException
 
@@ -49,6 +50,9 @@ def post_generate_audio(
         waveform_utils.run_all()
     except Exception as e:
         print(f"Error in generate_audiocast background_tasks: {str(e)}")
+    finally:
+        if os.path.exists(audio_path):
+            os.remove(audio_path)
 
 
 async def generate_audiocast(request: GenerateAudioCastRequest, background_tasks: BackgroundTasks):

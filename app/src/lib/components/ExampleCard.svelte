@@ -10,10 +10,10 @@
 
 	const { addChatItem, startSession } = getSessionContext();
 
-	function handleClick() {
+	async function handleClick() {
 		startSession(category);
 		addChatItem({ id: uuid(), content, role: 'user', loading: false });
-		goto(href);
+		return goto(href, { invalidateAll: true, replaceState: true });
 	}
 </script>
 

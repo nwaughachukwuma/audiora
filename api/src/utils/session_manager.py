@@ -149,3 +149,7 @@ class SessionManager(DBManager):
                     callback(info)
 
         return doc_ref.on_snapshot(on_snapshot)
+
+    @staticmethod
+    def _delete_session(doc_id: str):
+        return DBManager()._delete_document(collections["audiora_sessions"], doc_id)
