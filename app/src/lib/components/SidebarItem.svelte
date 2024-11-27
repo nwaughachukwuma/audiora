@@ -15,13 +15,11 @@
 	import { page } from '$app/stores';
 	import { Button } from './ui/button';
 	import { cn } from '@/utils/ui.utils';
+	import SidebarItemActions from './SidebarItemActions.svelte';
 
 	export let item: SidebarItemModel;
 
-	const [send, receive] = crossfade({
-		duration: 250,
-		easing: cubicInOut
-	});
+	const [send, receive] = crossfade({ duration: 250, easing: cubicInOut });
 
 	$: href = item.completed
 		? `/audiocast/${item.sessionId}`
@@ -52,7 +50,9 @@
 		{item.title}
 	</div>
 
-	<div class="text-[10px] px-2 hidden group-hover:block absolute bottom-0 right-0 text-sky-200">
+	<div class="text-[10px] px-2 hidden group-hover:block absolute bottom-0 left-0 text-sky-200">
 		{item.category}
 	</div>
+
+	<SidebarItemActions sessionId={item.sessionId} />
 </Button>
