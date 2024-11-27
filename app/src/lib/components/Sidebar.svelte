@@ -40,7 +40,7 @@
 	import NewAudiocastButton from './NewAudiocastButton.svelte';
 	import { goto } from '$app/navigation';
 	import { browser } from '$app/environment';
-	// import { env } from '@env';
+	import { env } from '@env';
 
 	const dispatch = createEventDispatcher<{ clickItem: void }>();
 	const { openSettingsDrawer$ } = getAppContext();
@@ -66,9 +66,9 @@
 			localStorage.removeItem(`${SESSION_KEY}_${sessionId}`);
 			sidebarItems = getSidebarItems(getSessionItems());
 
-			// void fetch(`${env.API_BASE_URL}/delete-session/${sessionId}`, {
-			// 	method: 'DELETE'
-			// }).catch(() => {});
+			void fetch(`${env.API_BASE_URL}/delete-session/${sessionId}`, {
+				method: 'DELETE'
+			}).catch(() => void 0);
 
 			return goto('/', { invalidateAll: true, replaceState: true });
 		};
@@ -104,7 +104,7 @@
 		{/if}
 
 		<div class="flex w-full flex-col gap-y-1.5 pt-2" class:hidden={!inLast24Hrs.length}>
-			<div class="px-2 text-sm font-medium">Today</div>
+			<div class="px-2 text-sm font-semibold">Today</div>
 			{#each inLast24Hrs as item (item.sessionId)}
 				<SidebarItem
 					{item}
@@ -115,7 +115,7 @@
 		</div>
 
 		<div class="flex w-full flex-col gap-y-1.5 pt-6" class:hidden={!inLast7Days.length}>
-			<div class="px-2 text-sm font-medium">Last 7 days</div>
+			<div class="px-2 text-sm font-semibold">Last 7 days</div>
 			{#each inLast7Days as item (item.sessionId)}
 				<SidebarItem
 					{item}
@@ -126,7 +126,7 @@
 		</div>
 
 		<div class="flex w-full flex-col gap-y-1.5 pt-6" class:hidden={!inLast30Days.length}>
-			<div class="px-2 text-sm font-medium">Last month</div>
+			<div class="px-2 text-sm font-semibold">Last month</div>
 			{#each inLast30Days as item (item.sessionId)}
 				<SidebarItem
 					{item}
