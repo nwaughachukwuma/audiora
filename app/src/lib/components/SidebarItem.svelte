@@ -30,7 +30,7 @@
 <Button
 	{href}
 	variant="ghost"
-	class="relative no-underline group hover:no-underline justify-start py-6 flex items-center px-2 hover:bg-gray-700 bg-gray-900"
+	class="relative no-underline group justify-between hover:no-underline py-6 flex items-center px-2 hover:bg-gray-700 bg-gray-900"
 	data-sveltekit-noscroll
 	on:click
 >

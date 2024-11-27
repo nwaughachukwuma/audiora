@@ -21,31 +21,34 @@
 	}
 </script>
 
-<div
-	class="absolute rounded-r-md hidden group/action bg-gray-800/80 hover:bg-gray-800 h-full group-hover:flex items-center right-0 p-2"
->
+<div class="hidden h-full z-50 group-hover:flex items-center p-1">
 	<button
-		class="text-gray-400 group-hover/action:text-gray-100"
-		on:click={() => (openDialog = true)}
+		class="text-gray-400 hover:text-red-500"
+		on:click|stopPropagation|preventDefault={() => (openDialog = true)}
 	>
 		<Trash class="w-4 h-4 inline" />
 	</button>
 </div>
 
-<AlertDialog.Root bind:open={openDialog}>
-	<AlertDialog.Trigger>Open</AlertDialog.Trigger>
-	<AlertDialog.Content class="border-neutral-800">
-		<AlertDialog.Header>
-			<AlertDialog.Title>Delete audiocast?</AlertDialog.Title>
-			<AlertDialog.Description>
-				This action cannot be undone. This will permanently delete your audiocast data.
-			</AlertDialog.Description>
-		</AlertDialog.Header>
-		<AlertDialog.Footer>
-			<AlertDialog.Cancel on:click={() => (openDialog = false)}>Cancel</AlertDialog.Cancel>
-			<AlertDialog.Action class="bg-red-500 text-red-100 hover:bg-red-600" on:click={deleteSession}
-				>Continue</AlertDialog.Action
-			>
-		</AlertDialog.Footer>
-	</AlertDialog.Content>
-</AlertDialog.Root>
+{#if openDialog}
+	<AlertDialog.Root open portal="body" closeOnOutsideClick closeOnEscape>
+		<AlertDialog.Content class="border-neutral-800 overflow-hidden">
+			<AlertDialog.Header>
+				<AlertDialog.Title>Delete audiocast?</AlertDialog.Title>
+				<AlertDialog.Description>
+					This action cannot be undone. This will permanently delete your audiocast data.
+				</AlertDialog.Description>
+			</AlertDialog.Header>
+
+			<AlertDialog.Footer>
+				<AlertDialog.Cancel on:click={() => (openDialog = false)}>Cancel</AlertDialog.Cancel>
+				<AlertDialog.Action
+					class="bg-red-700 text-red-100 hover:bg-red-600"
+					on:click={deleteSession}
+				>
+					Continue
+				</AlertDialog.Action>
+			</AlertDialog.Footer>
+		</AlertDialog.Content>
+	</AlertDialog.Root>
+{/if}
