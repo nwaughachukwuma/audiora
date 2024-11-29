@@ -15,16 +15,18 @@
 </script>
 
 <div
-	id="chatContainer1"
-	class="mx-auto flex h-full w-full flex-col overflow-auto items-center gap-1 px-4"
+	class="mx-auto flex h-full w-full flex-col overflow-hidden justify-between items-center gap-1 relative"
 >
-	<div class="sm:max-w-xl lg:max-w-3xl max-w-full w-full">
-		<div class="scrollbar-y-1 w-full h-[calc(100%-4rem)] block">
-			<slot name="content"></slot>
-			<div class="h-24"></div>
+	<div id="chatContainer1" class="overflow-auto w-full flex justify-center mx-auto px-4">
+		<div class="sm:max-w-xl lg:max-w-3xl max-w-full w-full">
+			<div class="scrollbar-y-1 w-full h-full block">
+				<slot name="content"></slot>
+			</div>
 		</div>
+	</div>
 
-		{#if !hasFinalResponse && !$sessionCompleted$ && !$fetchingSource$ && !$audioSource$}
+	{#if !hasFinalResponse && !$sessionCompleted$ && !$fetchingSource$ && !$audioSource$}
+		<div class="shrink-0 w-full sm:max-w-xl lg:max-w-3xl max-w-full max-sm:px-4 px-1 py-4">
 			<ChatBoxContainer
 				bind:searchTerm
 				loading={navLoading}
@@ -33,6 +35,6 @@
 				on:keypress
 				on:click
 			/>
-		{/if}
-	</div>
+		</div>
+	{/if}
 </div>

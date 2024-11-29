@@ -10,11 +10,14 @@
 	import Sidebar from '@/components/Sidebar.svelte';
 	import { page } from '$app/stores';
 	import Spinner from '@/components/Spinner.svelte';
-	import { setAppContext } from '@/stores/appContext.svelte';
+	import { getAppContext, setAppContext } from '@/stores/appContext.svelte';
 	import { onMount } from 'svelte';
 	import { getAnalytics, logEvent } from 'firebase/analytics';
+	import cs from 'clsx';
 
 	export let data;
+
+	const { openSettingsDrawer$ } = getAppContext();
 
 	$: sessionId = $page.params.sessionId || data.sessionId;
 
@@ -34,16 +37,24 @@
 </svelte:head>
 
 <div class="h-screen bg-background block w-full">
-	<RootNav {sessionId} />
-
-	<div class="relative flex h-full w-full gap-x-2">
+	<div class={cs({ 'md:hidden': $openSettingsDrawer$ })}>
+		<RootNav {sessionId} />
+	</div>
+	<div
+		class={cs('flex w-full', {
+			'h-full': $openSettingsDrawer$,
+			'h-[calc(100%-4rem)]': !$openSettingsDrawer$
+		})}
+	>
 		{#if browser}
 			<span class="hidden md:block">
 				<Sidebar />
 			</span>
 
 			{#key sessionId}
-				<slot />
+				<div class={cs('w-full max-w-screen-2xl mx-auto', { 'md:mt-16': $openSettingsDrawer$ })}>
+					<slot />
+				</div>
 			{/key}
 		{:else}
 			<div class="-mt-16 flex h-full w-full items-center justify-center sm:-mt-24">

@@ -25,7 +25,7 @@
 
 <div class="w-full h-full block mt-16">
 	<div class="w-full mx-auto md:w-4/5 mb-6 text-center">
-		<h3 class="text-2xl sm:text-3xl font-semibold">Start with one of the following</h3>
+		<h3 class="text-2xl sm:text-3xl font-semibold">Start with one</h3>
 	</div>
 	<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-4">
 		{#each contentExamplesDict as [category, content]}
