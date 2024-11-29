@@ -8,7 +8,7 @@
 	export let disabled = false;
 </script>
 
-<div class="bg-background block w-full max-sm:px-2 py-4">
+<div class="bg-background block w-full">
 	<div class="block w-full items-center">
 		<ChatBox {showIcon} disabled={loading || disabled} bind:searchTerm on:keypress>
 			<svelte:fragment slot="icon-right" let:disabled>

@@ -41,15 +41,17 @@
 	import cs from 'clsx';
 	import { page } from '$app/stores';
 	import NewAudiocastButton from './NewAudiocastButton.svelte';
-	import { goto } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
 	import { env } from '@env';
+	import SidebarToggleButton from './SidebarToggleButton.svelte';
+	import Logo from './Logo.svelte';
 
 	const dispatch = createEventDispatcher<{ clickItem: void }>();
 	const { openSettingsDrawer$ } = getAppContext();
 	const { session$, refreshSidebar$ } = getSessionContext();
 
 	$: sidebarItems = getSidebarItems(getSessionItems());
-	
+
 	$: if ($refreshSidebar$ || $session$?.title) {
 		sidebarItems = getSidebarItems(getSessionItems());
 	}
@@ -79,12 +81,23 @@
 </script>
 
 <div
-	class={cs('scrollbar-none block h-full shrink-0 overflow-x-hidden bg-gray-900', {
-		'w-full overflow-y-auto px-2 md:w-72 xl:w-80': $openSettingsDrawer$,
-		'w-0': !$openSettingsDrawer$
+	class={cs('scrollbar-none block h-full shrink-0 overflow-y-auto overflow-x-hidden bg-gray-900', {
+		'w-full px-2 md:w-72 xl:w-80': $openSettingsDrawer$,
+		'w-0 opacity-0': !$openSettingsDrawer$
 	})}
 	style="transition: width 0.3s cubic-bezier(0.34, 1.47, 0.64, 1), padding 0.3s ease;"
 >
+	<div
+		class="flex pl-1 max-md:hidden mt-[6px] animate-fade-in mb-2 items-center"
+		class:hidden={!$openSettingsDrawer$}
+	>
+		<SidebarToggleButton on:click={() => openSettingsDrawer$.update((v) => !v)} />
+
+		<a class="block shrink-0" href="/" on:click={invalidateAll}>
+			<Logo />
+		</a>
+	</div>
+
 	<nav
 		class={cs('flex w-full flex-col gap-x-2 pt-2 lg:gap-x-0 lg:gap-y-1', {
 			'opacity-100': $openSettingsDrawer$,
@@ -104,40 +117,40 @@
 					<span class="px-2 mt-3 font-medium">Your audiocasts will appear here</span>
 				</div>
 			</div>
+		{:else}
+			<div class="flex w-full flex-col gap-y-1.5 pt-2" class:hidden={!inLast24Hrs.length}>
+				<div class="px-2 text-sm font-semibold">Last 24 hrs</div>
+				{#each inLast24Hrs as item (item.sessionId)}
+					<SidebarItem
+						{item}
+						on:click={dispatchClickItem}
+						on:deleteSession={deleteSession(item.sessionId)}
+					/>
+				{/each}
+			</div>
+
+			<div class="flex w-full flex-col gap-y-1.5 pt-6" class:hidden={!inLast7Days.length}>
+				<div class="px-2 text-sm font-semibold">Last 7 days</div>
+				{#each inLast7Days as item (item.sessionId)}
+					<SidebarItem
+						{item}
+						on:click={dispatchClickItem}
+						on:deleteSession={deleteSession(item.sessionId)}
+					/>
+				{/each}
+			</div>
+
+			<div class="flex w-full flex-col gap-y-1.5 pt-6" class:hidden={!inLast30Days.length}>
+				<div class="px-2 text-sm font-semibold">Last 30 days</div>
+				{#each inLast30Days as item (item.sessionId)}
+					<SidebarItem
+						{item}
+						on:click={dispatchClickItem}
+						on:deleteSession={deleteSession(item.sessionId)}
+					/>
+				{/each}
+			</div>
+			<div class="block h-20"></div>
 		{/if}
-
-		<div class="flex w-full flex-col gap-y-1.5 pt-2" class:hidden={!inLast24Hrs.length}>
-			<div class="px-2 text-sm font-semibold">Today</div>
-			{#each inLast24Hrs as item (item.sessionId)}
-				<SidebarItem
-					{item}
-					on:click={dispatchClickItem}
-					on:deleteSession={deleteSession(item.sessionId)}
-				/>
-			{/each}
-		</div>
-
-		<div class="flex w-full flex-col gap-y-1.5 pt-6" class:hidden={!inLast7Days.length}>
-			<div class="px-2 text-sm font-semibold">Last 7 days</div>
-			{#each inLast7Days as item (item.sessionId)}
-				<SidebarItem
-					{item}
-					on:click={dispatchClickItem}
-					on:deleteSession={deleteSession(item.sessionId)}
-				/>
-			{/each}
-		</div>
-
-		<div class="flex w-full flex-col gap-y-1.5 pt-6" class:hidden={!inLast30Days.length}>
-			<div class="px-2 text-sm font-semibold">Last month</div>
-			{#each inLast30Days as item (item.sessionId)}
-				<SidebarItem
-					{item}
-					on:click={dispatchClickItem}
-					on:deleteSession={deleteSession(item.sessionId)}
-				/>
-			{/each}
-		</div>
-		<div class="block h-20"></div>
 	</nav>
 </div>
