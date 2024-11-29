@@ -1,4 +1,5 @@
 <script lang="ts" context="module">
+	import { browser } from '$app/environment';
 	import { SESSION_KEY } from '@/stores/sessionContext.svelte';
 
 	const ONE_DAY_MS = 24 * 60 * 60 * 1000;
@@ -6,6 +7,8 @@
 	const last7Days = Date.now() - 4 * ONE_DAY_MS;
 
 	export function getSessionItems() {
+		if (!browser) return [];
+
 		return Object.entries(localStorage)
 			.filter(([key]) => key.startsWith(SESSION_KEY))
 			.map(
@@ -39,17 +42,17 @@
 	import { page } from '$app/stores';
 	import NewAudiocastButton from './NewAudiocastButton.svelte';
 	import { goto } from '$app/navigation';
-	import { browser } from '$app/environment';
 	import { env } from '@env';
 
 	const dispatch = createEventDispatcher<{ clickItem: void }>();
 	const { openSettingsDrawer$ } = getAppContext();
 	const { session$, refreshSidebar$ } = getSessionContext();
 
-	$: sessionItems = browser || $session$ ? getSessionItems() : [];
-
-	$: sidebarItems = getSidebarItems(sessionItems);
-	$: if ($refreshSidebar$) sidebarItems = getSidebarItems(getSessionItems());
+	$: sidebarItems = getSidebarItems(getSessionItems());
+	
+	$: if ($refreshSidebar$ || $session$?.title) {
+		sidebarItems = getSidebarItems(getSessionItems());
+	}
 
 	$: inLast24Hrs = sidebarItems.filter((i) => i.nonce > last24Hrs);
 	$: inLast7Days = sidebarItems.filter((i) => i.nonce < last24Hrs && i.nonce > last7Days);

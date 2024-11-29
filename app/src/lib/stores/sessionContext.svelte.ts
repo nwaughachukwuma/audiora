@@ -84,6 +84,16 @@ export function setSessionContext(sessionId: string) {
 				session.chats = chats;
 				return session;
 			});
+		},
+		updateSessionTitle: (chunk: string) => {
+			session$.update((session) => {
+				if (session) {
+					if (session.title.toLowerCase() === 'untitled') session.title = '';
+					session.title += chunk;
+				}
+				return session;
+			});
+			return session$;
 		}
 	});
 }

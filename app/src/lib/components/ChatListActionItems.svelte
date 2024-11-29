@@ -16,7 +16,7 @@
 	export let summary: string;
 	export let title: string;
 
-	const { session$, audioSource$, fetchingSource$, sessionId$, sessionCompleted$ } =
+	const { session$, audioSource$, fetchingSource$, sessionId$, sessionCompleted$, updateSessionTitle } =
 		getSessionContext();
 
 	async function ongenerate(summary: string) {
@@ -79,15 +79,9 @@
 
 	async function handleStreamingResponse(res: Response) {
 		if (!res.ok) return;
-
+		
 		for await (const chunk of streamingResponse(res)) {
-			session$.update((session) => {
-				if (session) {
-					if (session.title.toLowerCase() === 'untitled') session.title = '';
-					session.title += chunk;
-				}
-				return session;
-			});
+			updateSessionTitle(chunk);
 		}
 	}
 
