@@ -2,12 +2,9 @@
 	import { getSessionContext } from '@/stores/sessionContext.svelte';
 	import ChatBoxContainer from './ChatBoxContainer.svelte';
 	import { isfinalResponse } from '@/utils/session.utils';
-	import { getAppContext } from '@/stores/appContext.svelte';
 
 	export let searchTerm = '';
 	export let disableTextInput = false;
-
-	const { openSettingsDrawer$ } = getAppContext();
 
 	const { sessionCompleted$, fetchingSource$, audioSource$, session$ } = getSessionContext();
 
