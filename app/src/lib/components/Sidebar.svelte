@@ -52,7 +52,7 @@
 
 	$: sidebarItems = getSidebarItems(getSessionItems());
 
-	$: if ($refreshSidebar$ || $session$?.title) {
+	$: if ($refreshSidebar$ || $session$) {
 		sidebarItems = getSidebarItems(getSessionItems());
 	}
 
