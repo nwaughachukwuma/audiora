@@ -25,7 +25,7 @@ export interface SessionModel {
 	id: string;
 	category: ContentCategory;
 	chats: Array<SessionChatItem>;
-	completed?: boolean;
+	status?: 'collating' | 'completed' | 'generating' | 'failed';
 	metadata?: ChatMetadata;
 	created_at?: string;
 }

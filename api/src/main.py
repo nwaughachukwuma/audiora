@@ -25,7 +25,7 @@ from .utils.custom_sources.generate_url_source import (
 )
 from .utils.custom_sources.save_copied_source import CopiedPasteSourceRequest, save_copied_source
 from .utils.custom_sources.save_uploaded_sources import UploadedFiles
-from .utils.generate_audiocast import GenerateAudioCastRequest, generate_audiocast
+from .utils.generate_audiocast import GenerateAudioCastRequest, GenerateAudiocastException, generate_audiocast
 from .utils.generate_audiocast_source import GenerateAudiocastSource, generate_audiocast_source
 from .utils.get_audiocast import get_audiocast
 from .utils.get_session_title import GetSessionTitleModel, get_session_title
@@ -78,6 +78,7 @@ def chat_endpoint(
     db._add_chat(request.chatItem)
 
     def on_finish(text: str):
+        background_tasks.add_task(db._update, {"status": "collating"})
         background_tasks.add_task(
             db._add_chat,
             SessionChatItem(role="assistant", content=text),
@@ -90,6 +91,12 @@ def chat_endpoint(
     )
 
     return StreamingResponse(response, media_type="text/event-stream")
+
+
+@app.exception_handler(GenerateAudiocastException)
+async def generate_audiocast_exception_handler(_, exc):
+    SessionManager._update_status(exc.session_id, "failed")
+    return HTTPException(status_code=exc.status_code, detail=str(exc.detail))
 
 
 @app.post("/audiocast/generate", response_model=str)

@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Callable, Dict, List, Optional, cast
+from typing import Callable, Dict, List, Literal, Optional, cast
 
 from src.services.firestore_sdk import (
     Collection,
@@ -19,6 +19,9 @@ class ChatMetadata:
     title: Optional[str] = None
 
 
+SessionStatus = Literal["collating", "completed", "generating", "failed"]
+
+
 @dataclass
 class SessionModel:
     id: str
@@ -26,7 +29,7 @@ class SessionModel:
     chats: List[SessionChatItem]
     metadata: Optional[ChatMetadata]
     created_at: Optional[str] = None
-    completed: Optional[bool] = None
+    status: Optional[SessionStatus] = None
 
 
 class SessionManager(DBManager):
@@ -150,3 +153,7 @@ class SessionManager(DBManager):
     @staticmethod
     def _delete_session(doc_id: str):
         return DBManager()._delete_document(collections["audiora_sessions"], doc_id)
+
+    @staticmethod
+    def _update_status(doc_id: str, status: SessionStatus):
+        return DBManager()._update_document(collections["audiora_sessions"], doc_id, data={"status": status})
