@@ -94,12 +94,8 @@ def chat_endpoint(
 
 
 @app.exception_handler(GenerateAudiocastException)
-async def generate_audiocast_exception_handler(request, exc):
-    print("generate_audiocast_exception_handler>>>>>>")
-    print("Request: ", request)
-
-    db = SessionManager(exc.session_id, exc.category)
-    db._update({"status": "failed"})
+async def generate_audiocast_exception_handler(_, exc):
+    SessionManager._update_status(exc.session_id, "failed")
     return HTTPException(status_code=exc.status_code, detail=str(exc.detail))
 
 

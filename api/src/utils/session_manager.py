@@ -153,3 +153,7 @@ class SessionManager(DBManager):
     @staticmethod
     def _delete_session(doc_id: str):
         return DBManager()._delete_document(collections["audiora_sessions"], doc_id)
+
+    @staticmethod
+    def _update_status(doc_id: str, status: SessionStatus):
+        return DBManager()._update_document(collections["audiora_sessions"], doc_id, data={"status": status})

@@ -13,8 +13,10 @@
 </script>
 
 <script lang="ts">
+	import { onMount } from 'svelte';
+	import { getAnalytics, logEvent } from 'firebase/analytics';
 	import { getSessionContext } from '@/stores/sessionContext.svelte';
-	import type { ContentCategory, SessionModel } from '@/utils/types';
+	import type { ContentCategory } from '@/utils/types';
 	import { env } from '@env';
 	import { parse } from 'marked';
 	import * as Accordion from '@/components/ui/accordion';
@@ -25,23 +27,23 @@
 	import AudiocastPageSkeletonLoader from '@/components/AudiocastPageSkeletonLoader.svelte';
 	import RenderAudioSources from '@/components/RenderAudioSources.svelte';
 	import AudiocastPageHeader from '@/components/AudiocastPageHeader.svelte';
+	import { toast } from 'svelte-sonner';
 
 	export let data;
 
-	const { customSources$, session$, sessionModel$ } = getSessionContext();
+	const { session$, sessionModel$ } = getSessionContext();
 
 	let generating = false;
 
 	$: sessionId = $page.params.sessionId;
-	$: $customSources$;
-
 	$: sessionModel = $sessionModel$ || data.sessionModel;
+	$: checkAudiocast(sessionId);
+
 	$: sessionTitle = sessionModel.metadata?.title || 'Untitled';
+	$: isGenerating = sessionModel.status === 'generating' || generating;
 
 	async function generateAudiocast(sessionId: string, category: ContentCategory, summary: string) {
-		if (generating) return;
 		generating = true;
-
 		return fetch(`${env.API_BASE_URL}/audiocast/generate`, {
 			method: 'POST',
 			body: JSON.stringify({ sessionId, summary, category }),
@@ -49,21 +51,34 @@
 		})
 			.then<string>((res) => {
 				if (res.ok) return res.json();
-				throw new Error('Failed to generate audiocast');
+				throw new Error(res.statusText);
+			})
+			.then(() => toast.success('Audiocast generated successfully'));
+	}
+
+	async function checkAudiocast(sessionId: string) {
+		if (isGenerating || sessionModel.status === 'completed') return;
+
+		return fetch(`${env.API_BASE_URL}/audiocast/${sessionId}`)
+			.then((res) => {
+				if (res.ok) return;
+				else if (res.status === 404 && $session$?.summary) {
+					return generateAudiocast(sessionId, sessionModel.category, $session$.summary);
+				}
+				throw new Error(res.statusText);
+			})
+			.catch((error) => {
+				toast.error('Error fetching audiocast:', { description: String(error) });
 			})
 			.finally(() => (generating = false));
 	}
 
-	async function getAudiocast(sessionId: string): Promise<SessionModel | string | undefined> {
-		return fetch(`${env.API_BASE_URL}/audiocast/${sessionId}`).then<SessionModel>((res) => {
-			if (res.ok) return res.json();
-			else if (res.status === 404 && $session$?.summary) {
-				return generateAudiocast(sessionId, sessionModel.category, $session$.summary);
-			}
-
-			throw new Error('Failed to get audiocast');
+	onMount(() => {
+		logEvent(getAnalytics(), 'page_view', {
+			page_title: 'Audiocast',
+			page_path: `/audiocast/${sessionId}`
 		});
-	}
+	});
 </script>
 
 <div
@@ -71,25 +86,7 @@
 >
 	<AudiocastPageHeader category={sessionModel.category} title={sessionModel.metadata?.title} />
 
-	{#await getAudiocast(sessionId)}
-		<div class="flex flex-col w-full">
-			<AudiocastPageSkeletonLoader />
-
-			{#if generating}
-				<div class="flex mt-4 flex-col gap-y-3 w-full items-center">
-					<p class="py-2 px-4 bg-sky-600/20 animate-pulse text-sky-300 rounded-sm">
-						Generating your audiocast...Please wait
-					</p>
-
-					{#if sessionModel?.metadata?.info}
-						<p class="py-2 px-4 animate-pulse text-gray-400 rounded-sm">
-							Status: {sessionModel.metadata.info}
-						</p>
-					{/if}
-				</div>
-			{/if}
-		</div>
-	{:then}
+	{#if sessionModel.status === 'completed'}
 		<div class="flex w-full mt-4 flex-col gap-y-3">
 			<RenderMedia filename={sessionId} let:uri>
 				<audio controls class="w-full animate-fade-in block">
@@ -137,9 +134,25 @@
 				<AudiocastPageChat slot="chats-button" chats={sessionModel.chats} />
 			</AudiocastPageAction>
 		</div>
-	{:catch error}
-		<div>Error: {String(error)}</div>
-	{/await}
+	{:else}
+		<div class="flex flex-col w-full">
+			<AudiocastPageSkeletonLoader />
+
+			{#if isGenerating}
+				<div class="flex mt-4 flex-col gap-y-3 w-full items-center">
+					<p class="py-2 px-4 bg-sky-600/20 animate-pulse text-sky-300 rounded-sm">
+						Generating your audiocast...Please wait
+					</p>
+
+					{#if sessionModel?.metadata?.info}
+						<p class="py-2 px-4 animate-pulse text-gray-400 rounded-sm">
+							Status: {sessionModel.metadata.info}
+						</p>
+					{/if}
+				</div>
+			{/if}
+		</div>
+	{/if}
 </div>
 
 <style lang="postcss">

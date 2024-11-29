@@ -1,9 +1,10 @@
 <script>
 	import { getSessionContext } from '@/stores/sessionContext.svelte';
 	import { Button } from '@/components/ui/button';
-	const { session$, sessionModel$ } = getSessionContext();
+	const { session$, sessionModel$, customSources$ } = getSessionContext();
 
 	$: $sessionModel$;
+	$: $customSources$;
 </script>
 
 <!-- TODO: Use only the DB references -->

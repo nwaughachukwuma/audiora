@@ -28,4 +28,7 @@ def get_audiocast(session_id: str):
             detail=f"Audiocast not found for session_id: {session_id}",
         )
 
+    if session_data.status != "completed":
+        SessionManager._update_status(session_id, "completed")
+
     return session_data.__dict__

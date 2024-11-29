@@ -18,11 +18,10 @@ from .waveform_utils import WaveformUtils
 class GenerateAudiocastException(HTTPException):
     name = "GenerateAudiocastException"
 
-    def __init__(self, detail: str, session_id: str, category: ContentCategory, status_code=500):
+    def __init__(self, detail: str, session_id: str, status_code=500):
         self.detail = detail
         self.status_code = status_code
         self.session_id = session_id
-        self.category = category
 
 
 def compile_custom_sources(session_id: str):
@@ -66,10 +65,7 @@ async def generate_audiocast(request: GenerateAudioCastRequest, background_tasks
 
     if not session_data:
         raise GenerateAudiocastException(
-            status_code=404,
-            detail=f"Audiocast data not found for session_id: {session_id}",
-            session_id=session_id,
-            category=category,
+            status_code=404, detail=f"Audiocast data not found for session_id: {session_id}", session_id=session_id
         )
 
     if session_data.status == "completed":
@@ -77,9 +73,16 @@ async def generate_audiocast(request: GenerateAudioCastRequest, background_tasks
     elif session_data.status == "generating":
         print(f"Queueing the current audio generation request>>>>\n\nSessionId: {session_id}")
 
-        background_tasks.add_task(generate_audiocast, request, background_tasks)
-        await asyncio.sleep(5)
-        return "Audiocast generation already in progress!"
+        async def retry_generation():
+            await asyncio.sleep(10)
+            try:
+                await generate_audiocast(request, background_tasks)
+            except Exception as e:
+                print(f"Retry failed for session {session_id}: {str(e)}")
+                SessionManager._update_status(session_id, "failed")
+
+        background_tasks.add_task(retry_generation)
+        return "Audiocast generation in progress. Please wait..."
 
     db._update({"status": "generating"})
 
@@ -100,10 +103,7 @@ async def generate_audiocast(request: GenerateAudioCastRequest, background_tasks
 
     if not source_content:
         raise GenerateAudiocastException(
-            status_code=500,
-            detail="Failed to generate source content",
-            session_id=session_id,
-            category=category,
+            status_code=500, detail="Failed to generate source content", session_id=session_id
         )
 
     # get custom sources
@@ -117,10 +117,7 @@ async def generate_audiocast(request: GenerateAudioCastRequest, background_tasks
 
     if not audio_script:
         raise GenerateAudiocastException(
-            status_code=500,
-            detail="Failed to generate audio script",
-            session_id=session_id,
-            category=category,
+            status_code=500, detail="Failed to generate audio script", session_id=session_id
         )
 
     # Generate audio
@@ -135,7 +132,6 @@ async def generate_audiocast(request: GenerateAudioCastRequest, background_tasks
         audio_path,
         audio_script,
     )
-
     db._update({"status": "completed"})
 
     return "Audiocast generated successfully!"

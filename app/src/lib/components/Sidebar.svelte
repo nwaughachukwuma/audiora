@@ -47,8 +47,8 @@
 	const { session$, refreshSidebar$ } = getSessionContext();
 
 	$: sessionItems = browser || $session$ ? getSessionItems() : [];
-	$: sidebarItems = getSidebarItems(sessionItems);
 
+	$: sidebarItems = getSidebarItems(sessionItems);
 	$: if ($refreshSidebar$) sidebarItems = getSidebarItems(getSessionItems());
 
 	$: inLast24Hrs = sidebarItems.filter((i) => i.nonce > last24Hrs);
