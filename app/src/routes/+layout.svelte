@@ -37,13 +37,13 @@
 </svelte:head>
 
 <div class="h-screen bg-background block w-full">
-	<div class={cs({ 'md:hidden': $openSettingsDrawer$ })}>
+	<div class={cs('w-full', { 'md:hidden': $openSettingsDrawer$ })}>
 		<RootNav {sessionId} />
 	</div>
 	<div
-		class={cs('flex w-full', {
+		class={cs('flex w-full relative', {
 			'h-full': $openSettingsDrawer$,
-			'h-[calc(100%-4rem)]': !$openSettingsDrawer$
+			'h-[calc(100vh-4rem)]': !$openSettingsDrawer$
 		})}
 	>
 		{#if browser}
