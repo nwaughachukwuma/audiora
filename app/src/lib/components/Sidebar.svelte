@@ -114,7 +114,7 @@
 			<div class="flex w-full h-screen items-center animate-fade-in">
 				<div class="-mt-16 flex flex-col text-gray-300 items-center">
 					<HeadphoneOff class="w-14 h-14" />
-					<span class="px-2 mt-3 font-medium">Your audiocasts will appear here</span>
+					<span class="px-2 mt-3 font-medium">Audiocasts will appear here</span>
 				</div>
 			</div>
 		{:else}
