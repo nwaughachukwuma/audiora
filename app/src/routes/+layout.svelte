@@ -37,13 +37,13 @@
 </svelte:head>
 
 <div class="h-screen bg-background block w-full">
-	<div class={cs('w-full', { 'md:hidden': $openSettingsDrawer$ })}>
+	<div class={cs('w-full flex-none', { 'md:hidden': $openSettingsDrawer$ })}>
 		<RootNav {sessionId} />
 	</div>
 	<div
-		class={cs('flex w-full relative', {
+		class={cs('flex w-full relative flex-1 overflow-hidden', {
 			'h-full': $openSettingsDrawer$,
-			'h-[calc(100vh-4rem)]': !$openSettingsDrawer$
+			'h-[calc(100dvh-4rem)]': !$openSettingsDrawer$
 		})}
 	>
 		{#if browser}
@@ -52,12 +52,16 @@
 			</span>
 
 			{#key sessionId}
-				<div class={cs('w-full max-w-screen-2xl mx-auto', { 'md:mt-16': $openSettingsDrawer$ })}>
+				<div
+					class={cs('w-full slot-container max-w-screen-2xl mx-auto', {
+						'md:mt-16': $openSettingsDrawer$
+					})}
+				>
 					<slot />
 				</div>
 			{/key}
 		{:else}
-			<div class="-mt-16 flex h-full w-full items-center justify-center sm:-mt-24">
+			<div class="-mt-14 flex h-full w-full items-center justify-center sm:-mt-20">
 				<Spinner />
 			</div>
 		{/if}
@@ -65,3 +69,11 @@
 </div>
 
 <Toaster />
+
+<style>
+	@media only screen and (max-width: 424px) {
+		.slot-container {
+			padding-bottom: env(safe-area-inset-bottom);
+		}
+	}
+</style>
