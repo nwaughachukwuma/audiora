@@ -7,11 +7,22 @@
 <head>
 	<meta charset="utf-8" />
 	<link rel="icon" href="%sveltekit.assets%/favicon.svg" />
+	<link rel="manifest" href="/manifest.json" />
 	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, user-scalable=no" />
 	<meta name="apple-mobile-web-app-capable" content="yes" />
 	<meta name="mobile-web-app-capable" content="yes">
 	<meta name="theme-color" content="#000000" />
 	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+	
+	<!-- Add PWA icon links -->
+	<link rel="apple-touch-icon" sizes="72x72" href="/icons/icon-72x72.png">
+	<link rel="apple-touch-icon" sizes="96x96" href="/icons/icon-96x96.png">
+	<link rel="apple-touch-icon" sizes="128x128" href="/icons/icon-128x128.png">
+	<link rel="apple-touch-icon" sizes="144x144" href="/icons/icon-144x144.png">
+	<link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png">
+	<link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192x192.png">
+	<link rel="apple-touch-icon" sizes="384x384" href="/icons/icon-384x384.png">
+	<link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512x512.png">
 
 	<title>Audiora</title>
 	<meta name="description" content="Listen to anything, anytime, leveraging AI" />
@@ -43,6 +54,14 @@
 
 <body class="h-full w-full overflow-hidden dark" data-sveltekit-preload-data="hover">
 	<div style="display: contents" class="w-full h-full">%sveltekit.body%</div>
+
+	<script>
+		if ('serviceWorker' in navigator) {
+			window.addEventListener('load', () => {
+				navigator.serviceWorker.register('/sw.js');
+			});
+		}
+	</script>
 </body>
 
 </html>
