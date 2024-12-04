@@ -22,7 +22,9 @@
 	$: sessionId = $page.params.sessionId || data.sessionId;
 
 	$: setAppContext();
-	$: setSessionContext(sessionId);
+	$: ({ session$ } = setSessionContext(sessionId));
+
+	$: sessionTitle = $session$?.title;
 
 	onMount(() => {
 		logEvent(getAnalytics(), 'page_view', {
@@ -48,7 +50,9 @@
 	>
 		{#if browser}
 			<span class="hidden md:block">
-				<Sidebar />
+				{#key sessionTitle}
+					<Sidebar />
+				{/key}
 			</span>
 
 			{#key sessionId}

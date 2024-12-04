@@ -13,8 +13,7 @@
 
 	export let data;
 
-	const { session$, addChatItem, updateChatContent, sessionId$, fetchingSource$ } =
-		getSessionContext();
+	const { session$, addChatItem, updateChatContent, sessionId$ } = getSessionContext();
 
 	let searchTerm = '';
 	let loading = false;
@@ -95,11 +94,7 @@
 				{@const finalResponse = isfinalResponse(item)}
 				<ChatListItem type={item.role} content={item.content} loading={item.loading} />
 
-				{#if finalResponse && $fetchingSource$}
-					<div class="py-2 px-4 mx-auto w-fit bg-sky-600/20 animate-pulse text-sky-300 rounded-sm">
-						Generating Source Material...Please wait
-					</div>
-				{:else if finalResponse}
+				{#if finalResponse}
 					<ChatListActionItems
 						title={$session$?.title || 'Untitled'}
 						{sessionId}

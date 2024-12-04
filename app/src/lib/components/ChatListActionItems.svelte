@@ -16,8 +16,14 @@
 	export let summary: string;
 	export let title: string;
 
-	const { session$, audioSource$, fetchingSource$, sessionId$, sessionCompleted$, updateSessionTitle } =
-		getSessionContext();
+	const {
+		session$,
+		audioSource$,
+		fetchingSource$,
+		sessionId$,
+		sessionCompleted$,
+		updateSessionTitle
+	} = getSessionContext();
 
 	async function ongenerate(summary: string) {
 		session$.update((session) => {
@@ -79,7 +85,7 @@
 
 	async function handleStreamingResponse(res: Response) {
 		if (!res.ok) return;
-		
+
 		for await (const chunk of streamingResponse(res)) {
 			updateSessionTitle(chunk);
 		}
@@ -118,17 +124,14 @@
 				on:click={() => ongenerate(summary)}>Generate Audiocast</Button
 			>
 
-			{#if $audioSource$}
-				<ManageAudioSourceDrawer aiSource={$audioSource$} />
-			{:else}
-				<Button
-					variant="ghost"
-					class="bg-gray-800 py-6 text-base hover:bg-gray-700 text-emerald-600 hover:text-emerald-600"
-					on:click={() => onreviewSource(category, summary)}
-				>
-					Review Source
-				</Button>
-			{/if}
+			<ManageAudioSourceDrawer
+				aiSource={$audioSource$}
+				on:click={() => {
+					if (!$audioSource$ && !$fetchingSource$) {
+						onreviewSource(category, summary);
+					}
+				}}
+			/>
 		</div>
 	{/if}
 </div>

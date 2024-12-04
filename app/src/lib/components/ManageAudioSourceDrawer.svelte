@@ -77,7 +77,11 @@
 
 <Drawer.Root {snapPoints} bind:activeSnapPoint direction="bottom" dismissible shouldScaleBackground>
 	<Drawer.Trigger>
-		<Button variant="ghost" class="bg-gray-800 text-base py-6 w-full hover:bg-gray-700 text-white">
+		<Button
+			variant="ghost"
+			on:click
+			class="bg-gray-800 text-base py-6 w-full hover:bg-gray-700 text-white"
+		>
 			Manage Sources
 		</Button>
 	</Drawer.Trigger>
@@ -86,11 +90,12 @@
 
 	<Drawer.Portal>
 		<Drawer.Content class="border-neutral-800 pb-40 block h-full w-full rounded-t-md">
-			<Drawer.Title
-				class="text-2xl px-4 py-2 mx-auto md:max-w-3xl xl:max-w-4xl w-full gradient-gray-to-emerald font-medium"
-			>
-				Audiocast Source
-			</Drawer.Title>
+			<Drawer.Header class="mx-auto md:max-w-3xl xl:max-w-4xl w-full px-4 py-2">
+				<Drawer.Title class="text-2xl gradient-gray-to-emerald font-medium">Sources</Drawer.Title>
+				<Drawer.Description class="text-gray-400">
+					Manage your sources for this audiocast
+				</Drawer.Description>
+			</Drawer.Header>
 
 			<div class="h-full overflow-hidden overflow-y-auto">
 				<div
