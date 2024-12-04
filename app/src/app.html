@@ -46,14 +46,6 @@
 
 <body class="h-full w-full overflow-hidden dark" data-sveltekit-preload-data="hover">
 	<div style="display: contents" class="w-full h-full">%sveltekit.body%</div>
-
-	<script>
-		if ('serviceWorker' in navigator) {
-			window.addEventListener('load', () => {
-				navigator.serviceWorker.register('/sw.js');
-			});
-		}
-	</script>
 </body>
 
 </html>
