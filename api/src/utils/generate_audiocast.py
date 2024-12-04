@@ -122,7 +122,7 @@ async def generate_audiocast(request: GenerateAudioCastRequest, background_tasks
 
     # Generate audio
     update_session_info("Generating audio...")
-    audio_manager = AudioManager(custom_config=AudioManagerConfig(tts_provider="openai"))
+    audio_manager = AudioManager(custom_config=AudioManagerConfig(tts_provider="elevenlabs"))
     audio_path = await audio_manager.generate_speech(audio_script)
 
     background_tasks.add_task(

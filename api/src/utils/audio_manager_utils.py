@@ -19,7 +19,7 @@ from src.utils.generate_speech_utils import (
 
 @dataclass
 class AudioManagerConfig:
-    tts_provider: Optional[TTSProvider] = "openai"
+    tts_provider: Optional[TTSProvider] = "elevenlabs"
     temp_audio_dir: str = field(default_factory=lambda: "/tmp/audiora")
     outdir_base: str = field(default_factory=lambda: "/tmp/audiora/output")
 

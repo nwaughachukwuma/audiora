@@ -65,10 +65,15 @@ class AudioManager(AudioManagerSpeechGenerator, ContentSplitter):
 
         print(f"nway_content: {nway_content}")
 
-        if self.config.tts_provider == "openai":
+        if self.config.tts_provider == "elevenlabs":
+            try:
+                audio_files = await self.__text_to_speech_elevenlabs(nway_content, tags)
+            except Exception as e:
+                logger.warning(f"ElevenLabs TTS failed: {str(e)}. Falling back to OpenAI")
+                self.config.tts_provider = "openai"
+                return await self.text_to_speech(audio_script, output_file)
+        elif self.config.tts_provider == "openai":
             audio_files = await self.__text_to_speech_openai(nway_content, tags)
-        elif self.config.tts_provider == "elevenlabs":
-            audio_files = await self.__text_to_speech_elevenlabs(nway_content, tags)
         else:
             raise Exception("Invalid TTS model specified")
 
