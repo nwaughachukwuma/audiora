@@ -10,6 +10,7 @@ from fastapi_utilities import add_timer_middleware
 from .services.storage import StorageManager
 from .utils.chat_request import chat_request
 from .utils.chat_utils import (
+    ContentCategory,
     SessionChatItem,
     SessionChatRequest,
 )
@@ -25,6 +26,7 @@ from .utils.custom_sources.generate_url_source import (
 )
 from .utils.custom_sources.save_copied_source import CopiedPasteSourceRequest, save_copied_source
 from .utils.custom_sources.save_uploaded_sources import UploadedFiles
+from .utils.detect_content_category import DetectContentCategoryRequest, detect_content_category
 from .utils.generate_audiocast import GenerateAudioCastRequest, GenerateAudiocastException, generate_audiocast
 from .utils.generate_audiocast_source import GenerateAudiocastSource, generate_audiocast_source
 from .utils.get_audiocast import get_audiocast
@@ -206,3 +208,11 @@ def delete_session_endpoint(sessionId: str):
     """
     SessionManager._delete_session(sessionId)
     return "Deleted"
+
+
+@app.post("/detect-category", response_model=ContentCategory)
+async def detect_category_endpoint(request: DetectContentCategoryRequest):
+    """
+    Detect category of a given content
+    """
+    return await detect_content_category(request.content)

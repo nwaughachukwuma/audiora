@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, tick } from 'svelte';
 	import ChatContainer from '@/components/ChatContainer.svelte';
 	import { getSessionContext, type ChatItem } from '@/stores/sessionContext.svelte.js';
 	import ChatListItem from '@/components/ChatListItem.svelte';
@@ -13,7 +13,8 @@
 
 	export let data;
 
-	const { session$, addChatItem, updateChatContent, sessionId$ } = getSessionContext();
+	const { session$, addChatItem, updateChatContent, sessionId$, removeChatItem } =
+		getSessionContext();
 
 	let searchTerm = '';
 	let loading = false;
@@ -27,8 +28,7 @@
 
 	async function handleFirstEntry() {
 		if (!$session$ || $session$.chats.length > 1) return;
-		loading = true;
-		await chatRequest($session$.chats[0]).finally(() => (loading = false));
+		return chatRequest($session$.chats[0]);
 	}
 
 	const scrollChatContent = debounce(500, () => {
@@ -40,30 +40,41 @@
 	});
 
 	async function handleSearch() {
-		if (loading || !searchTerm) return;
-		loading = true;
+		if (!searchTerm) return;
+
 		scrollChatContent();
 
 		const chatItem: ChatItem = {
 			id: uuid(),
 			content: searchTerm,
 			role: 'user',
-			loading: false
+			loading: false,
+			createdAt: Date.now()
 		};
 		addChatItem(chatItem);
 		searchTerm = '';
-
-		return chatRequest(chatItem).finally(() => (loading = false));
+		return chatRequest(chatItem);
 	}
 
 	async function chatRequest(uItem: ChatItem) {
-		const aItem = addChatItem({ id: uuid(), content: '', role: 'assistant', loading: true });
+		if (loading) return;
+		loading = true;
+
+		const aItem = addChatItem({
+			id: uuid(),
+			content: '',
+			role: 'assistant',
+			loading: true,
+			createdAt: Date.now()
+		});
 
 		return fetch(`${env.API_BASE_URL}/chat/${sessionId}`, {
 			method: 'POST',
 			body: JSON.stringify({ chatItem: uItem, contentCategory: category }),
 			headers: { 'Content-Type': 'application/json' }
-		}).then((res) => handleStreamingResponse(res, aItem.id));
+		})
+			.then((res) => handleStreamingResponse(res, aItem.id))
+			.finally(() => (loading = false));
 	}
 
 	async function handleStreamingResponse(res: Response, id: string) {
@@ -79,6 +90,19 @@
 	$: sessionChats = $session$?.chats || [];
 
 	onMount(() => (mounted = true));
+
+	async function onregenerate() {
+		const chats = $session$?.chats;
+		if (!chats || chats.length === 1) return;
+
+		const curChatItem = chats[chats.length - 1];
+		const prevChatItem = chats[chats.length - 2];
+		removeChatItem(curChatItem.id);
+
+		await tick();
+
+		return chatRequest(prevChatItem);
+	}
 </script>
 
 <ChatContainer bind:searchTerm on:click={handleSearch} on:keypress={handleSearch}>
@@ -92,7 +116,13 @@
 		<div class="flex flex-col gap-y-3 h-full">
 			{#each sessionChats as item (item.id)}
 				{@const finalResponse = isfinalResponse(item)}
-				<ChatListItem type={item.role} content={item.content} loading={item.loading} />
+				<ChatListItem
+					type={item.role}
+					content={item.content}
+					loading={item.loading}
+					createdAt={item.createdAt}
+					on:regenerate={onregenerate}
+				/>
 
 				{#if finalResponse}
 					<ChatListActionItems

@@ -15,6 +15,7 @@ export type ChatItem = {
 	content: string;
 	role: 'user' | 'assistant';
 	loading?: boolean;
+	createdAt?: number;
 };
 
 export type Session = {
@@ -73,6 +74,17 @@ export function setSessionContext(sessionId: string) {
 				session.chats = chats;
 				return session;
 			});
+		},
+		removeChatItem: (chatId: string) => {
+			session$.update((session) => {
+				if (!session) return session;
+
+				const chats = session.chats.filter((i) => i.id !== chatId);
+				session.chats = chats;
+				return session;
+			});
+
+			return session$;
 		},
 		updateChatContent: (chatId: string, chunk: string) => {
 			session$.update((session) => {
