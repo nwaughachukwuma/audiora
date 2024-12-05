@@ -17,9 +17,9 @@
 	import ExampleCard from './ExampleCard.svelte';
 	export let sessionId: string;
 
-	$: contentExamplesDict = Object.entries(contentExamples) as Array<
-		[category: ContentCategory, content: string]
-	>;
+	$: contentExamplesDict = (
+		Object.entries(contentExamples) as Array<[category: ContentCategory, content: string]>
+	).slice(0, 6);
 </script>
 
 <div class="w-full h-full block">

@@ -55,4 +55,8 @@
 			</ChatBoxAndWidget>
 		{/if}
 	</svelte:fragment>
+
+	<svelte:fragment slot="chatbox">
+		<span></span>
+	</svelte:fragment>
 </ChatContainer>

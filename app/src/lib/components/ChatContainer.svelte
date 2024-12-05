@@ -25,16 +25,18 @@
 		</div>
 	</div>
 
-	{#if !hasFinalResponse && !$sessionCompleted$ && !$fetchingSource$ && !$audioSource$}
-		<div class="shrink-0 w-full sm:max-w-xl lg:max-w-3xl max-w-full max-sm:px-4 px-1 py-4">
-			<ChatBoxContainer
-				bind:searchTerm
-				loading={navLoading}
-				showIcon
-				disabled={$sessionCompleted$ || disableTextInput}
-				on:keypress
-				on:click
-			/>
-		</div>
-	{/if}
+	<slot name="chatbox">
+		{#if !hasFinalResponse && !$sessionCompleted$ && !$fetchingSource$ && !$audioSource$}
+			<div class="shrink-0 w-full sm:max-w-xl lg:max-w-3xl max-w-full max-sm:px-4 px-1 py-4">
+				<ChatBoxContainer
+					bind:searchTerm
+					loading={navLoading}
+					showIcon
+					disabled={$sessionCompleted$ || disableTextInput}
+					on:keypress
+					on:click
+				/>
+			</div>
+		{/if}
+	</slot>
 </div>
