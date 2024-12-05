@@ -12,7 +12,7 @@
 
 	async function handleClick() {
 		startSession(category);
-		addChatItem({ id: uuid(), content, role: 'user', loading: false });
+		addChatItem({ id: uuid(), content, role: 'user', loading: false, createdAt: Date.now() });
 		return goto(href, { invalidateAll: true, replaceState: true });
 	}
 </script>

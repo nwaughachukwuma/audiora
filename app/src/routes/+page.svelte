@@ -25,7 +25,7 @@
 		startSession(category);
 		
 		const content = `${selectContent}\nCategory: ${category} `;
-		addChatItem({ id: uuid(), content, role: 'user', loading: false });
+		addChatItem({ id: uuid(), content, role: 'user', loading: false, createdAt: Date.now() });
 
 		const href = `/chat/${sessionId}?category=${category}&chat`;
 		return goto(href, { invalidateAll: true, replaceState: true });
