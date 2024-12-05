@@ -76,7 +76,7 @@
 </script>
 
 <Drawer.Root {snapPoints} bind:activeSnapPoint direction="bottom" dismissible shouldScaleBackground>
-	<Drawer.Trigger>
+	<Drawer.Trigger class="relative">
 		<Button
 			variant="ghost"
 			on:click
@@ -84,6 +84,14 @@
 		>
 			Manage Sources
 		</Button>
+
+		{#if numSources || aiSource}
+			<div
+				class="p-2 absolute flex items-center justify-center bg-emerald-800 text-emerald-200 text-xs translate-x-3 -translate-y-3 top-0 right-0 rounded-full w-6 h-6"
+			>
+				{(numSources || 0) + (aiSource ? 1 : 0)}
+			</div>
+		{/if}
 	</Drawer.Trigger>
 
 	<Drawer.Overlay class="bg-black/40" />
