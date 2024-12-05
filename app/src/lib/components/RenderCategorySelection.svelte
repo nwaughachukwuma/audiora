@@ -31,14 +31,17 @@
 	}
 </script>
 
-<!-- Rename to get_category_selection.svelte -->
-
 <div class="flex flex-col gap-y-3 h-full">
 	<div class="flex flex-col gap-y-3 w-full">
 		<ChatListItem type="user" {content} />
 
 		{#if detectingCategory}
-			<ChatListItem type="assistant" content="Auto-detecting content category..." loading>
+			<ChatListItem
+				type="assistant"
+				content="Auto-detecting content category..."
+				loading
+				createdAt={Date.now()}
+			>
 				<span slot="loading" class="animate-pulse">
 					Auto-detecting content category...Please wait
 				</span>
