@@ -29,10 +29,14 @@
 
 	<div class="max-w-full justify-center break-words text-gray-200 flex flex-col text-base">
 		{#if loading}
-			<span class="animate-pulse">Generating response...</span>
+			<slot name="loading">
+				<span class="animate-pulse">Generating response...</span>
+			</slot>
 		{:else}
 			{#await parse(content) then parsedContent}
 				{@html parsedContent}
+			{:catch error}
+				<p class="text-red-300">{String(error)}</p>
 			{/await}
 		{/if}
 	</div>

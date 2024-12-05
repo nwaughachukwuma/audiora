@@ -42,7 +42,11 @@
 		<ChatListItem type="user" {content} />
 
 		{#if detectingCategory}
-			<ChatListItem type="assistant" content="Auto-detecting content category..." loading />
+			<ChatListItem type="assistant" content="Auto-detecting content category..." loading>
+				<span slot="loading" class="animate-pulse">
+					Auto-detecting content category...Please wait
+				</span>
+			</ChatListItem>
 		{:else}
 			<ChatListItem type="assistant" content="Please select your audiocast category" />
 		{/if}
