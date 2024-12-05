@@ -15,6 +15,7 @@ export type ChatItem = {
 	content: string;
 	role: 'user' | 'assistant';
 	loading?: boolean;
+	createdAt?: number;
 };
 
 export type Session = {

@@ -48,7 +48,8 @@
 			id: uuid(),
 			content: searchTerm,
 			role: 'user',
-			loading: false
+			loading: false,
+			createdAt: Date.now()
 		};
 		addChatItem(chatItem);
 		searchTerm = '';
@@ -57,7 +58,13 @@
 	}
 
 	async function chatRequest(uItem: ChatItem) {
-		const aItem = addChatItem({ id: uuid(), content: '', role: 'assistant', loading: true });
+		const aItem = addChatItem({
+			id: uuid(),
+			content: '',
+			role: 'assistant',
+			loading: true,
+			createdAt: Date.now()
+		});
 
 		return fetch(`${env.API_BASE_URL}/chat/${sessionId}`, {
 			method: 'POST',
@@ -92,7 +99,12 @@
 		<div class="flex flex-col gap-y-3 h-full">
 			{#each sessionChats as item (item.id)}
 				{@const finalResponse = isfinalResponse(item)}
-				<ChatListItem type={item.role} content={item.content} loading={item.loading} />
+				<ChatListItem
+					type={item.role}
+					content={item.content}
+					loading={item.loading}
+					createdAt={item.createdAt}
+				/>
 
 				{#if finalResponse}
 					<ChatListActionItems
