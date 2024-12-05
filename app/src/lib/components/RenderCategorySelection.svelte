@@ -5,9 +5,11 @@
 </script>
 
 <div class="flex flex-col gap-y-3 h-full">
-	<ChatListItem type="user" {content} />
+	<div class="flex flex-col gap-y-3 w-full">
+		<ChatListItem type="user" {content} />
 
-	<ChatListItem type="assistant" content="Please select your audiocast category" />
+		<ChatListItem type="assistant" content="Please select your audiocast category" />
+	</div>
 
 	<SelectCategory on:selectCategory />
 </div>
