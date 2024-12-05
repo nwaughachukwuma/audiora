@@ -75,6 +75,17 @@ export function setSessionContext(sessionId: string) {
 				return session;
 			});
 		},
+		removeChatItem: (chatId: string) => {
+			session$.update((session) => {
+				if (!session) return session;
+
+				const chats = session.chats.filter((i) => i.id !== chatId);
+				session.chats = chats;
+				return session;
+			});
+
+			return session$;
+		},
 		updateChatContent: (chatId: string, chunk: string) => {
 			session$.update((session) => {
 				if (!session) return session;

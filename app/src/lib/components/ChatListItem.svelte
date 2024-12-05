@@ -7,11 +7,14 @@
 	import cs from 'clsx';
 	import { parse } from 'marked';
 	import { Button } from './ui/button';
+	import { createEventDispatcher } from 'svelte';
 
 	export let type: 'user' | 'assistant';
 	export let content: string;
 	export let loading = false;
 	export let createdAt: number | undefined = undefined;
+
+	const dispatch = createEventDispatcher<{ regenerate: void }>();
 
 	$: likelyErrored = loading && (!createdAt || Date.now() - createdAt > TWO_MINUTES_MS);
 </script>
@@ -59,6 +62,7 @@
 	<Button
 		variant="ghost"
 		class="w-fit bg-gray-800 flex gap-x-2 text-gray-400 items-center hover:bg-gray-700 transition-all px-4 py-0.5"
+		on:click={() => dispatch('regenerate')}
 	>
 		<span>Regenerate</span>
 		<RotateCw class="inline w-4" />
