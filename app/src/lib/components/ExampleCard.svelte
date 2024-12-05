@@ -19,7 +19,7 @@
 
 <button
 	on:click={handleClick}
-	class="border no-underline hover:no-underline rounded-md group border-gray-600 p-4 bg-gray-900 hover:bg-gray-800"
+	class="border rounded-md min-h-[72px] md:h-24 group p-3 bg-zinc-800/50 border-zinc-700 text-zinc-300 hover:bg-zinc-700/50 transition-all hover:text-zinc-100"
 >
 	<span class="text-sm">
 		{content}

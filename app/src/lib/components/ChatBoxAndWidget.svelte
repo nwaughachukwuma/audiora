@@ -15,7 +15,7 @@
 	import { PaperclipIcon, ArrowUpIcon } from 'lucide-svelte';
 </script>
 
-<div class="flex flex-col items-center justify-center p-6">
+<div class="flex flex-col items-center justify-center">
 	<div class="w-full max-w-3xl space-y-8">
 		<div class="text-center space-y-2">
 			<h1 class="md:text-4xl text-3xl font-semibold text-white">What can I help with?</h1>
@@ -43,16 +43,18 @@
 			</div>
 		</Card>
 
-		<div class="flex flex-wrap gap-2 justify-center">
-			{#each examples as item, index (index)}
-				<Button
-					variant="outline"
-					class="bg-zinc-800/50 border-zinc-700 text-zinc-300 hover:bg-zinc-700/50 hover:text-white"
-				>
-					<span class="mr-2">{item.icon}</span>
-					{item.text}
-				</Button>
-			{/each}
-		</div>
+		<slot name="examples">
+			<div class="flex flex-wrap gap-2 justify-center">
+				{#each examples as item, index (index)}
+					<Button
+						variant="outline"
+						class="bg-zinc-800/50 border-zinc-700 text-zinc-300 hover:bg-zinc-700/50 hover:text-white"
+					>
+						<span class="mr-2">{item.icon}</span>
+						{item.text}
+					</Button>
+				{/each}
+			</div>
+		</slot>
 	</div>
 </div>

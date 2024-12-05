@@ -26,14 +26,14 @@ content_categories: List[ContentCategory] = [
 ]
 
 content_examples: Dict[ContentCategory, str] = {
-    "podcast": "Create a podcast exploring the intersection of ancient philosophy and artificial intelligence.",
-    "sermon": "Write a sermon connecting the teachings of Augustine with modern digital ethics.",
-    "audiodrama": "A reimagining of Homer's Odyssey set in a cyberpunk future.",
-    "lecture": "A lecture comparing Shakespeare's influence on modern social media communication.",
-    "commentary": "A commentary on how Classical music influences contemporary electronic genres.",
-    "voicenote": "A personal reflection on reading Plato's Republic in today's political climate.",
-    "interview": "An interview with an archaeologist using AI to uncover ancient Roman artifacts.",
-    "soundbite": "A quick take on how ancient Greek democracy shapes modern blockchain governance.",
+    "podcast": "Podcast exploring the intersection of ancient philosophy and AI",
+    "sermon": "Sermon connecting the teachings of Augustine with modern digital ethics",
+    "audiodrama": "Reimagining of Homer's Odyssey set in a cyberpunk future",
+    "lecture": "Lecture comparing Shakespeare's influence on modern social media",
+    "commentary": "Commentary on how Classical music influences contemporary electronic genres",
+    "voicenote": "Personal reflection on reading Plato's Republic in today's political climate",
+    "interview": "Interview with an archaeologist using AI to uncover ancient Roman artifacts",
+    "soundbite": "Quick take on how ancient Greek democracy shapes modern blockchain governance",
 }
 
 category_qualifiers: Dict[ContentCategory, str] = {

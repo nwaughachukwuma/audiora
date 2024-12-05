@@ -6,6 +6,7 @@
 	import { goto } from '$app/navigation';
 	import type { ContentCategory } from '@/utils/types';
 	import RenderCategorySelection from '@/components/RenderCategorySelection.svelte';
+	import ChatBoxAndWidget from '@/components/ChatBoxAndWidget.svelte';
 
 	const { sessionId$, addChatItem, startSession } = getSessionContext();
 
@@ -23,7 +24,7 @@
 
 	async function continueChat(category: ContentCategory) {
 		startSession(category);
-		
+
 		const content = `${selectContent}\nCategory: ${category} `;
 		addChatItem({ id: uuid(), content, role: 'user', loading: false, createdAt: Date.now() });
 
@@ -49,7 +50,9 @@
 				on:selectCategory={({ detail }) => continueChat(detail.value)}
 			/>
 		{:else}
-			<RenderExamples {sessionId} />
+			<ChatBoxAndWidget>
+				<RenderExamples slot="examples" {sessionId} />
+			</ChatBoxAndWidget>
 		{/if}
 	</svelte:fragment>
 </ChatContainer>
