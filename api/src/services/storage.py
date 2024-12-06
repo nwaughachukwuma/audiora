@@ -31,6 +31,8 @@ class UploadItemParams:
 
 
 class StorageManager:
+    bucket_name = BUCKET_NAME
+
     def check_blob_exists(self, filename: str, root_path=BLOB_BASE_URI):
         """check if a file exists in the bucket"""
         blobname = f"{root_path}/{filename}"
@@ -123,3 +125,8 @@ class StorageManager:
                 expiration=expiration,
                 method="GET",
             )
+
+    def get_gcs_url(self, filename: str):
+        """get full path to a file in the bucket"""
+        blobname = f"{BLOB_BASE_URI}/{filename}"
+        return f"gs://{BUCKET_NAME}/{blobname}"

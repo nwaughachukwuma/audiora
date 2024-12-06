@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi_utilities import add_timer_middleware
 
-from .services.storage import StorageManager, UploadItemParams
+from .services.storage import BLOB_BASE_URI, StorageManager, UploadItemParams
 from .utils.chat_request import chat_request
 from .utils.chat_utils import (
     ContentCategory,
@@ -226,12 +226,17 @@ async def store_file_upload(files: list[UploadFile], sessionId: str = Form(...))
     """
     storage_manager = StorageManager()
 
-    async def upload_handler(file: UploadFile):
+    async def upload_handler(file: UploadFile) -> str:
         file_obj = BytesIO(await file.read())
+
+        filename = sessionId
+        file_exists = storage_manager.check_blob_exists(filename)
+        if file_exists:
+            return storage_manager.get_gcs_url(filename)
 
         result = storage_manager.upload_to_gcs(
             item=file_obj,
-            blobname=sessionId,
+            blobname=f"{BLOB_BASE_URI}/{filename}",
             params=UploadItemParams(
                 cache_control="public, max-age=31536000",
                 content_type=file.content_type or "application/octet-stream",
