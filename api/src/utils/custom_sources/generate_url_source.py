@@ -20,7 +20,7 @@ class DeleteCustomSourcesRequest(BaseModel):
     sourceId: str
 
 
-def generate_custom_source(request: GenerateCustomSourceRequest, background_tasks: BackgroundTasks):
+def generate_custom_source(request: GenerateCustomSourceRequest, background_tasks: BackgroundTasks | None = None):
     extractor = ExtractURLContent()
     content = extractor._extract(request.url)
 
@@ -33,5 +33,9 @@ def generate_custom_source(request: GenerateCustomSourceRequest, background_task
         manager = CustomSourceManager(request.sessionId)
         manager._set_custom_source(custom_source)
 
-    background_tasks.add_task(save_to_firestore)
+    if background_tasks:
+        background_tasks.add_task(save_to_firestore)
+    else:
+        save_to_firestore()
+
     return content.model_dump()

@@ -25,15 +25,14 @@ from .utils.custom_sources.generate_url_source import (
     GetCustomSourcesRequest,
     generate_custom_source,
 )
+from .utils.custom_sources.manage_attachments import ManageAttachments
 from .utils.custom_sources.save_copied_source import CopiedPasteSourceRequest, save_copied_source
 from .utils.custom_sources.save_uploaded_sources import UploadedFiles
-from .utils.decorators import use_cache_manager
 from .utils.detect_content_category import DetectContentCategoryRequest, detect_content_category
 from .utils.generate_audiocast import GenerateAudioCastRequest, GenerateAudiocastException, generate_audiocast
 from .utils.generate_audiocast_source import GenerateAudiocastSource, generate_audiocast_source
 from .utils.get_audiocast import get_audiocast
 from .utils.get_session_title import GetSessionTitleModel, get_session_title
-from .utils.make_seed import get_hash
 from .utils.session_manager import SessionManager, SessionModel
 from .utils.summarize_custom_sources import SummarizeCustomSourcesRequest, summarize_custom_sources
 
@@ -81,21 +80,12 @@ async def chat_endpoint(
     """Chat endpoint"""
     category = request.contentCategory
     attachments = request.attachments
+
     db = SessionManager(session_id, category)
-
-    sources_summary: str | None = None
-    if attachments:
-        attachments.sort(key=lambda x: x.lower())
-
-        @use_cache_manager(get_hash(attachments))
-        async def _get_attachments_summary():
-            summary = await summarize_custom_sources(attachments)
-            db._update_source(summary)
-            return summary
-
-        sources_summary = await _get_attachments_summary()
-
     db._add_chat(request.chatItem)
+
+    attachment_manager = ManageAttachments(session_id)
+    sources_summary = await attachment_manager.get_attachments_summary(db, attachments)
 
     def on_finish(text: str):
         background_tasks.add_task(db._update, {"status": "collating"})
@@ -103,6 +93,9 @@ async def chat_endpoint(
             db._add_chat,
             SessionChatItem(role="assistant", content=text),
         )
+
+        if attachments:
+            background_tasks.add_task(attachment_manager.store_attachments, attachments)
 
     response = chat_request(
         content_category=category,

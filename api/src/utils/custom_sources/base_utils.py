@@ -103,3 +103,15 @@ class CustomSourceManager(DBManager):
 
     def _delete_custom_source(self, source_id: str):
         return self._get_doc_ref(source_id).delete()
+
+    def _get_custom_source_by_url(self, url: str):
+        self._check_document()
+        try:
+            session_ref = self._get_collection(self.collection).document(self.doc_id)
+            docs = session_ref.collection(self.sub_collection).where("url", "==", url).get()
+            for doc in docs:
+                if doc.exists:
+                    return cast(CustomSourceModel, self._safe_to_dict(doc.to_dict()))
+        except Exception as e:
+            print(f"Error getting custom sources for Session: {self.doc_id}", e)
+        return None
