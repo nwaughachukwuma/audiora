@@ -9,9 +9,7 @@
 	import { toast } from 'svelte-sonner';
 	export let selectedFiles: File[] = [];
 
-	const dispatch = createEventDispatcher<{
-		attach: { files: File[] };
-	}>();
+	const dispatch = createEventDispatcher<{ attach: { files: File[] } }>();
 
 	let fileInput: HTMLInputElement;
 
@@ -44,9 +42,10 @@
 	<PaperclipIcon class="h-5 w-5" />
 </Button>
 
+<!-- TODO: add support for .docx -->
 <input
 	type="file"
-	accept=".pdf,.txt,.docx"
+	accept=".pdf,.txt"
 	multiple
 	class="hidden"
 	bind:this={fileInput}
