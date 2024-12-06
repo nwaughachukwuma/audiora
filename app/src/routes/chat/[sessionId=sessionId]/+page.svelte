@@ -76,7 +76,7 @@
 			body: JSON.stringify({
 				chatItem: uItem,
 				contentCategory: category,
-				attachements: $sessionUploadItems$.map((i) => i.gcsUrl).filter(Boolean)
+				attachments: $sessionUploadItems$.map((i) => i.gcsUrl).filter(Boolean)
 			}),
 			headers: { 'Content-Type': 'application/json' }
 		})

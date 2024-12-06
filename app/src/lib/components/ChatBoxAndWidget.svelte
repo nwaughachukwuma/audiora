@@ -54,6 +54,7 @@
 						class="w-full outline-none bg-transparent border-0 focus:ring-0 text-white placeholder-zinc-400 resize-none py-3 px-4"
 						rows={1}
 						tabindex={0}
+						autofocus
 						bind:value={searchTerm}
 						on:keypress={handleKeyPress}
 					/>

@@ -38,7 +38,7 @@
 				{#if loading}
 					<Spinner />
 				{:else}
-					<FileIcon class="w-6 h-6 text-emerald-800" />
+					<FileIcon class="w-6 h-6 text-emerald-800 animate-fade-in" />
 				{/if}
 			</div>
 			<div class="flex-1 min-w-0">
