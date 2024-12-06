@@ -14,12 +14,13 @@
 	import { Card } from '@/components/ui/card';
 	import { ArrowUpIcon } from 'lucide-svelte';
 	import { createEventDispatcher } from 'svelte';
-	import ChatBoxAttachment, { uploadedItems$ } from './ChatBoxAttachment.svelte';
+	import ChatBoxAttachment from './ChatBoxAttachment.svelte';
 	import ChatBoxAttachmentPreview from './ChatBoxAttachmentPreview.svelte';
+	import { setAttachmentsContext } from '@/stores/attachmentsContext.svelte';
 
 	export let searchTerm = '';
 
-	let selectedFiles: File[] = [];
+	const { uploadedItems$ } = setAttachmentsContext();
 
 	const dispatch = createEventDispatcher<{
 		submitSearch: { value: string };
@@ -36,8 +37,6 @@
 		if (!searchTerm.trim()) return;
 		dispatch('submitSearch', { value: searchTerm });
 	}
-
-	$: selectedFiles = $uploadedItems$.map((item) => item.file);
 </script>
 
 <div class="flex flex-col items-center max-lg:pt-16 md:justify-center h-full">
@@ -78,8 +77,8 @@
 				</slot>
 			</div>
 
-			{#if selectedFiles.length > 0}
-				<ChatBoxAttachmentPreview bind:selectedFiles on:updateAttach />
+			{#if $uploadedItems$.length > 0}
+				<ChatBoxAttachmentPreview />
 			{/if}
 		</Card>
 

@@ -1,27 +1,19 @@
 <script lang="ts" context="module">
-	import { writable } from 'svelte/store';
 	const MAX_FILES = 5;
 	const TEN_MB = 10 * 1024 * 1024;
-
-	type UploadedItem = {
-		id: string;
-		file: File;
-		loading?: boolean;
-		errored?: boolean;
-		gcsUrl?: string;
-	};
-
-	export const uploadedItems$ = writable<UploadedItem[]>([]);
 </script>
 
 <script lang="ts">
-	import { PaperclipIcon } from 'lucide-svelte';
-	import { Button } from './ui/button';
-	import { toast } from 'svelte-sonner';
 	import { env } from '@env';
+	import { Button } from './ui/button';
+	import { PaperclipIcon } from 'lucide-svelte';
 	import { slug } from 'github-slugger';
 	import { onDestroy } from 'svelte';
 	import { beforeNavigate } from '$app/navigation';
+	import { toast } from 'svelte-sonner';
+	import { getAttachmentsContext } from '@/stores/attachmentsContext.svelte';
+
+	const { uploadedItems$ } = getAttachmentsContext();
 
 	let fileInput: HTMLInputElement;
 
