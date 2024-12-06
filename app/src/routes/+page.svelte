@@ -42,7 +42,7 @@
 		'flex-col justify-start': triggerSelectCategory && selectContent
 	})}
 >
-	<div class="sm:max-w-xl lg:max-w-3xl max-w-full w-full">
+	<div class="sm:max-w-xl lg:max-w-3xl max-w-full w-full max-h-full">
 		<div class="scrollbar-y-1 w-full h-full block">
 			{#if triggerSelectCategory && selectContent}
 				<RenderCategorySelection

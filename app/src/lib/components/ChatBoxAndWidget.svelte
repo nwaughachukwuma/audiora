@@ -30,15 +30,16 @@
 	}
 
 	function dispatchSearch() {
-		console.log({ searchTerm });
+		if (!searchTerm.trim()) return;
 		dispatch('submitSearch', { value: searchTerm });
 	}
 </script>
 
-<div class="flex flex-col items-center justify-center">
+<div class="flex flex-col items-center max-lg:pt-16 md:justify-center h-full">
 	<div class="w-full max-w-3xl space-y-8">
 		<div class="text-center space-y-2">
 			<h1 class="md:text-4xl text-3xl font-semibold text-white">What can I help with?</h1>
+			<h3 class="text-base text-gray-400">Listen to anything, anytime</h3>
 		</div>
 
 		<Card class="bg-zinc-800/50 border-0 overflow-hidden">
@@ -64,6 +65,7 @@
 						variant="ghost"
 						size="icon"
 						class="text-zinc-400 hover:text-white"
+						disabled={!searchTerm}
 						on:click={dispatchSearch}
 					>
 						<ArrowUpIcon class="h-5 w-5" />
