@@ -1,5 +1,6 @@
 import asyncio
 
+from src.services.storage import StorageManager
 from src.utils.decorators import use_cache_manager
 from src.utils.make_seed import get_hash
 from src.utils.session_manager import SessionManager
@@ -38,10 +39,14 @@ class ManageAttachments:
         manager = CustomSourceManager(self.session_id)
 
         async def _handler(url: str):
-            custom_source = manager._get_custom_source_by_url(url)
-            if not custom_source:
-                request = GenerateCustomSourceRequest(url=url, sessionId=self.session_id)
-                generate_custom_source(request)
+            storage_manager = StorageManager()
+            blobname = url.replace(f"gs://{storage_manager.bucket_name}/", "")
+            signed_url = storage_manager.get_signed_url(blobname)
 
-        await asyncio.gather(*[_handler(url) for url in attachments])
+            custom_source = manager._get_custom_source_by_url(signed_url)
+            if not custom_source:
+                request = GenerateCustomSourceRequest(url=signed_url, sessionId=self.session_id)
+                return generate_custom_source(request)
+
+        await asyncio.gather(*[_handler(url) for url in attachments], return_exceptions=True)
         return True

@@ -1,6 +1,7 @@
 from typing import Literal, Optional, TypedDict, cast
 
 from google.cloud.firestore_v1 import DocumentReference
+from google.cloud.firestore_v1.base_query import FieldFilter
 from pydantic import BaseModel
 
 from src.services.firestore_sdk import (
@@ -108,7 +109,11 @@ class CustomSourceManager(DBManager):
         self._check_document()
         try:
             session_ref = self._get_collection(self.collection).document(self.doc_id)
-            docs = session_ref.collection(self.sub_collection).where("url", "==", url).get()
+
+            query = session_ref.collection(self.sub_collection).where(filter=FieldFilter("url", "==", url))
+
+            docs = query.get()
+
             for doc in docs:
                 if doc.exists:
                     return cast(CustomSourceModel, self._safe_to_dict(doc.to_dict()))

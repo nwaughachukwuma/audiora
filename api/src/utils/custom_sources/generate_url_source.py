@@ -20,7 +20,10 @@ class DeleteCustomSourcesRequest(BaseModel):
     sourceId: str
 
 
-def generate_custom_source(request: GenerateCustomSourceRequest, background_tasks: BackgroundTasks | None = None):
+def generate_custom_source(
+    request: GenerateCustomSourceRequest,
+    background_tasks: BackgroundTasks | None = None,
+):
     extractor = ExtractURLContent()
     content = extractor._extract(request.url)
 
