@@ -22,8 +22,15 @@
 		fetchingSource$,
 		sessionId$,
 		sessionCompleted$,
-		updateSessionTitle
+		updateSessionTitle,
+		sessionModel$
 	} = getSessionContext();
+
+	$: dbAudioSource = $sessionModel$?.metadata?.source;
+
+	$: if (dbAudioSource && $audioSource$ != dbAudioSource) {
+		$audioSource$ = dbAudioSource;
+	}
 
 	async function ongenerate(summary: string) {
 		session$.update((session) => {

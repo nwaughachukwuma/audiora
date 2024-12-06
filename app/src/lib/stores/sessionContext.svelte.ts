@@ -5,7 +5,7 @@ import { getSession$ } from '@/db/db.session';
 import type { ContentCategory } from '@/utils/types';
 import { setContext, getContext } from 'svelte';
 import { persisted } from 'svelte-persisted-store';
-import { derived, get, writable } from 'svelte/store';
+import { derived, writable } from 'svelte/store';
 
 const CONTEXT_KEY = {};
 export const SESSION_KEY = 'AUDIOCAST_SESSION';
