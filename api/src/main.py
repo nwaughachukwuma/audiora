@@ -33,6 +33,7 @@ from .utils.generate_audiocast_source import GenerateAudiocastSource, generate_a
 from .utils.get_audiocast import get_audiocast
 from .utils.get_session_title import GetSessionTitleModel, get_session_title
 from .utils.session_manager import SessionManager, SessionModel
+from .utils.summarize_custom_sources import SummarizeCustomSourcesRequest, summarize_custom_sources
 
 app = FastAPI(title="Audiora", version="1.0.0")
 
@@ -242,3 +243,11 @@ async def store_file_upload(file: UploadFile, filename: str = Form(...)):
     )
 
     return result
+
+
+@app.post("/summarize-custom-sources", response_model=str)
+async def summarize_custom_sources_endpoint(request: SummarizeCustomSourcesRequest):
+    """
+    Summarize custom sources from specified source URLs
+    """
+    return await summarize_custom_sources(request.sourceURLs)

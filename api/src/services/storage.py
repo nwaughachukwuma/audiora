@@ -130,3 +130,7 @@ class StorageManager:
         """get full path to a file in the bucket"""
         blobname = f"{BLOB_BASE_URI}/{filename}"
         return f"gs://{BUCKET_NAME}/{blobname}"
+
+    def get_blob(self, blobname: str):
+        """get a blob object"""
+        return bucket.blob(blobname)
