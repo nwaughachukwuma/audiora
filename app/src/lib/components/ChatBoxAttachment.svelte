@@ -23,8 +23,7 @@
 		const files = Array.from(fileList);
 
 		if (selectedFiles.length + files.length > MAX_FILES) {
-			alert(`You can only upload up to ${MAX_FILES} files`);
-			return;
+			return toast.info(`You can only upload up to ${MAX_FILES} files`);
 		}
 
 		selectedFiles = [...selectedFiles, ...files];
@@ -47,7 +46,7 @@
 
 <input
 	type="file"
-	accept=".pdf,.txt"
+	accept=".pdf,.txt,.docx"
 	multiple
 	class="hidden"
 	bind:this={fileInput}
