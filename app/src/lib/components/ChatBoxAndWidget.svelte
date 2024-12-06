@@ -56,21 +56,23 @@
 				</div>
 			</div>
 			<div class="flex flex-row-reverse items-center justify-between p-2 bg-zinc-800/30">
-				<div class="flex items-center gap-2 px-2">
-					<Button variant="ghost" size="icon" class="text-zinc-400 hover:text-white" on:click>
-						<PaperclipIcon class="h-5 w-5" />
-					</Button>
+				<slot name="tools">
+					<div class="flex items-center gap-2 px-2">
+						<Button variant="ghost" size="icon" class="text-zinc-400 hover:text-white" on:click>
+							<PaperclipIcon class="h-5 w-5" />
+						</Button>
 
-					<Button
-						variant="ghost"
-						size="icon"
-						class="text-zinc-400 hover:text-white"
-						disabled={!searchTerm}
-						on:click={dispatchSearch}
-					>
-						<ArrowUpIcon class="h-5 w-5" />
-					</Button>
-				</div>
+						<Button
+							variant="ghost"
+							size="icon"
+							class="text-zinc-400 hover:text-white"
+							disabled={!searchTerm}
+							on:click={dispatchSearch}
+						>
+							<ArrowUpIcon class="h-5 w-5" />
+						</Button>
+					</div>
+				</slot>
 			</div>
 		</Card>
 
