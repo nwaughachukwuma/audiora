@@ -14,6 +14,7 @@
 	import { onMount } from 'svelte';
 	import { getAnalytics, logEvent } from 'firebase/analytics';
 	import cs from 'clsx';
+	import { setAttachmentsContext } from '@/stores/attachmentsContext.svelte';
 
 	export let data;
 
@@ -25,6 +26,7 @@
 	$: ({ session$ } = setSessionContext(sessionId));
 
 	$: sessionTitle = $session$?.title;
+	$: setAttachmentsContext(sessionId);
 
 	onMount(() => {
 		logEvent(getAnalytics(), 'page_view', {

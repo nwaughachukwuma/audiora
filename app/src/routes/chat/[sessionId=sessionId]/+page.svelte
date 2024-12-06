@@ -10,11 +10,14 @@
 	import { debounce } from 'throttle-debounce';
 	import AudiocastPageHeader from '@/components/AudiocastPageHeader.svelte';
 	import { getSummary, isfinalResponse } from '@/utils/session.utils';
+	import { getAttachmentsContext } from '@/stores/attachmentsContext.svelte.js';
 
 	export let data;
 
 	const { session$, addChatItem, updateChatContent, sessionId$, removeChatItem } =
 		getSessionContext();
+
+	const { sessionUploadItems$ } = getAttachmentsContext();
 
 	let searchTerm = '';
 	let loading = false;
@@ -70,7 +73,11 @@
 
 		return fetch(`${env.API_BASE_URL}/chat/${sessionId}`, {
 			method: 'POST',
-			body: JSON.stringify({ chatItem: uItem, contentCategory: category }),
+			body: JSON.stringify({
+				chatItem: uItem,
+				contentCategory: category,
+				attachements: $sessionUploadItems$.map((i) => i.gcsUrl).filter(Boolean)
+			}),
 			headers: { 'Content-Type': 'application/json' }
 		})
 			.then((res) => handleStreamingResponse(res, aItem.id))

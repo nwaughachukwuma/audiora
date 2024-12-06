@@ -20,7 +20,7 @@
 
 	export let searchTerm = '';
 
-	const { uploadedItems$ } = getAttachmentsContext();
+	const { sessionUploadItems$ } = getAttachmentsContext();
 
 	const dispatch = createEventDispatcher<{
 		submitSearch: { value: string };
@@ -77,7 +77,7 @@
 				</slot>
 			</div>
 
-			{#if $uploadedItems$.length > 0}
+			{#if $sessionUploadItems$.length > 0}
 				<ChatBoxAttachmentPreview />
 			{/if}
 		</Card>

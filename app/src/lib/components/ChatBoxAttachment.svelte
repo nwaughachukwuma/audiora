@@ -8,14 +8,16 @@
 	import { Button } from './ui/button';
 	import { PaperclipIcon } from 'lucide-svelte';
 	import { slug } from 'github-slugger';
-	import { onDestroy } from 'svelte';
-	import { beforeNavigate } from '$app/navigation';
 	import { toast } from 'svelte-sonner';
 	import { getAttachmentsContext } from '@/stores/attachmentsContext.svelte';
+	import { getSessionContext } from '@/stores/sessionContext.svelte';
 
-	const { uploadedItems$ } = getAttachmentsContext();
+	const { sessionId$ } = getSessionContext();
+	const { addUploadItem, sessionUploadItems$, updateUploadItem } = getAttachmentsContext();
 
 	let fileInput: HTMLInputElement;
+
+	$: sessionId = $sessionId$;
 
 	async function handleFileSelect(fileList: FileList | null) {
 		if (!fileList) return toast.error('No files selected');
@@ -23,7 +25,7 @@
 		const files = Array.from(fileList);
 		fileInput.value = '';
 
-		if ($uploadedItems$.length + files.length > MAX_FILES) {
+		if ($sessionUploadItems$.length + files.length > MAX_FILES) {
 			return toast.info(`You can only upload up to ${MAX_FILES} files`);
 		}
 
@@ -33,9 +35,11 @@
 				continue;
 			}
 
-			uploadedItems$.update((files) => {
-				files.push({ id: slug(file.name), file: file, loading: true, errored: false });
-				return files;
+			addUploadItem({
+				id: `${sessionId}_${slug(file.name)}`,
+				file: file,
+				loading: true,
+				errored: false
 			});
 		}
 
@@ -43,7 +47,7 @@
 	}
 
 	async function uploadFiles(file: File) {
-		const fileId = slug(file.name);
+		const fileId = `${sessionId}_${slug(file.name)}`;
 
 		const formData = new FormData();
 		formData.append('file', file);
@@ -57,43 +61,20 @@
 				if (res.ok) return res.json();
 				throw new Error('Failed to upload files');
 			})
-			.then((url) => {
-				uploadedItems$.update((files) => {
-					return files.map((f) => {
-						if (f.id === fileId) f.gcsUrl = url;
-						return f;
-					});
-				});
-			})
+			.then((url) => updateUploadItem(fileId, { gcsUrl: url }))
 			.catch((err) => {
 				toast.error(err.message);
-
-				uploadedItems$.update((files) => {
-					return files.map((f) => {
-						if (f.id === fileId) f.errored = true;
-						return f;
-					});
-				});
+				updateUploadItem(fileId, { errored: true });
 			})
-			.finally(() => {
-				uploadedItems$.update((files) =>
-					files.map((f) => {
-						if (f.id === fileId) f.loading = false;
-						return f;
-					})
-				);
-			});
+			.finally(() => updateUploadItem(fileId, { loading: false }));
 	}
-
-	onDestroy(() => uploadedItems$.set([]));
-	beforeNavigate(() => uploadedItems$.set([]));
 </script>
 
 <Button
 	variant="ghost"
 	size="icon"
 	class="text-zinc-400 hover:text-white"
-	disabled={$uploadedItems$.length >= MAX_FILES}
+	disabled={$sessionUploadItems$.length >= MAX_FILES}
 	on:click={() => fileInput.click()}
 >
 	<PaperclipIcon class="h-5 w-5" />

@@ -4,13 +4,7 @@
 	import { getAttachmentsContext } from '@/stores/attachmentsContext.svelte';
 	import Spinner from './Spinner.svelte';
 
-	const { uploadedItems$ } = getAttachmentsContext();
-
-	function removeFile(id: string) {
-		uploadedItems$.update((files) => {
-			return files.filter((f) => f.id !== id);
-		});
-	}
+	const { removeUploadItem, sessionUploadItems$ } = getAttachmentsContext();
 
 	function formatFileSize(bytes: number): string {
 		if (bytes === 0) return '0 Bytes';
@@ -34,7 +28,7 @@
 		}
 	}
 
-	$: validItems = $uploadedItems$.filter((item) => !item.errored);
+	$: validItems = $sessionUploadItems$.filter((item) => !item.errored);
 </script>
 
 <div class="p-2 flex flex-wrap gap-2 bg-zinc-800/30">
@@ -58,7 +52,7 @@
 				size="icon"
 				class="text-zinc-400 hover:text-white hover:bg-zinc-700/70"
 				disabled={loading}
-				on:click={() => removeFile(id)}
+				on:click={() => removeUploadItem(id)}
 			>
 				<XIcon class="h-4 w-4" />
 			</Button>
