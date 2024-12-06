@@ -1,4 +1,5 @@
 import asyncio
+from io import BytesIO
 from time import time
 from typing import Any, Callable, Generator
 
@@ -7,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi_utilities import add_timer_middleware
 
-from .services.storage import StorageManager
+from .services.storage import StorageManager, UploadItemParams
 from .utils.chat_request import chat_request
 from .utils.chat_utils import (
     ContentCategory,
@@ -216,3 +217,29 @@ async def detect_category_endpoint(request: DetectContentCategoryRequest):
     Detect category of a given content
     """
     return await detect_content_category(request.content)
+
+
+@app.post("/store-file-upload", response_model=str)
+async def store_file_upload(files: list[UploadFile], sessionId: str = Form(...)):
+    """
+    Store file uploaded from the frontend
+    """
+    storage_manager = StorageManager()
+
+    async def upload_handler(file: UploadFile):
+        file_obj = BytesIO(await file.read())
+
+        result = storage_manager.upload_to_gcs(
+            item=file_obj,
+            blobname=sessionId,
+            params=UploadItemParams(
+                content_type=file.content_type or "application/octet-stream",
+            ),
+        )
+
+        return result
+
+    tasks = [upload_handler(file) for file in files]
+    ref_urls = await asyncio.gather(*tasks)
+
+    return ref_urls
