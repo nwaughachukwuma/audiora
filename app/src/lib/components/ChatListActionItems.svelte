@@ -56,7 +56,7 @@
 			})
 			.then((res) => {
 				$audioSource$ = res;
-				toast.success('Audiocast source generated successfully');
+				toast.success('AI-generated source material generated successfully');
 			})
 			.catch((error) => toast.error(error.message))
 			.finally(() => ($fetchingSource$ = false));
