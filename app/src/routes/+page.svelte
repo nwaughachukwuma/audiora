@@ -1,12 +1,12 @@
 <script lang="ts">
 	import RenderExamples from '@/components/RenderExamples.svelte';
-	import ChatContainer from '@/components/ChatContainer.svelte';
 	import { getSessionContext } from '@/stores/sessionContext.svelte.js';
 	import { uuid } from '@/utils/uuid';
 	import { goto } from '$app/navigation';
 	import type { ContentCategory } from '@/utils/types';
 	import RenderCategorySelection from '@/components/RenderCategorySelection.svelte';
 	import ChatBoxAndWidget from '@/components/ChatBoxAndWidget.svelte';
+	import { cn } from '@/utils/ui.utils';
 
 	const { sessionId$, addChatItem, startSession } = getSessionContext();
 
@@ -37,26 +37,23 @@
 	<title>Audiora</title>
 </svelte:head>
 
-<ChatContainer
-	disableTextInput={triggerSelectCategory}
-	bind:searchTerm
-	on:click={handleSearch}
-	on:keypress={handleSearch}
+<div
+	class={cn('overflow-auto w-full h-full flex items-center justify-center mx-auto px-4', {
+		'flex-col justify-start': triggerSelectCategory && selectContent
+	})}
 >
-	<svelte:fragment slot="content">
-		{#if triggerSelectCategory && selectContent}
-			<RenderCategorySelection
-				content={selectContent}
-				on:selectCategory={({ detail }) => continueChat(detail.value)}
-			/>
-		{:else}
-			<ChatBoxAndWidget>
-				<RenderExamples slot="examples" {sessionId} />
-			</ChatBoxAndWidget>
-		{/if}
-	</svelte:fragment>
-
-	<svelte:fragment slot="chatbox">
-		<span></span>
-	</svelte:fragment>
-</ChatContainer>
+	<div class="sm:max-w-xl lg:max-w-3xl max-w-full w-full">
+		<div class="scrollbar-y-1 w-full h-full block">
+			{#if triggerSelectCategory && selectContent}
+				<RenderCategorySelection
+					content={selectContent}
+					on:selectCategory={({ detail }) => continueChat(detail.value)}
+				/>
+			{:else}
+				<ChatBoxAndWidget bind:searchTerm on:submitSearch={handleSearch}>
+					<RenderExamples slot="examples" {sessionId} />
+				</ChatBoxAndWidget>
+			{/if}
+		</div>
+	</div>
+</div>

@@ -9,10 +9,30 @@
 	];
 </script>
 
-<script>
+<script lang="ts">
 	import { Button } from '@/components/ui/button';
 	import { Card } from '@/components/ui/card';
 	import { PaperclipIcon, ArrowUpIcon } from 'lucide-svelte';
+	import { createEventDispatcher } from 'svelte';
+
+	export let searchTerm = '';
+
+	const dispatch = createEventDispatcher<{
+		submitSearch: { value: string };
+		attach: void;
+	}>();
+
+	function handleKeyPress(ev: KeyboardEvent) {
+		if (ev.key === 'Enter' && !ev.shiftKey && searchTerm) {
+			ev.preventDefault();
+			dispatchSearch();
+		}
+	}
+
+	function dispatchSearch() {
+		console.log({ searchTerm });
+		dispatch('submitSearch', { value: searchTerm });
+	}
 </script>
 
 <div class="flex flex-col items-center justify-center">
@@ -28,15 +48,24 @@
 						placeholder="Message Audiora"
 						class="w-full outline-none bg-transparent border-0 focus:ring-0 text-white placeholder-zinc-400 resize-none py-3 px-4"
 						rows={1}
+						tabindex={0}
+						bind:value={searchTerm}
+						on:keypress={handleKeyPress}
 					/>
 				</div>
 			</div>
 			<div class="flex flex-row-reverse items-center justify-between p-2 bg-zinc-800/30">
 				<div class="flex items-center gap-2 px-2">
-					<Button variant="ghost" size="icon" class="text-zinc-400 hover:text-white">
+					<Button variant="ghost" size="icon" class="text-zinc-400 hover:text-white" on:click>
 						<PaperclipIcon class="h-5 w-5" />
 					</Button>
-					<Button variant="ghost" size="icon" class="text-zinc-400 hover:text-white">
+
+					<Button
+						variant="ghost"
+						size="icon"
+						class="text-zinc-400 hover:text-white"
+						on:click={dispatchSearch}
+					>
 						<ArrowUpIcon class="h-5 w-5" />
 					</Button>
 				</div>

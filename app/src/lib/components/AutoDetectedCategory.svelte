@@ -28,7 +28,7 @@
 
 <ChatListItem
 	type="assistant"
-	content="I auto-detected you want {categoryWithArticle}. Press NEXT to continue if correct."
+	content="I auto-detected you want {categoryWithArticle}. Press NEXT to continue."
 />
 
 <Button
@@ -40,4 +40,4 @@
 	<ArrowRight class="w-4 ml-1 inline" />
 </Button>
 
-<ChatListItem type="assistant" content="Else, select your audiocast category" />
+<ChatListItem type="assistant" content="Or select your audiocast category" />
