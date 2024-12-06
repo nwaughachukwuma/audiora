@@ -219,33 +219,26 @@ async def detect_category_endpoint(request: DetectContentCategoryRequest):
     return await detect_content_category(request.content)
 
 
-@app.post("/store-file-uploads", response_model=list[str])
-async def store_file_upload(files: list[UploadFile], sessionId: str = Form(...)):
+@app.post("/store-file-upload", response_model=str)
+async def store_file_upload(file: UploadFile, filename: str = Form(...)):
     """
     Store file uploaded from the frontend
     """
     storage_manager = StorageManager()
 
-    async def upload_handler(file: UploadFile) -> str:
-        file_obj = BytesIO(await file.read())
+    file_obj = BytesIO(await file.read())
 
-        filename = sessionId
-        file_exists = storage_manager.check_blob_exists(filename)
-        if file_exists:
-            return storage_manager.get_gcs_url(filename)
+    file_exists = storage_manager.check_blob_exists(filename)
+    if file_exists:
+        return storage_manager.get_gcs_url(filename)
 
-        result = storage_manager.upload_to_gcs(
-            item=file_obj,
-            blobname=f"{BLOB_BASE_URI}/{filename}",
-            params=UploadItemParams(
-                cache_control="public, max-age=31536000",
-                content_type=file.content_type or "application/octet-stream",
-            ),
-        )
+    result = storage_manager.upload_to_gcs(
+        item=file_obj,
+        blobname=f"{BLOB_BASE_URI}/{filename}",
+        params=UploadItemParams(
+            cache_control="public, max-age=31536000",
+            content_type=file.content_type or "application/octet-stream",
+        ),
+    )
 
-        return result
-
-    tasks = [upload_handler(file) for file in files]
-    ref_urls = await asyncio.gather(*tasks)
-
-    return ref_urls
+    return result
