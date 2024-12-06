@@ -1,42 +1,109 @@
-<script context="module">
+<script lang="ts" context="module">
+	import { writable } from 'svelte/store';
 	const MAX_FILES = 5;
+	const TEN_MB = 10 * 1024 * 1024;
+
+	type UploadedItem = {
+		id: string;
+		file: File;
+		loading?: boolean;
+		errored?: boolean;
+		gcsUrl?: string;
+	};
+
+	export const uploadedItems$ = writable<UploadedItem[]>([]);
 </script>
 
 <script lang="ts">
 	import { PaperclipIcon } from 'lucide-svelte';
-	import { createEventDispatcher } from 'svelte';
 	import { Button } from './ui/button';
 	import { toast } from 'svelte-sonner';
-	export let selectedFiles: File[] = [];
-
-	const dispatch = createEventDispatcher<{ attach: { files: File[] } }>();
+	import { env } from '@env';
+	import { slug } from 'github-slugger';
+	import { onDestroy } from 'svelte';
+	import { beforeNavigate } from '$app/navigation';
 
 	let fileInput: HTMLInputElement;
 
-	function handleFileSelect(fileList: FileList | null) {
-		if (!fileList) {
-			return toast.error('No files selected');
-		}
+	async function handleFileSelect(fileList: FileList | null) {
+		if (!fileList) return toast.error('No files selected');
 
 		const files = Array.from(fileList);
+		fileInput.value = '';
 
-		if (selectedFiles.length + files.length > MAX_FILES) {
+		if ($uploadedItems$.length + files.length > MAX_FILES) {
 			return toast.info(`You can only upload up to ${MAX_FILES} files`);
 		}
 
-		selectedFiles = [...selectedFiles, ...files];
-		dispatch('attach', { files: selectedFiles });
+		for (const file of files) {
+			if (file.size > TEN_MB) {
+				toast.info(`File ${file.name} exceeds 10MB. Skipping...`);
+				continue;
+			}
 
-		// Reset input
-		fileInput.value = '';
+			$uploadedItems$.push({
+				id: slug(file.name),
+				file: file,
+				loading: true,
+				errored: false
+			});
+		}
+
+		return Promise.all(files.map(uploadFiles));
 	}
+
+	async function uploadFiles(file: File) {
+		const fileId = slug(file.name);
+
+		const formData = new FormData();
+		formData.append('file', file);
+		formData.append('filename', fileId);
+
+		return fetch(`${env.API_BASE_URL}/store-file-upload`, {
+			method: 'POST',
+			body: formData
+		})
+			.then<string>((res) => {
+				if (res.ok) return res.json();
+				throw new Error('Failed to upload files');
+			})
+			.then((url) => {
+				uploadedItems$.update((files) => {
+					return files.map((f) => {
+						if (f.id === fileId) f.gcsUrl = url;
+						return f;
+					});
+				});
+			})
+			.catch((err) => {
+				toast.error(err.message);
+
+				uploadedItems$.update((files) => {
+					return files.map((f) => {
+						if (f.id === fileId) f.errored = true;
+						return f;
+					});
+				});
+			})
+			.finally(() => {
+				uploadedItems$.update((files) =>
+					files.map((f) => {
+						if (f.id === fileId) f.loading = false;
+						return f;
+					})
+				);
+			});
+	}
+
+	onDestroy(() => uploadedItems$.set([]));
+	beforeNavigate(() => uploadedItems$.set([]));
 </script>
 
 <Button
 	variant="ghost"
 	size="icon"
 	class="text-zinc-400 hover:text-white"
-	disabled={selectedFiles.length >= MAX_FILES}
+	disabled={$uploadedItems$.length >= MAX_FILES}
 	on:click={() => fileInput.click()}
 >
 	<PaperclipIcon class="h-5 w-5" />

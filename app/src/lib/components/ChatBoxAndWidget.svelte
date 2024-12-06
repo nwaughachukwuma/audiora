@@ -14,7 +14,7 @@
 	import { Card } from '@/components/ui/card';
 	import { ArrowUpIcon } from 'lucide-svelte';
 	import { createEventDispatcher } from 'svelte';
-	import ChatBoxAttachment from './ChatBoxAttachment.svelte';
+	import ChatBoxAttachment, { uploadedItems$ } from './ChatBoxAttachment.svelte';
 	import ChatBoxAttachmentPreview from './ChatBoxAttachmentPreview.svelte';
 
 	export let searchTerm = '';
@@ -36,6 +36,8 @@
 		if (!searchTerm.trim()) return;
 		dispatch('submitSearch', { value: searchTerm });
 	}
+
+	$: selectedFiles = $uploadedItems$.map((item) => item.file);
 </script>
 
 <div class="flex flex-col items-center max-lg:pt-16 md:justify-center h-full">
@@ -61,7 +63,7 @@
 			<div class="flex flex-row-reverse items-center justify-between p-2 bg-zinc-800/30">
 				<slot name="tools">
 					<div class="flex items-center gap-2 px-2">
-						<ChatBoxAttachment bind:selectedFiles on:attach />
+						<ChatBoxAttachment />
 
 						<Button
 							variant="ghost"
