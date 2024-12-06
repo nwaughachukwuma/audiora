@@ -219,7 +219,7 @@ async def detect_category_endpoint(request: DetectContentCategoryRequest):
     return await detect_content_category(request.content)
 
 
-@app.post("/store-file-upload", response_model=str)
+@app.post("/store-file-uploads", response_model=list[str])
 async def store_file_upload(files: list[UploadFile], sessionId: str = Form(...)):
     """
     Store file uploaded from the frontend
@@ -233,6 +233,7 @@ async def store_file_upload(files: list[UploadFile], sessionId: str = Form(...))
             item=file_obj,
             blobname=sessionId,
             params=UploadItemParams(
+                cache_control="public, max-age=31536000",
                 content_type=file.content_type or "application/octet-stream",
             ),
         )
