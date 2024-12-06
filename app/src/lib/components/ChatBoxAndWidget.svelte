@@ -12,14 +12,17 @@
 <script lang="ts">
 	import { Button } from '@/components/ui/button';
 	import { Card } from '@/components/ui/card';
-	import { PaperclipIcon, ArrowUpIcon } from 'lucide-svelte';
+	import { ArrowUpIcon } from 'lucide-svelte';
 	import { createEventDispatcher } from 'svelte';
+	import ChatBoxAttachment from './ChatBoxAttachment.svelte';
+	import ChatBoxAttachmentPreview from './ChatBoxAttachmentPreview.svelte';
 
 	export let searchTerm = '';
 
+	let selectedFiles: File[] = [];
+
 	const dispatch = createEventDispatcher<{
 		submitSearch: { value: string };
-		attach: void;
 	}>();
 
 	function handleKeyPress(ev: KeyboardEvent) {
@@ -58,9 +61,7 @@
 			<div class="flex flex-row-reverse items-center justify-between p-2 bg-zinc-800/30">
 				<slot name="tools">
 					<div class="flex items-center gap-2 px-2">
-						<Button variant="ghost" size="icon" class="text-zinc-400 hover:text-white" on:click>
-							<PaperclipIcon class="h-5 w-5" />
-						</Button>
+						<ChatBoxAttachment bind:selectedFiles on:attach />
 
 						<Button
 							variant="ghost"
@@ -74,6 +75,10 @@
 					</div>
 				</slot>
 			</div>
+
+			{#if selectedFiles.length > 0}
+				<ChatBoxAttachmentPreview bind:selectedFiles on:updateAttach />
+			{/if}
 		</Card>
 
 		<slot name="examples">
@@ -83,7 +88,9 @@
 						variant="outline"
 						class="bg-zinc-800/50 border-zinc-700 text-zinc-300 hover:bg-zinc-700/50 hover:text-white"
 					>
-						<span class="mr-2">{item.icon}</span>
+						{#if item.icon}
+							<span class="mr-2">{item.icon}</span>
+						{/if}
 						{item.text}
 					</Button>
 				{/each}
