@@ -20,4 +20,5 @@ export const setAttachmentsContext = () => {
 
 export type AttachmentsContext = ReturnType<typeof setAttachmentsContext>;
 
-export const getAttachmentsContext = () => getContext<AttachmentsContext>(CONTEXT_KEY);
+export const getAttachmentsContext = () =>
+	getContext<AttachmentsContext>(CONTEXT_KEY) || setAttachmentsContext();

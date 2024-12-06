@@ -16,11 +16,11 @@
 	import { createEventDispatcher } from 'svelte';
 	import ChatBoxAttachment from './ChatBoxAttachment.svelte';
 	import ChatBoxAttachmentPreview from './ChatBoxAttachmentPreview.svelte';
-	import { setAttachmentsContext } from '@/stores/attachmentsContext.svelte';
+	import { getAttachmentsContext } from '@/stores/attachmentsContext.svelte';
 
 	export let searchTerm = '';
 
-	const { uploadedItems$ } = setAttachmentsContext();
+	const { uploadedItems$ } = getAttachmentsContext();
 
 	const dispatch = createEventDispatcher<{
 		submitSearch: { value: string };
