@@ -4,7 +4,9 @@ from pydantic import BaseModel
 
 from src.services.gemini_client import get_gemini
 from src.services.storage import StorageManager
-from src.utils.custom_sources.read_content import ReadContent
+
+from .custom_sources.read_content import ReadContent
+from .decorators import process_time
 
 
 class SummarizeCustomSourcesRequest(BaseModel):
@@ -60,6 +62,7 @@ async def get_sources_str(source_urls: list[str]) -> str:
     return "\n\n".join(valid_sources)
 
 
+@process_time()
 async def summarize_custom_sources(source_urls: list[str]) -> str:
     """
     Summarize the contents of list of custom sources using Gemini Flash.

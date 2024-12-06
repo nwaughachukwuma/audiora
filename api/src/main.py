@@ -27,11 +27,13 @@ from .utils.custom_sources.generate_url_source import (
 )
 from .utils.custom_sources.save_copied_source import CopiedPasteSourceRequest, save_copied_source
 from .utils.custom_sources.save_uploaded_sources import UploadedFiles
+from .utils.decorators import use_cache_manager
 from .utils.detect_content_category import DetectContentCategoryRequest, detect_content_category
 from .utils.generate_audiocast import GenerateAudioCastRequest, GenerateAudiocastException, generate_audiocast
 from .utils.generate_audiocast_source import GenerateAudiocastSource, generate_audiocast_source
 from .utils.get_audiocast import get_audiocast
 from .utils.get_session_title import GetSessionTitleModel, get_session_title
+from .utils.make_seed import get_hash
 from .utils.session_manager import SessionManager, SessionModel
 from .utils.summarize_custom_sources import SummarizeCustomSourcesRequest, summarize_custom_sources
 
@@ -71,14 +73,28 @@ def root():
 
 
 @app.post("/chat/{session_id}", response_model=Generator[str, Any, None])
-def chat_endpoint(
+async def chat_endpoint(
     session_id: str,
     request: SessionChatRequest,
     background_tasks: BackgroundTasks,
 ):
     """Chat endpoint"""
     category = request.contentCategory
+    attachments = request.attachments
     db = SessionManager(session_id, category)
+
+    sources_summary: str | None = None
+    if attachments:
+        attachments.sort(key=lambda x: x.lower())
+
+        @use_cache_manager(get_hash(attachments))
+        async def _get_attachments_summary():
+            summary = await summarize_custom_sources(attachments)
+            db._update_source(summary)
+            return summary
+
+        sources_summary = await _get_attachments_summary()
+
     db._add_chat(request.chatItem)
 
     def on_finish(text: str):
@@ -91,6 +107,7 @@ def chat_endpoint(
     response = chat_request(
         content_category=category,
         previous_messages=db._get_chats(),
+        reference_material=sources_summary,
         on_finish=on_finish,
     )
 
