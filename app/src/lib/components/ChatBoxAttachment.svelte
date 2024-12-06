@@ -33,11 +33,9 @@
 				continue;
 			}
 
-			$uploadedItems$.push({
-				id: slug(file.name),
-				file: file,
-				loading: true,
-				errored: false
+			uploadedItems$.update((files) => {
+				files.push({ id: slug(file.name), file: file, loading: true, errored: false });
+				return files;
 			});
 		}
 

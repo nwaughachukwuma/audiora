@@ -1,15 +1,15 @@
 <script lang="ts">
-	import { XIcon } from 'lucide-svelte';
+	import { FileIcon, XIcon } from 'lucide-svelte';
 	import { Button } from './ui/button';
-	import { createEventDispatcher } from 'svelte';
+	import { getAttachmentsContext } from '@/stores/attachmentsContext.svelte';
+	import Spinner from './Spinner.svelte';
 
-	export let selectedFiles: File[] = [];
+	const { uploadedItems$ } = getAttachmentsContext();
 
-	const dispatch = createEventDispatcher<{ updateAttach: { files: File[] } }>();
-
-	function removeFile(index: number) {
-		selectedFiles = selectedFiles.filter((_, i) => i !== index);
-		dispatch('updateAttach', { files: selectedFiles });
+	function removeFile(id: string) {
+		uploadedItems$.update((files) => {
+			return files.filter((f) => f.id !== id);
+		});
 	}
 
 	function formatFileSize(bytes: number): string {
@@ -33,11 +33,20 @@
 				return fileType;
 		}
 	}
+
+	$: validItems = $uploadedItems$.filter((item) => !item.errored);
 </script>
 
 <div class="p-2 flex flex-wrap gap-2 bg-zinc-800/30">
-	{#each selectedFiles as file, index}
-		<div class="flex items-center w-56 justify-between bg-zinc-700/30 rounded p-2">
+	{#each validItems as { file, id, loading } (id)}
+		<div class="flex items-center w-56 gap-2 justify-between bg-zinc-700/30 rounded p-2">
+			<div class="p-1">
+				{#if loading}
+					<Spinner />
+				{:else}
+					<FileIcon class="w-6 h-6 text-emerald-800" />
+				{/if}
+			</div>
 			<div class="flex-1 min-w-0">
 				<p class="text-sm text-white truncate">{file.name}</p>
 				<p class="text-xs text-zinc-400">
@@ -48,7 +57,8 @@
 				variant="ghost"
 				size="icon"
 				class="text-zinc-400 hover:text-white hover:bg-zinc-700/70"
-				on:click={() => removeFile(index)}
+				disabled={loading}
+				on:click={() => removeFile(id)}
 			>
 				<XIcon class="h-4 w-4" />
 			</Button>
