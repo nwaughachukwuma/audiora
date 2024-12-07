@@ -5,7 +5,7 @@
 	import { goto } from '$app/navigation';
 	import type { ContentCategory } from '@/utils/types';
 	import RenderCategorySelection from '@/components/RenderCategorySelection.svelte';
-	import ChatBoxAndWidget from '@/components/ChatBoxAndWidget.svelte';
+	import ChatBoxAndWidgetHOC from '@/components/ChatBoxAndWidgetHOC.svelte';
 	import { cn } from '@/utils/ui.utils';
 
 	const { sessionId$, addChatItem, startSession } = getSessionContext();
@@ -50,9 +50,9 @@
 					on:selectCategory={({ detail }) => continueChat(detail.value)}
 				/>
 			{:else}
-				<ChatBoxAndWidget bind:searchTerm on:submitSearch={handleSearch}>
+				<ChatBoxAndWidgetHOC bind:searchTerm on:submitSearch={handleSearch}>
 					<RenderExamples slot="examples" {sessionId} />
-				</ChatBoxAndWidget>
+				</ChatBoxAndWidgetHOC>
 			{/if}
 		</div>
 	</div>
