@@ -63,7 +63,7 @@
 	<div class="flex flex-row-reverse items-center justify-between p-2 bg-zinc-800/30">
 		<slot name="tools">
 			<div class="flex items-center gap-2 px-2">
-				<ChatBoxAttachment />
+				<ChatBoxAttachment disabled={resolveDisabled} />
 
 				<Button
 					variant="ghost"
@@ -73,7 +73,7 @@
 					on:click={dispatchSearch}
 				>
 					{#if loading}
-						<Spinner small />
+						<Spinner />
 					{:else}
 						<ArrowUpIcon class="h-5 w-5" />
 					{/if}

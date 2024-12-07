@@ -12,6 +12,8 @@
 	import { getAttachmentsContext } from '@/stores/attachmentsContext.svelte';
 	import { getSessionContext } from '@/stores/sessionContext.svelte';
 
+	export let disabled = false;
+
 	const { sessionId$ } = getSessionContext();
 	const { addUploadItem, sessionUploadItems$, updateUploadItem } = getAttachmentsContext();
 
@@ -68,13 +70,15 @@
 			})
 			.finally(() => updateUploadItem(fileId, { loading: false }));
 	}
+
+	$: resolveDisabled = $sessionUploadItems$.length >= MAX_FILES || disabled;
 </script>
 
 <Button
 	variant="ghost"
 	size="icon"
 	class="text-zinc-400 hover:text-white"
-	disabled={$sessionUploadItems$.length >= MAX_FILES}
+	disabled={resolveDisabled}
 	on:click={() => fileInput.click()}
 >
 	<PaperclipIcon class="h-5 w-5" />
