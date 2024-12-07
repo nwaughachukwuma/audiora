@@ -10,6 +10,7 @@
 
 	$: chats = $session$?.chats || [];
 	$: hasFinalResponse = chats.some(isfinalResponse);
+	$: hasLoadingItem = chats.some((v) => !!v.loading);
 </script>
 
 <div
@@ -28,7 +29,7 @@
 			<div class="shrink-0 w-full sm:max-w-xl lg:max-w-3xl max-w-full max-sm:px-4 px-1 py-4">
 				<ChatBoxAndWidget
 					bind:searchTerm
-					loading={false}
+					loading={hasLoadingItem}
 					disabled={$sessionCompleted$ || disableTextInput}
 					on:submitSearch
 				/>

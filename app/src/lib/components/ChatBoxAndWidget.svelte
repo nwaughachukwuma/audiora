@@ -14,6 +14,8 @@
 
 	const { sessionUploadItems$ } = getAttachmentsContext();
 
+	$: resolveDisabled = loading || disabled;
+
 	const dispatch = createEventDispatcher<{
 		submitSearch: { value: string };
 	}>();
@@ -47,10 +49,11 @@
 		<div class="flex-1">
 			<textarea
 				placeholder="Message Audiora"
-				class="w-full outline-none bg-transparent border-0 focus:ring-0 text-white placeholder-zinc-400 resize-none py-3 px-4 max-h-72 overflow-hidden box-border"
 				rows="1"
 				autofocus
-				disabled={loading || disabled}
+				class="w-full outline-none bg-transparent border-0 focus:ring-0 text-white placeholder-zinc-400 resize-none py-3 px-4 max-h-72 overflow-hidden box-border"
+				class:pointer-events-none={resolveDisabled}
+				disabled={resolveDisabled}
 				on:input={(e) => auto_resize(e.currentTarget)}
 				bind:value={searchTerm}
 				on:keypress={handleKeyPress}
@@ -66,7 +69,7 @@
 					variant="ghost"
 					size="icon"
 					class="text-zinc-400 hover:text-white"
-					disabled={!searchTerm || loading || disabled}
+					disabled={!searchTerm || resolveDisabled}
 					on:click={dispatchSearch}
 				>
 					{#if loading}
