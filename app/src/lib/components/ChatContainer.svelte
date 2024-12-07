@@ -1,14 +1,12 @@
 <script>
 	import { getSessionContext } from '@/stores/sessionContext.svelte';
-	import ChatBoxContainer from './ChatBoxContainer.svelte';
 	import { isfinalResponse } from '@/utils/session.utils';
+	import ChatBoxAndWidget from './ChatBoxAndWidget.svelte';
 
 	export let searchTerm = '';
 	export let disableTextInput = false;
 
 	const { sessionCompleted$, fetchingSource$, session$ } = getSessionContext();
-
-	let navLoading = false;
 
 	$: chats = $session$?.chats || [];
 	$: hasFinalResponse = chats.some(isfinalResponse);
@@ -28,13 +26,11 @@
 	<slot name="chatbox">
 		{#if !hasFinalResponse && !$sessionCompleted$ && !$fetchingSource$}
 			<div class="shrink-0 w-full sm:max-w-xl lg:max-w-3xl max-w-full max-sm:px-4 px-1 py-4">
-				<ChatBoxContainer
+				<ChatBoxAndWidget
 					bind:searchTerm
-					loading={navLoading}
-					showIcon
+					loading={false}
 					disabled={$sessionCompleted$ || disableTextInput}
-					on:keypress
-					on:click
+					on:submitSearch
 				/>
 			</div>
 		{/if}

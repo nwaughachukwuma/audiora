@@ -17,8 +17,11 @@
 	import ChatBoxAttachment from './ChatBoxAttachment.svelte';
 	import ChatBoxAttachmentPreview from './ChatBoxAttachmentPreview.svelte';
 	import { getAttachmentsContext } from '@/stores/attachmentsContext.svelte';
+	import Spinner from './Spinner.svelte';
 
 	export let searchTerm = '';
+	export let loading = false;
+	export let disabled = false;
 
 	const { sessionUploadItems$ } = getAttachmentsContext();
 
@@ -65,6 +68,7 @@
 						class="w-full outline-none bg-transparent border-0 focus:ring-0 text-white placeholder-zinc-400 resize-none py-3 px-4 max-h-72 overflow-hidden box-border"
 						rows="1"
 						autofocus
+						disabled={loading || disabled}
 						on:input={(e) => auto_resize(e.currentTarget)}
 						bind:value={searchTerm}
 						on:keypress={handleKeyPress}
@@ -80,10 +84,14 @@
 							variant="ghost"
 							size="icon"
 							class="text-zinc-400 hover:text-white"
-							disabled={!searchTerm}
+							disabled={!searchTerm || loading || disabled}
 							on:click={dispatchSearch}
 						>
-							<ArrowUpIcon class="h-5 w-5" />
+							{#if loading}
+								<Spinner small />
+							{:else}
+								<ArrowUpIcon class="h-5 w-5" />
+							{/if}
 						</Button>
 					</div>
 				</slot>
