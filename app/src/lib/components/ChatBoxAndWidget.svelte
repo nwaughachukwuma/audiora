@@ -54,6 +54,10 @@
 		</div>
 
 		<Card class="bg-zinc-800/50 border-0 overflow-hidden">
+			{#if $sessionUploadItems$.length > 0}
+				<ChatBoxAttachmentPreview />
+			{/if}
+
 			<div class="flex items-center p-2">
 				<div class="flex-1">
 					<textarea
@@ -84,10 +88,6 @@
 					</div>
 				</slot>
 			</div>
-
-			{#if $sessionUploadItems$.length > 0}
-				<ChatBoxAttachmentPreview />
-			{/if}
 		</Card>
 
 		<slot name="examples">
