@@ -7,7 +7,7 @@ from typing import Any
 
 @dataclass
 class RetryConfig:
-    retries: int = 3
+    max_retries: int = 3
     delay: float = 1.0
     backoff: float | None = None
 
@@ -25,11 +25,11 @@ def retry(retry_config: RetryConfig | None, default_return: Any = None) -> Any:
             async def async_wrapper(*args, **kwargs):
                 async def _async_retry():
                     delay = config.delay
-                    for attempt in range(config.retries):
+                    for attempt in range(config.max_retries):
                         try:
                             return await func(*args, **kwargs)
                         except Exception as e:
-                            print(f"Retry attempt {attempt + 1}/{config.retries} failed: {e}")
+                            print(f"Retry attempt {attempt + 1}/{config.max_retries} failed: {e}")
                             await asyncio.sleep(delay)
                             if config.backoff:
                                 delay *= config.backoff
@@ -44,11 +44,11 @@ def retry(retry_config: RetryConfig | None, default_return: Any = None) -> Any:
         def wrapper(*args, **kwargs):
             def _sync_retry():
                 delay = config.delay
-                for attempt in range(config.retries):
+                for attempt in range(config.max_retries):
                     try:
                         return func(*args, **kwargs)
                     except Exception as e:
-                        print(f"Retry attempt {attempt + 1}/{config.retries} failed: {e}")
+                        print(f"Retry attempt {attempt + 1}/{config.max_retries} failed: {e}")
                         sleep(delay)
                         if config.backoff:
                             delay *= config.backoff

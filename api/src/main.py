@@ -1,4 +1,3 @@
-import asyncio
 from io import BytesIO
 from time import time
 from typing import Any, Callable, Generator
@@ -28,6 +27,7 @@ from .utils.custom_sources.generate_url_source import (
 from .utils.custom_sources.manage_attachments import ManageAttachments
 from .utils.custom_sources.save_copied_source import CopiedPasteSourceRequest, save_copied_source
 from .utils.custom_sources.save_uploaded_sources import UploadedFiles
+from .utils.decorators.retry_decorator import RetryConfig, retry
 from .utils.detect_content_category import DetectContentCategoryRequest, detect_content_category
 from .utils.generate_audiocast import GenerateAudioCastRequest, GenerateAudiocastException, generate_audiocast
 from .utils.generate_audiocast_source import GenerateAudiocastSource, generate_audiocast_source
@@ -140,31 +140,22 @@ async def get_signed_url_endpoint(blobname: str):
     """
     Get signed URL for generated audiocast
     """
-    retry_count = 0
-    max_retries = 3
-    errors: list[str] = []
 
-    delay = 5
-    backoff = 1.5
+    @retry(RetryConfig(max_retries=3, delay=5, backoff=1.5))
+    def handler():
+        return StorageManager().get_signed_url(blobname=blobname)
 
-    while retry_count < max_retries:
-        try:
-            url = StorageManager().get_signed_url(blobname=blobname)
-            return JSONResponse(
-                content=url,
-                headers={
-                    "Content-Type": "application/json",
-                    "Cache-Control": "public, max-age=86390, immutable",
-                },
-            )
-        except Exception as e:
-            errors.append(str(e))
+    url = handler()
+    if not url:
+        raise HTTPException(status_code=500, detail="Failed to get signed URL")
 
-        await asyncio.sleep(delay)
-        delay *= backoff
-        retry_count += 1
-
-    raise HTTPException(status_code=500, detail="".join(errors))
+    return JSONResponse(
+        content=url,
+        headers={
+            "Content-Type": "application/json",
+            "Cache-Control": "public, max-age=86390, immutable",
+        },
+    )
 
 
 @app.post("/get-session-title", response_model=str)
