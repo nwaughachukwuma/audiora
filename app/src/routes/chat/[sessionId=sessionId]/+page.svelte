@@ -10,11 +10,15 @@
 	import { debounce } from 'throttle-debounce';
 	import AudiocastPageHeader from '@/components/AudiocastPageHeader.svelte';
 	import { getSummary, isfinalResponse } from '@/utils/session.utils';
+	import { getAttachmentsContext } from '@/stores/attachmentsContext.svelte.js';
+	import { pluralize } from '@/utils/pluralize';
 
 	export let data;
 
 	const { session$, addChatItem, updateChatContent, sessionId$, removeChatItem } =
 		getSessionContext();
+
+	const { sessionUploadItems$ } = getAttachmentsContext();
 
 	let searchTerm = '';
 	let loading = false;
@@ -70,7 +74,11 @@
 
 		return fetch(`${env.API_BASE_URL}/chat/${sessionId}`, {
 			method: 'POST',
-			body: JSON.stringify({ chatItem: uItem, contentCategory: category }),
+			body: JSON.stringify({
+				chatItem: uItem,
+				contentCategory: category,
+				attachments: $sessionUploadItems$.map((i) => i.gcsUrl).filter(Boolean)
+			}),
 			headers: { 'Content-Type': 'application/json' }
 		})
 			.then((res) => handleStreamingResponse(res, aItem.id))
@@ -114,15 +122,25 @@
 		</p>
 
 		<div class="flex flex-col gap-y-3 h-full">
-			{#each sessionChats as item (item.id)}
+			{#each sessionChats as item, ix (item.id)}
 				{@const finalResponse = isfinalResponse(item)}
+				{@const firstRequest = ix === 1}
 				<ChatListItem
 					type={item.role}
 					content={item.content}
 					loading={item.loading}
 					createdAt={item.createdAt}
 					on:regenerate={onregenerate}
-				/>
+				>
+					<span class="animate-pulse" slot="loading">
+						{#if firstRequest && $sessionUploadItems$.length}
+							{@const count = $sessionUploadItems$.length}
+							Evaluating {pluralize(count, 'attachment', 'attachments')}...
+						{:else}
+							Generating response...
+						{/if}
+					</span>
+				</ChatListItem>
 
 				{#if finalResponse}
 					<ChatListActionItems

@@ -38,7 +38,7 @@ def process_time():
     return decorator
 
 
-def use_cache_manager(cache_key: str):
+def use_cache_manager(cache_key: str, expiry=86400):
     """decorator to use cache manager"""
 
     def decorator(func):
@@ -54,7 +54,7 @@ def use_cache_manager(cache_key: str):
 
             if result and cache:
                 redis = cache.get("redis")
-                await redis.set(cache_key, result, ex=cache.get("expiry"))
+                await redis.set(cache_key, result, ex=expiry)
 
             return result
 

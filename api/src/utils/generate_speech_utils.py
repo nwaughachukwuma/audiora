@@ -4,7 +4,7 @@ from typing import Dict, List, Literal
 
 from src.services.elevenlabs_client import get_elevenlabs_client
 from src.services.openai_client import get_openai
-from src.utils.decorators import process_time
+from src.utils.decorators.base import process_time
 
 TTSProvider = Literal["openai", "elevenlabs"]
 

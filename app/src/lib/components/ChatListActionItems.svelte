@@ -54,10 +54,7 @@
 				if (res.ok) return res.json();
 				throw new Error('Failed to get audiocast source');
 			})
-			.then((res) => {
-				$audioSource$ = res;
-				toast.success('AI-generated source material generated successfully');
-			})
+			.then(() => toast.success('AI-generated source material generated successfully'))
 			.catch((error) => toast.error(error.message))
 			.finally(() => ($fetchingSource$ = false));
 	}

@@ -3,6 +3,7 @@ import os
 
 from fastapi import BackgroundTasks, HTTPException
 
+from src.env_var import PROD_ENV
 from src.services.storage import StorageManager
 
 from .audio_manager import AudioManager, AudioManagerConfig
@@ -122,7 +123,9 @@ async def generate_audiocast(request: GenerateAudioCastRequest, background_tasks
 
     # Generate audio
     update_session_info("Generating audio...")
-    audio_manager = AudioManager(custom_config=AudioManagerConfig(tts_provider="elevenlabs"))
+
+    tts_provider = "elevenlabs" if PROD_ENV else "openai"
+    audio_manager = AudioManager(custom_config=AudioManagerConfig(tts_provider=tts_provider))
     audio_path = await audio_manager.generate_speech(audio_script)
 
     background_tasks.add_task(

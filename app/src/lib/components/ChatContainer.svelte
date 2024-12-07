@@ -6,7 +6,7 @@
 	export let searchTerm = '';
 	export let disableTextInput = false;
 
-	const { sessionCompleted$, fetchingSource$, audioSource$, session$ } = getSessionContext();
+	const { sessionCompleted$, fetchingSource$, session$ } = getSessionContext();
 
 	let navLoading = false;
 
@@ -26,7 +26,7 @@
 	</div>
 
 	<slot name="chatbox">
-		{#if !hasFinalResponse && !$sessionCompleted$ && !$fetchingSource$ && !$audioSource$}
+		{#if !hasFinalResponse && !$sessionCompleted$ && !$fetchingSource$}
 			<div class="shrink-0 w-full sm:max-w-xl lg:max-w-3xl max-w-full max-sm:px-4 px-1 py-4">
 				<ChatBoxContainer
 					bind:searchTerm

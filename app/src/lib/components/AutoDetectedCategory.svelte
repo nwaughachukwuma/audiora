@@ -33,7 +33,7 @@
 
 <Button
 	variant="ghost"
-	class="text-base px-10 py-6 bg-gray-800 w-fit hover:bg-gray-700"
+	class="text-base min-w-2/5 w-1/2 mx-auto mb-3 transition-all px-10 py-6 bg-gray-950/40 max-md:w-full hover:bg-gray-800"
 	on:click={() => dispatch('selectCategory', { value: category })}
 >
 	<span> Next </span>

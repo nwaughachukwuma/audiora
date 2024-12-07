@@ -1,5 +1,5 @@
 import uuid
-from typing import Dict, List, Literal
+from typing import Dict, List, Literal, Optional
 
 from pydantic import BaseModel, Field
 
@@ -57,3 +57,4 @@ class SessionChatItem(BaseModel):
 class SessionChatRequest(BaseModel):
     contentCategory: ContentCategory
     chatItem: SessionChatItem
+    attachments: Optional[List[str]] = None

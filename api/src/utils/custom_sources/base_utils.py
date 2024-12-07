@@ -1,6 +1,7 @@
 from typing import Literal, Optional, TypedDict, cast
 
 from google.cloud.firestore_v1 import DocumentReference
+from google.cloud.firestore_v1.base_query import FieldFilter
 from pydantic import BaseModel
 
 from src.services.firestore_sdk import (
@@ -103,3 +104,19 @@ class CustomSourceManager(DBManager):
 
     def _delete_custom_source(self, source_id: str):
         return self._get_doc_ref(source_id).delete()
+
+    def _get_custom_source_by_url(self, url: str):
+        self._check_document()
+        try:
+            session_ref = self._get_collection(self.collection).document(self.doc_id)
+
+            query = session_ref.collection(self.sub_collection).where(filter=FieldFilter("url", "==", url))
+
+            docs = query.get()
+
+            for doc in docs:
+                if doc.exists:
+                    return cast(CustomSourceModel, self._safe_to_dict(doc.to_dict()))
+        except Exception as e:
+            print(f"Error getting custom sources for Session: {self.doc_id}", e)
+        return None

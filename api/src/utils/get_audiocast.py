@@ -2,7 +2,7 @@ from fastapi import HTTPException
 
 from src.services.storage import StorageManager
 
-from .decorators import process_time
+from .decorators.base import process_time
 from .session_manager import SessionManager
 
 

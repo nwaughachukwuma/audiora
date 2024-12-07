@@ -1,4 +1,4 @@
-import asyncio
+from io import BytesIO
 from time import time
 from typing import Any, Callable, Generator
 
@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi_utilities import add_timer_middleware
 
-from .services.storage import StorageManager
+from .services.storage import BLOB_BASE_URI, StorageManager, UploadItemParams
 from .utils.chat_request import chat_request
 from .utils.chat_utils import (
     ContentCategory,
@@ -24,14 +24,18 @@ from .utils.custom_sources.generate_url_source import (
     GetCustomSourcesRequest,
     generate_custom_source,
 )
+from .utils.custom_sources.manage_attachments import ManageAttachments
+from .utils.custom_sources.read_content import ReadContent
 from .utils.custom_sources.save_copied_source import CopiedPasteSourceRequest, save_copied_source
 from .utils.custom_sources.save_uploaded_sources import UploadedFiles
+from .utils.decorators.retry_decorator import RetryConfig, retry
 from .utils.detect_content_category import DetectContentCategoryRequest, detect_content_category
 from .utils.generate_audiocast import GenerateAudioCastRequest, GenerateAudiocastException, generate_audiocast
 from .utils.generate_audiocast_source import GenerateAudiocastSource, generate_audiocast_source
 from .utils.get_audiocast import get_audiocast
 from .utils.get_session_title import GetSessionTitleModel, get_session_title
 from .utils.session_manager import SessionManager, SessionModel
+from .utils.summarize_custom_sources import SummarizeCustomSourcesRequest, summarize_custom_sources
 
 app = FastAPI(title="Audiora", version="1.0.0")
 
@@ -69,15 +73,20 @@ def root():
 
 
 @app.post("/chat/{session_id}", response_model=Generator[str, Any, None])
-def chat_endpoint(
+async def chat_endpoint(
     session_id: str,
     request: SessionChatRequest,
     background_tasks: BackgroundTasks,
 ):
     """Chat endpoint"""
     category = request.contentCategory
+    attachments = request.attachments
+
     db = SessionManager(session_id, category)
     db._add_chat(request.chatItem)
+
+    attachment_manager = ManageAttachments(session_id)
+    sources_summary = await attachment_manager.get_attachments_summary(db, attachments)
 
     def on_finish(text: str):
         background_tasks.add_task(db._update, {"status": "collating"})
@@ -86,9 +95,13 @@ def chat_endpoint(
             SessionChatItem(role="assistant", content=text),
         )
 
+        if attachments:
+            background_tasks.add_task(attachment_manager.store_attachments, attachments)
+
     response = chat_request(
         content_category=category,
         previous_messages=db._get_chats(),
+        reference_material=sources_summary,
         on_finish=on_finish,
     )
 
@@ -128,27 +141,22 @@ async def get_signed_url_endpoint(blobname: str):
     """
     Get signed URL for generated audiocast
     """
-    retry_count = 0
-    max_retries = 3
-    errors: list[str] = []
 
-    while retry_count < max_retries:
-        try:
-            url = StorageManager().get_signed_url(blobname=blobname)
-            return JSONResponse(
-                content=url,
-                headers={
-                    "Content-Type": "application/json",
-                    "Cache-Control": "public, max-age=86390, immutable",
-                },
-            )
-        except Exception as e:
-            errors.append(str(e))
+    @retry(RetryConfig(max_retries=3, delay=5, backoff=1.5))
+    def handler() -> str | None:
+        return StorageManager().get_signed_url(blobname=blobname)
 
-        await asyncio.sleep(5)
-        retry_count += 1
+    url = handler()
+    if not url:
+        raise HTTPException(status_code=500, detail="Failed to get signed URL")
 
-    raise HTTPException(status_code=500, detail="".join(errors))
+    return JSONResponse(
+        content=url,
+        headers={
+            "Content-Type": "application/json",
+            "Cache-Control": "public, max-age=86390, immutable",
+        },
+    )
 
 
 @app.post("/get-session-title", response_model=str)
@@ -216,3 +224,42 @@ async def detect_category_endpoint(request: DetectContentCategoryRequest):
     Detect category of a given content
     """
     return await detect_content_category(request.content)
+
+
+@app.post("/store-file-upload", response_model=str)
+async def store_file_upload(file: UploadFile, filename: str = Form(...), preserve: bool = Form(False)):
+    """
+    Store file uploaded from the frontend
+    """
+    print(f"Storing file: {filename}. Preserve: {preserve}")
+
+    storage_manager = StorageManager()
+    file_exists = storage_manager.check_blob_exists(filename)
+    if file_exists:
+        return storage_manager.get_gcs_url(filename)
+
+    file_content = await ReadContent()._read_file(file, preserve=preserve)
+    content_type = (
+        file.content_type or "application/octet-stream"
+        if preserve or isinstance(file_content, BytesIO)
+        else "text/plain"
+    )
+
+    result = storage_manager.upload_to_gcs(
+        item=file_content,
+        blobname=f"{BLOB_BASE_URI}/{filename}",
+        params=UploadItemParams(
+            cache_control="public, max-age=31536000",
+            content_type=content_type,
+        ),
+    )
+
+    return result
+
+
+@app.post("/summarize-custom-sources", response_model=str)
+async def summarize_custom_sources_endpoint(request: SummarizeCustomSourcesRequest):
+    """
+    Summarize custom sources from specified source URLs
+    """
+    return await summarize_custom_sources(request.sourceURLs)

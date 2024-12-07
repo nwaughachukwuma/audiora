@@ -12,14 +12,18 @@
 <script lang="ts">
 	import { Button } from '@/components/ui/button';
 	import { Card } from '@/components/ui/card';
-	import { PaperclipIcon, ArrowUpIcon } from 'lucide-svelte';
+	import { ArrowUpIcon } from 'lucide-svelte';
 	import { createEventDispatcher } from 'svelte';
+	import ChatBoxAttachment from './ChatBoxAttachment.svelte';
+	import ChatBoxAttachmentPreview from './ChatBoxAttachmentPreview.svelte';
+	import { getAttachmentsContext } from '@/stores/attachmentsContext.svelte';
 
 	export let searchTerm = '';
 
+	const { sessionUploadItems$ } = getAttachmentsContext();
+
 	const dispatch = createEventDispatcher<{
 		submitSearch: { value: string };
-		attach: void;
 	}>();
 
 	function handleKeyPress(ev: KeyboardEvent) {
@@ -33,6 +37,13 @@
 		if (!searchTerm.trim()) return;
 		dispatch('submitSearch', { value: searchTerm });
 	}
+
+	function auto_resize(element: EventTarget & HTMLTextAreaElement) {
+		requestAnimationFrame(() => {
+			element.style.height = 'auto';
+			element.style.height = element.scrollHeight + 'px';
+		});
+	}
 </script>
 
 <div class="flex flex-col items-center max-lg:pt-16 md:justify-center h-full">
@@ -43,24 +54,27 @@
 		</div>
 
 		<Card class="bg-zinc-800/50 border-0 overflow-hidden">
+			{#if $sessionUploadItems$.length > 0}
+				<ChatBoxAttachmentPreview />
+			{/if}
+
 			<div class="flex items-center p-2">
 				<div class="flex-1">
 					<textarea
 						placeholder="Message Audiora"
-						class="w-full outline-none bg-transparent border-0 focus:ring-0 text-white placeholder-zinc-400 resize-none py-3 px-4"
-						rows={1}
-						tabindex={0}
+						class="w-full outline-none bg-transparent border-0 focus:ring-0 text-white placeholder-zinc-400 resize-none py-3 px-4 max-h-72 overflow-hidden box-border"
+						rows="1"
+						autofocus
+						on:input={(e) => auto_resize(e.currentTarget)}
 						bind:value={searchTerm}
 						on:keypress={handleKeyPress}
-					/>
+					></textarea>
 				</div>
 			</div>
 			<div class="flex flex-row-reverse items-center justify-between p-2 bg-zinc-800/30">
 				<slot name="tools">
 					<div class="flex items-center gap-2 px-2">
-						<Button variant="ghost" size="icon" class="text-zinc-400 hover:text-white" on:click>
-							<PaperclipIcon class="h-5 w-5" />
-						</Button>
+						<ChatBoxAttachment />
 
 						<Button
 							variant="ghost"
@@ -83,7 +97,9 @@
 						variant="outline"
 						class="bg-zinc-800/50 border-zinc-700 text-zinc-300 hover:bg-zinc-700/50 hover:text-white"
 					>
-						<span class="mr-2">{item.icon}</span>
+						{#if item.icon}
+							<span class="mr-2">{item.icon}</span>
+						{/if}
 						{item.text}
 					</Button>
 				{/each}

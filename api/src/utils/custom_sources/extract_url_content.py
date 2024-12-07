@@ -5,7 +5,8 @@ import httpx
 from bs4 import BeautifulSoup, Tag
 from pydantic import BaseModel
 
-from src.utils.decorators import process_time
+from src.services.storage import StorageManager
+from src.utils.decorators.base import process_time
 
 from .base_utils import SourceContent
 from .read_content import ReadContent
@@ -42,14 +43,24 @@ class ExtractURLContent(ReadContent):
 
         return self._clean_text(text_content), metadata
 
+    def _resolve_gcs_url(self, url) -> str:
+        if url.startswith("gs://"):
+            storage_manager = StorageManager()
+            blobame = storage_manager.get_blobname_from_url(url)
+            return storage_manager.get_signed_url(blobame)
+
+        return url
+
     @process_time()
     def _extract(self, url: str) -> SourceContent:
-        parsed_url = urlparse(url)
+        resolved_url = self._resolve_gcs_url(url)
+
+        parsed_url = urlparse(resolved_url)
         if not parsed_url.scheme or not parsed_url.netloc:
             raise ValueError("Invalid URL provided")
 
         try:
-            response = httpx.get(url)
+            response = httpx.get(resolved_url)
             response.raise_for_status()
             content_type = response.headers.get("content-type", "").lower()
 
