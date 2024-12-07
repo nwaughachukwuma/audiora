@@ -28,6 +28,7 @@ async def generate_audiocast_source(request: GenerateAudiocastSource):
     async def _handler():
         db = SessionManager(session_id, category)
         db._update_info("Generating source content...")
+
         generator = GenerateSourceContent(category, preference_summary)
         source_content = await generator._run()
         db._update_source(source_content)
