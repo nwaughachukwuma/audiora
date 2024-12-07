@@ -13,27 +13,23 @@ AudioScriptProvider = Literal["openai", "anthropic", "gemini"]
 class AudioScriptMaker:
     category: ContentCategory
 
-    def __init__(self, category: ContentCategory, source_content: str, compiled_custom_sources: str | None = None):
+    def __init__(self, category: ContentCategory, ai_source: str, compiled_custom_sources: str | None = None):
         self.category = category
-        self.source_content = source_content
+        self.ai_source = ai_source
         self.compiled_custom_sources = compiled_custom_sources
 
     def create(self, provider: AudioScriptProvider = "openai"):
         """
         Create an audio script based on the source content
         Args:
-            category (ContentCategory): The content category
-            source_content (str): The audiocast source content
+            provider (AudioScriptProvider): Provider for generating the audio script
         Returns:
             str: streamlined audio script
         """
-        print("Generating audio script...")
-        print(f"Category: {self.category}; Source content: {self.source_content}")
-        if self.compiled_custom_sources:
-            print(f"Custom sources: {self.compiled_custom_sources}")
+        print(f"Generating audio script...Category: {self.category}")
 
         prompt_maker = TTSPromptMaker(self.category, Metadata())
-        system_prompt = prompt_maker.get_system_prompt(self.source_content, self.compiled_custom_sources)
+        system_prompt = prompt_maker.get_system_prompt(self.ai_source, self.compiled_custom_sources)
 
         if provider == "anthropic":
             audio_script = self.__use_anthropic(system_prompt)

@@ -113,7 +113,7 @@
 	}
 </script>
 
-<ChatContainer bind:searchTerm on:click={handleSearch} on:keypress={handleSearch}>
+<ChatContainer bind:searchTerm on:submitSearch={handleSearch}>
 	<div slot="content" class="block w-full">
 		<AudiocastPageHeader category={data.category} title={$session$?.title} />
 

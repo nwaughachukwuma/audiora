@@ -19,7 +19,7 @@ class TTSPromptMaker:
         """Get connection tags based on the number of speakers."""
         return [f"<Speaker{i}>" for i in range(1, 10)]
 
-    def get_system_prompt(self, source_content: str, compiled_custom_sources: str | None = None) -> str:
+    def get_system_prompt(self, ai_source: str, compiled_custom_sources: str | None = None) -> str:
         """
         Generate an optimized system prompt for converting source contents into the appropriate format.
         """
@@ -28,7 +28,7 @@ class TTSPromptMaker:
         Your task is to transform the following source contents into a single, engaging {self.category} TTS-optimized audiocast script.
 
         Source Contents:
-        - AI-generated: {source_content}
+        - AI-generated: {ai_source}
         {"- User-provided: " + compiled_custom_sources if compiled_custom_sources else ""}
 
         Content Parameters:
@@ -88,6 +88,9 @@ class TTSPromptMaker:
         - Treat the source contents as complimentary, transitioning smoothly between sections and segments
         - Exclude any unnecessary or incompatible details or information
         - Prioritize sections that greatly support the overall discussion/narrative
+        - Emphasize the user-provided contents if it greatly enhances the overall quality of the audiocast
+        - Tie core arguments, ideas and concepts back to reference source content
+        - Keep the overall flow natural and seamless
 
         Output Format Example for 2 speakers:
         <Speaker1>Hello there! [Content Intro & Overview].</Speaker1>

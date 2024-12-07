@@ -45,7 +45,7 @@
 		if ($fetchingSource$) return;
 		$fetchingSource$ = true;
 
-		return fetch(`${env.API_BASE_URL}/generate-audiocast-source`, {
+		return fetch(`${env.API_BASE_URL}/generate-aisource`, {
 			method: 'POST',
 			body: JSON.stringify({ sessionId, category, preferenceSummary: summary }),
 			headers: { 'Content-Type': 'application/json' }
