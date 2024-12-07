@@ -25,6 +25,7 @@ from .utils.custom_sources.generate_url_source import (
     generate_custom_source,
 )
 from .utils.custom_sources.manage_attachments import ManageAttachments
+from .utils.custom_sources.read_content import ReadContent
 from .utils.custom_sources.save_copied_source import CopiedPasteSourceRequest, save_copied_source
 from .utils.custom_sources.save_uploaded_sources import UploadedFiles
 from .utils.decorators.retry_decorator import RetryConfig, retry
@@ -142,7 +143,7 @@ async def get_signed_url_endpoint(blobname: str):
     """
 
     @retry(RetryConfig(max_retries=3, delay=5, backoff=1.5))
-    def handler():
+    def handler() -> str | None:
         return StorageManager().get_signed_url(blobname=blobname)
 
     url = handler()
@@ -226,24 +227,30 @@ async def detect_category_endpoint(request: DetectContentCategoryRequest):
 
 
 @app.post("/store-file-upload", response_model=str)
-async def store_file_upload(file: UploadFile, filename: str = Form(...)):
+async def store_file_upload(file: UploadFile, filename: str = Form(...), preserve: bool = Form(False)):
     """
     Store file uploaded from the frontend
     """
+    print(f"Storing file: {filename}. Preserve: {preserve}")
+
     storage_manager = StorageManager()
-
-    file_obj = BytesIO(await file.read())
-
     file_exists = storage_manager.check_blob_exists(filename)
     if file_exists:
         return storage_manager.get_gcs_url(filename)
 
+    file_content = await ReadContent()._read_file(file, preserve=preserve)
+    content_type = (
+        file.content_type or "application/octet-stream"
+        if preserve or isinstance(file_content, BytesIO)
+        else "text/plain"
+    )
+
     result = storage_manager.upload_to_gcs(
-        item=file_obj,
+        item=file_content,
         blobname=f"{BLOB_BASE_URI}/{filename}",
         params=UploadItemParams(
             cache_control="public, max-age=31536000",
-            content_type=file.content_type or "application/octet-stream",
+            content_type=content_type,
         ),
     )
 

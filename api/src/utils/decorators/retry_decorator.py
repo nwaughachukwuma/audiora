@@ -2,17 +2,17 @@ import asyncio
 from dataclasses import dataclass
 from functools import wraps
 from time import sleep
-from typing import Any
+from typing import Any, Optional
 
 
 @dataclass
 class RetryConfig:
     max_retries: int = 3
     delay: float = 1.0
-    backoff: float | None = None
+    backoff: Optional[float] = None
 
 
-def retry(retry_config: RetryConfig | None, default_return: Any = None) -> Any:
+def retry(retry_config: RetryConfig | None, default_return: Any = None):
     """
     Retry logic for async functions with exponential backoff.
     """
