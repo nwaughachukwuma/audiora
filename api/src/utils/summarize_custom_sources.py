@@ -68,7 +68,6 @@ async def summarize_custom_sources(source_urls: list[str]) -> str:
     Summarize the contents of list of custom sources using Gemini Flash.
     """
     content = await get_sources_str(source_urls)
-    print(f"Summarizing content >>> {content}")
 
     client = get_gemini()
 

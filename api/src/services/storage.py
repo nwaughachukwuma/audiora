@@ -134,3 +134,7 @@ class StorageManager:
     def get_blob(self, blobname: str):
         """get a blob object"""
         return bucket.blob(blobname)
+
+    def get_blobname_from_url(self, url: str):
+        """get blobname from a URL"""
+        return url.replace(f"gs://{self.bucket_name}/", "")
