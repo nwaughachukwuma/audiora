@@ -37,6 +37,13 @@
 		if (!searchTerm.trim()) return;
 		dispatch('submitSearch', { value: searchTerm });
 	}
+
+	function auto_resize(element: EventTarget & HTMLTextAreaElement) {
+		requestAnimationFrame(() => {
+			element.style.height = 'auto';
+			element.style.height = element.scrollHeight + 'px';
+		});
+	}
 </script>
 
 <div class="flex flex-col items-center max-lg:pt-16 md:justify-center h-full">
@@ -51,13 +58,13 @@
 				<div class="flex-1">
 					<textarea
 						placeholder="Message Audiora"
-						class="w-full outline-none bg-transparent border-0 focus:ring-0 text-white placeholder-zinc-400 resize-none py-3 px-4"
-						rows={1}
-						tabindex={0}
+						class="w-full outline-none bg-transparent border-0 focus:ring-0 text-white placeholder-zinc-400 resize-none py-3 px-4 max-h-72 overflow-hidden box-border"
+						rows="1"
 						autofocus
+						on:input={(e) => auto_resize(e.currentTarget)}
 						bind:value={searchTerm}
 						on:keypress={handleKeyPress}
-					/>
+					></textarea>
 				</div>
 			</div>
 			<div class="flex flex-row-reverse items-center justify-between p-2 bg-zinc-800/30">
