@@ -144,6 +144,9 @@ async def get_signed_url_endpoint(blobname: str):
     max_retries = 3
     errors: list[str] = []
 
+    delay = 5
+    backoff = 1.5
+
     while retry_count < max_retries:
         try:
             url = StorageManager().get_signed_url(blobname=blobname)
@@ -157,7 +160,8 @@ async def get_signed_url_endpoint(blobname: str):
         except Exception as e:
             errors.append(str(e))
 
-        await asyncio.sleep(5)
+        await asyncio.sleep(delay)
+        delay *= backoff
         retry_count += 1
 
     raise HTTPException(status_code=500, detail="".join(errors))
