@@ -6,7 +6,7 @@ from src.services.gemini_client import get_gemini
 from src.services.storage import StorageManager
 
 from .custom_sources.read_content import ReadContent
-from .decorators import process_time
+from .decorators.base import process_time
 
 
 class SummarizeCustomSourcesRequest(BaseModel):

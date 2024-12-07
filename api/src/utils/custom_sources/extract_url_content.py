@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup, Tag
 from pydantic import BaseModel
 
 from src.services.storage import StorageManager
-from src.utils.decorators import process_time
+from src.utils.decorators.base import process_time
 
 from .base_utils import SourceContent
 from .read_content import ReadContent

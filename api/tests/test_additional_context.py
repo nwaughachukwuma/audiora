@@ -5,7 +5,7 @@ from web_search import WebSearch
 from src.utils.audiocast_request import GenerateSourceContent
 from src.utils.audiocast_source_context import SourceContext
 from src.utils.chat_utils import ContentCategory
-from src.utils.decorators import process_time
+from src.utils.decorators.base import process_time
 
 
 async def test_additional_context(preference_summary: str):

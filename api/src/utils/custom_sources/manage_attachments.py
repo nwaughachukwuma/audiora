@@ -1,6 +1,6 @@
 import asyncio
 
-from src.utils.decorators import use_cache_manager
+from src.utils.decorators.base import use_cache_manager
 from src.utils.make_seed import get_hash
 from src.utils.session_manager import SessionManager
 from src.utils.summarize_custom_sources import summarize_custom_sources

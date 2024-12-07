@@ -2,7 +2,7 @@ from pydantic import BaseModel
 
 from src.utils.audiocast_request import GenerateSourceContent
 from src.utils.chat_utils import ContentCategory
-from src.utils.decorators import use_cache_manager
+from src.utils.decorators.base import use_cache_manager
 from src.utils.make_seed import get_hash
 from src.utils.session_manager import SessionManager
 
