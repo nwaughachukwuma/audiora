@@ -15,3 +15,5 @@ API_URL = environ["API_URL"]
 
 CSE_ID = environ["CSE_ID"]
 CSE_API_KEY = environ["GOOGLE_API_KEY"]
+
+PROD_ENV = environ.get("ENV", "dev") == "prod"
