@@ -31,7 +31,7 @@ from .utils.custom_sources.save_uploaded_sources import UploadedFiles
 from .utils.decorators.retry_decorator import RetryConfig, retry
 from .utils.detect_content_category import DetectContentCategoryRequest, detect_content_category
 from .utils.generate_audiocast import GenerateAudioCastRequest, GenerateAudiocastException, generate_audiocast
-from .utils.generate_audiocast_source import GenerateAudiocastSource, generate_audiocast_source
+from .utils.generate_audiocast_source import GenerateAiSourceRequest, generate_ai_source
 from .utils.get_audiocast import get_audiocast
 from .utils.get_session_title import GetSessionTitleModel, get_session_title
 from .utils.session_manager import SessionManager, SessionModel
@@ -128,11 +128,11 @@ def get_audiocast_endpoint(session_id: str):
     return result
 
 
-@app.post("/generate-audiocast-source", response_model=str)
-async def generate_audiocast_source_endpoint(request: GenerateAudiocastSource):
-    source_content = await generate_audiocast_source(request)
+@app.post("/generate-aisource", response_model=str)
+async def generate_aisource_endpoint(request: GenerateAiSourceRequest):
+    source_content = await generate_ai_source(request)
     if not source_content:
-        raise HTTPException(status_code=500, detail="Failed to generate source content")
+        raise HTTPException(status_code=500, detail="Failed to generate aisource content")
     return source_content
 
 

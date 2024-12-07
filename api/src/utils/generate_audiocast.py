@@ -11,7 +11,7 @@ from .audiocast_script_maker import AudioScriptMaker
 from .audiocast_utils import GenerateAudioCastRequest
 from .chat_utils import ContentCategory
 from .custom_sources.base_utils import CustomSourceManager
-from .generate_audiocast_source import GenerateAudiocastSource, generate_audiocast_source
+from .generate_audiocast_source import GenerateAiSourceRequest, generate_ai_source
 from .session_manager import SessionManager
 from .waveform_utils import WaveformUtils
 
@@ -90,21 +90,21 @@ async def generate_audiocast(request: GenerateAudioCastRequest, background_tasks
     def update_session_info(info: str):
         db._update_info(info)
 
-    source_content = session_data.metadata.source if session_data and session_data.metadata else None
+    ai_source = session_data.metadata.source if session_data and session_data.metadata else None
 
-    if not source_content:
+    if not ai_source:
         update_session_info("Generating source content...")
-        source_content = await generate_audiocast_source(
-            GenerateAudiocastSource(
+        ai_source = await generate_ai_source(
+            GenerateAiSourceRequest(
                 sessionId=session_id,
                 category=category,
                 preferenceSummary=summary,
             ),
         )
 
-    if not source_content:
+    if not ai_source:
         raise GenerateAudiocastException(
-            status_code=500, detail="Failed to generate source content", session_id=session_id
+            status_code=500, detail="Failed to generate source material", session_id=session_id
         )
 
     # get custom sources
@@ -113,7 +113,7 @@ async def generate_audiocast(request: GenerateAudioCastRequest, background_tasks
 
     # Generate audio script
     update_session_info("Generating audio script...")
-    script_maker = AudioScriptMaker(category, source_content, compiled_custom_sources)
+    script_maker = AudioScriptMaker(category, ai_source, compiled_custom_sources)
     audio_script = script_maker.create(provider="gemini")
 
     if not audio_script:

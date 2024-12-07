@@ -7,15 +7,15 @@ from src.utils.make_seed import get_hash
 from src.utils.session_manager import SessionManager
 
 
-class GenerateAudiocastSource(BaseModel):
+class GenerateAiSourceRequest(BaseModel):
     sessionId: str
     category: ContentCategory
     preferenceSummary: str
 
 
-async def generate_audiocast_source(request: GenerateAudiocastSource):
+async def generate_ai_source(request: GenerateAiSourceRequest):
     """
-    Generate audiocast source material based on user preferences.
+    Generate ai source material based on user preferences.
     """
     preference_summary = request.preferenceSummary
     category = request.category
