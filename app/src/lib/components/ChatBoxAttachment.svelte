@@ -52,6 +52,7 @@
 		const fileId = `${sessionId}_${slug(file.name)}`;
 
 		const formData = new FormData();
+		// const newFile = new File([file], fileId, { type: file.type });
 		formData.append('file', file);
 		formData.append('filename', fileId);
 
@@ -84,10 +85,9 @@
 	<PaperclipIcon class="h-5 w-5" />
 </Button>
 
-<!-- TODO: add support for .docx -->
 <input
 	type="file"
-	accept=".pdf,.txt"
+	accept=".pdf,.txt,.docx"
 	multiple
 	class="hidden"
 	bind:this={fileInput}

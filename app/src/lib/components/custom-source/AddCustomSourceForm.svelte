@@ -1,5 +1,20 @@
-<script context="module">
+<script lang="ts" context="module">
 	const TEN_MB = 10 * 1024 * 1024;
+
+	function validFileType(file: File) {
+		// Supported file types and extensions
+		const supportedTypes = [
+			'application/pdf',
+			'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+		];
+		const supportedExtensions = ['.pdf', '.docx', '.txt'];
+
+		// Check MIME type
+		if (supportedTypes.includes(file.type)) return true;
+
+		// Fallback: Check file extension (case insensitive)
+		return supportedExtensions.some((ext) => file.name.toLowerCase().endsWith(ext));
+	}
 </script>
 
 <script lang="ts">
@@ -65,7 +80,7 @@
 				continue;
 			}
 
-			if (file.type !== 'application/pdf' && !file.name.endsWith('.txt')) {
+			if (!validFileType(file)) {
 				toast.info(`Unsupported file type for ${file.name}. Skipping...`);
 				continue;
 			}
@@ -113,7 +128,7 @@
 							type="file"
 							class="hidden"
 							multiple
-							accept=".pdf,.txt"
+							accept=".pdf,.txt,.docx"
 							bind:this={fileuploadEl}
 							on:change={(e) => handleFiles(e.currentTarget.files)}
 						/>
@@ -136,7 +151,7 @@
 					<span>Website URL</span>
 				</div>
 				<div class="flex gap-2 text-sm text-blue-400">
-					<span>including .pdf</span>
+					<span>including .pdf & .docx</span>
 				</div>
 			</Button>
 

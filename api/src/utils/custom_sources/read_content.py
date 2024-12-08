@@ -1,8 +1,8 @@
 from io import BytesIO
 
+from docx import Document
 from fastapi import UploadFile
 from pypdf import PdfReader
-from docx import Document
 
 
 class ReadContent:
@@ -36,6 +36,8 @@ class ReadContent:
             text_content, _ = self._read_pdf(file_bytes)
         elif file.content_type == "text/plain":
             text_content = self._read_txt(file_bytes)
+        elif file.content_type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+            text_content = self._read_docx(file_bytes)
         else:
             return BytesIO(file_bytes)
 
