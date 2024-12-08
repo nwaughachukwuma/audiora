@@ -2,7 +2,7 @@
 	import { FileIcon, XIcon } from 'lucide-svelte';
 	import { Button } from './ui/button';
 	import { getAttachmentsContext } from '@/stores/attachmentsContext.svelte';
-	import Spinner from './Spinner.svelte';
+	import Spinner from './Spinner2.svelte';
 
 	const { removeUploadItem, sessionUploadItems$ } = getAttachmentsContext();
 
@@ -32,7 +32,7 @@
 </script>
 
 <div class="p-2 flex flex-wrap gap-2 bg-zinc-800/30">
-	{#each validItems as { file, id, loading } (id)}
+	{#each validItems as { file, id, loading }, ix (id + ix)}
 		<div class="flex items-center w-56 gap-2 justify-between bg-zinc-700/30 rounded p-2">
 			<div class="p-1">
 				{#if loading}

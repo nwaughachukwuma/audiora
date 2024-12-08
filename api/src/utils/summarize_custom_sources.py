@@ -30,7 +30,7 @@ def summarize_custom_sources_prompt(combined_content: str) -> str:
     """
 
 
-async def get_source_content(source_url: str) -> str:
+async def get_source_content(source_url: str):
     """
     Get the content of a source URL.
     """
@@ -45,8 +45,11 @@ async def get_source_content(source_url: str) -> str:
         text_content, _ = content_reader._read_pdf(content_byte)
     elif blob.content_type == "text/plain":
         text_content = content_reader._read_txt(content_byte)
+    elif blob.content_type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+        text_content = content_reader._read_docx(content_byte)
     else:
-        raise ValueError(f"Unsupported content type: {blob.content_type}")
+        print(f"Unsupported content type: {blob.content_type}")
+        return None
 
     return text_content
 

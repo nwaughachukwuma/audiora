@@ -35,3 +35,4 @@ setuptools
 lxml 
 beautifulsoup4 
 async-web-search
+python-docx

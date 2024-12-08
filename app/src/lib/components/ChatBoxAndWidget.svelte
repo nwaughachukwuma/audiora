@@ -6,7 +6,7 @@
 	import ChatBoxAttachment from './ChatBoxAttachment.svelte';
 	import ChatBoxAttachmentPreview from './ChatBoxAttachmentPreview.svelte';
 	import { getAttachmentsContext } from '@/stores/attachmentsContext.svelte';
-	import Spinner from './Spinner.svelte';
+	import Spinner from './Spinner2.svelte';
 
 	export let searchTerm = '';
 	export let loading = false;

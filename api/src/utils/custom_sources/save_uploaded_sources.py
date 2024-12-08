@@ -8,10 +8,9 @@ from .read_content import ReadContent
 TEN_MB = 10 * 1024 * 1024
 
 
-class UploadedFiles:
+class UploadedFiles(ReadContent):
     def __init__(self, session_id: str):
         self.session_id = session_id
-        self.content_reader = ReadContent()
 
     async def _extract_content(self, file: UploadFile):
         file_bytes = await file.read()
@@ -20,15 +19,20 @@ class UploadedFiles:
             return None
 
         if file.content_type == "application/pdf":
-            text_content, pdf_reader = self.content_reader._read_pdf(file_bytes)
+            text_content, pdf_reader = self._read_pdf(file_bytes)
 
             metadata = {**(pdf_reader.metadata or {}), "pages": pdf_reader.get_num_pages()}
             content_type = "application/pdf"
         elif file.content_type == "text/plain":
-            text_content = self.content_reader._read_txt(file_bytes)
+            text_content = self._read_txt(file_bytes)
 
             metadata = {}
             content_type = "text/plain"
+        elif file.content_type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+            text_content = self._read_docx(file_bytes)
+
+            metadata = {}
+            content_type = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         else:
             return None
 
