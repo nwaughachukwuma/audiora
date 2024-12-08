@@ -45,6 +45,8 @@ async def get_source_content(source_url: str):
         text_content, _ = content_reader._read_pdf(content_byte)
     elif blob.content_type == "text/plain":
         text_content = content_reader._read_txt(content_byte)
+    elif blob.content_type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+        text_content = content_reader._read_docx(content_byte)
     else:
         print(f"Unsupported content type: {blob.content_type}")
         return None

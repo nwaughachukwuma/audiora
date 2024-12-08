@@ -19,7 +19,11 @@ export type UploadSource = {
 
 export type Sources = (LinkSource | CopyPasteSource | UploadSource) & {
 	id: string;
-	content_type: 'text/plain' | 'text/html' | 'application/pdf';
+	content_type:
+		| 'text/plain'
+		| 'text/html'
+		| 'application/pdf'
+		| 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
 	content: string;
 	title?: string;
 	created_at?: string;
