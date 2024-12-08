@@ -135,7 +135,7 @@
 					</p>
 				</div>
 				<p class="text-sm text-gray-500">
-					Supported file types: PDF, .txt, Markdown. (Max size: 10MB)
+					Supported file types: PDF, TXT, DOCX, Markdown. (Max size: 10MB)
 				</p>
 			</div>
 		</div>
@@ -151,7 +151,7 @@
 					<span>Website URL</span>
 				</div>
 				<div class="flex gap-2 text-sm text-blue-400">
-					<span>including .pdf & .docx</span>
+					<span>including .pdf</span>
 				</div>
 			</Button>
 
