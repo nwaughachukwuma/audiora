@@ -2,6 +2,7 @@ from io import BytesIO
 
 from fastapi import UploadFile
 from pypdf import PdfReader
+from docx import Document
 
 
 class ReadContent:
@@ -20,6 +21,10 @@ class ReadContent:
 
     def _read_txt(self, content: bytes) -> str:
         return content.decode()
+
+    def _read_docx(self, content: bytes) -> str:
+        doc = Document(BytesIO(content))
+        return "\n\n".join([p.text for p in doc.paragraphs])
 
     async def _read_file(self, file: UploadFile, preserve: bool):
         file_bytes = await file.read()
