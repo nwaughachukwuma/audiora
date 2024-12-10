@@ -39,8 +39,8 @@
 		max={100}
 		step={1}
 		onValueChange={handleVolumeChange}
-		class="w-24"
-		rangeClass="bg-emerald-800"
-		thumbClass="bg-zinc-800 border-zinc-500"
+		class="w-14 md:w-20"
+		rangeClass="bg-white/70"
+		thumbClass="bg-white border-white"
 	/>
 </div>

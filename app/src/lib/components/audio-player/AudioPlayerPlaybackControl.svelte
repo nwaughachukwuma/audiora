@@ -20,7 +20,7 @@
 	};
 </script>
 
-<div class="flex justify-center items-center gap-x-4">
+<div class="flex justify-center items-center gap-x-1 md:gap-x-3">
 	<Button
 		variant="ghost"
 		size="icon"

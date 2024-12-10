@@ -55,10 +55,10 @@
 	};
 </script>
 
-<div class="w-full p-6 pb-3 rounded-xl bg-gradient-to-br from-gray-900 to-gray-800 shadow-lg">
+<div class="w-full pt-6 px-4 pb-3 rounded-xl bg-gradient-to-br from-gray-900 to-gray-800 shadow-lg">
 	<audio
 		bind:this={audioRef}
-		class="w-full animate-fade-in block"
+		class="hidden"
 		on:loadeddata={setAudioData}
 		on:timeupdate={setCurrentTime}
 	>
@@ -89,7 +89,7 @@
 
 		<AudioPlayerPlaybackControl bind:isPlaying {audioRef} />
 
-		<div class="flex justify-between items-center gap-x-4">
+		<div class="flex justify-between items-center gap-x-3">
 			<span class="md:hidden">
 				<AudioPlayerVolumeController {audioRef} bind:volume bind:isMuted />
 			</span>
