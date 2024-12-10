@@ -1,3 +1,25 @@
+<script lang="ts" context="module">
+	async function getImageBlob(url: string) {
+		const response = await fetch(url);
+		const blob = await response.blob();
+		const downloadUrl = URL.createObjectURL(blob);
+		return {
+			downloadUrl,
+			cleanup: () => URL.revokeObjectURL(downloadUrl)
+		};
+	}
+
+	function downloadFile(url: string, title: string) {
+		const link = document.createElement('a');
+		link.href = url;
+		link.download = `${slug(title).substring(0, 30)}_${Date.now()}.mp3`;
+
+		document.body.appendChild(link);
+		link.click();
+		link.remove();
+	}
+</script>
+
 <script lang="ts">
 	import { Download } from 'lucide-svelte';
 	import { slug } from 'github-slugger';
@@ -6,14 +28,11 @@
 	export let src: string;
 	export let title: string;
 
-	const downloadAudio = () => {
-		const link = document.createElement('a');
-		link.href = src;
-		link.download = `${slug(title).substring(0, 30)}_${Date.now()}.mp3`;
-		document.body.appendChild(link);
-		link.click();
-		document.body.removeChild(link);
-	};
+	async function downloadAudio() {
+		const { downloadUrl, cleanup } = await getImageBlob(src);
+		downloadFile(downloadUrl, title);
+		cleanup();
+	}
 </script>
 
 <Button
