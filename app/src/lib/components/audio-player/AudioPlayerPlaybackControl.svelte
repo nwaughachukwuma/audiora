@@ -29,6 +29,7 @@
 	>
 		<SkipBack class="h-5 w-5" />
 	</Button>
+
 	<Button
 		variant="ghost"
 		size="icon"
@@ -41,6 +42,7 @@
 			<Play class="h-7 w-7" />
 		{/if}
 	</Button>
+
 	<Button
 		variant="ghost"
 		size="icon"

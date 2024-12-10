@@ -79,13 +79,20 @@
 		</div>
 	</div>
 
-	<div class="flex justify-between items-center">
+	<div class="flex justify-between md:justify-center relative items-center gap-x-3">
+		<span class="max-md:hidden md:absolute md:left-0">
+			<AudioPlayerVolumeController {audioRef} bind:volume bind:isMuted />
+		</span>
+
 		<AudioPlayerPlaybackControl bind:isPlaying {audioRef} />
 
 		<div class="flex justify-between items-center gap-x-4">
-			<AudioPlayerVolumeController {audioRef} bind:volume bind:isMuted />
-
-			<AudioPlayerDownloadButton {src} {title} />
+			<span class="md:hidden">
+				<AudioPlayerVolumeController {audioRef} bind:volume bind:isMuted />
+			</span>
+			<span class="md:absolute md:right-0">
+				<AudioPlayerDownloadButton {src} {title} />
+			</span>
 		</div>
 	</div>
 </div>
