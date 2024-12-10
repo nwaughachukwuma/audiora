@@ -28,6 +28,7 @@
 	import RenderAudioSources from '@/components/RenderAudioSources.svelte';
 	import AudiocastPageHeader from '@/components/AudiocastPageHeader.svelte';
 	import { toast } from 'svelte-sonner';
+	import AudioPlayer from '@/components/audio-player/AudioPlayer.svelte';
 
 	export let data;
 
@@ -89,10 +90,11 @@
 	{#if sessionModel.status === 'completed'}
 		<div class="flex w-full mt-4 flex-col gap-y-3">
 			<RenderMedia filename={sessionId} let:uri>
-				<audio controls class="w-full animate-fade-in block">
+				<!-- <audio controls class="w-full animate-fade-in block">
 					<source src={uri} type="audio/mpeg" />
 					Your browser does not support the audio element.
-				</audio>
+				</audio> -->
+				<AudioPlayer src={uri} title={sessionTitle} />
 			</RenderMedia>
 
 			<Accordion.Root>

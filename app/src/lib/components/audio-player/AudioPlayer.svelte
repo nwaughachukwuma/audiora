@@ -1,12 +1,20 @@
+<script context="module">
+	const SLIDER_STEP = 0.25;
+</script>
+
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { Play, Pause, SkipBack, SkipForward } from 'lucide-svelte';
-	import { Button } from '@/components/ui/button';
 	import { Slider } from '@/components/ui/slider';
+	import AudioPlayerVolumeController from './AudioPlayerVolumeController.svelte';
+	import AudioPlayerDownloadButton from './AudioPlayerDownloadButton.svelte';
+	import AudioPlayerPlaybackControl from './AudioPlayerPlaybackControl.svelte';
 
 	export let src: string;
+	export let title: string;
 
 	let isPlaying = false;
+	let volume = 0.75;
+	let isMuted = false;
 
 	let audioRef: HTMLAudioElement;
 	let duration = 0;
@@ -24,32 +32,16 @@
 	}
 
 	onMount(() => {
-		audioRef.volume = 0.75;
+		audioRef.volume = volume;
 	});
 
-	const togglePlayPause = () => {
-		if (isPlaying) audioRef.pause();
-		else audioRef.play();
-		isPlaying = !isPlaying;
-	};
-
-	const skipForward = () => {
-		audioRef.currentTime += 10;
-	};
-
-	const skipBackward = () => {
-		audioRef.currentTime -= 10;
-	};
-
 	const handleSliderChange = (newValue: number[]) => {
-		const BUFFER = 1;
+		const BUFFER = 2 * SLIDER_STEP;
 		const [value] = newValue;
-
-		// It's a scrubbing event
+		// Only update if there's a significant change to prevent unnecessary updates
 		if (Math.abs(value - previousSliderValue) > BUFFER) {
 			audioRef.currentTime = (value / 100) * audioRef.duration;
 		}
-
 		previousSliderValue = value;
 	};
 
@@ -75,9 +67,11 @@
 		<Slider
 			value={[currentTime]}
 			max={duration}
-			step={1}
+			step={SLIDER_STEP}
 			onValueChange={handleSliderChange}
-			class="w-full"
+			class="w-full "
+			rangeClass="bg-emerald-800"
+			thumbClass="bg-zinc-800 border-zinc-500"
 		/>
 		<div class="flex justify-between text-xs text-gray-400 mt-2">
 			<span>{formatTime(currentTime)}</span>
@@ -85,34 +79,13 @@
 		</div>
 	</div>
 
-	<div class="flex justify-center items-center gap-x-4">
-		<Button
-			variant="ghost"
-			size="icon"
-			on:click={skipBackward}
-			class="text-gray-300 hover:text-white transition-colors"
-		>
-			<SkipBack class="h-6 w-6" />
-		</Button>
-		<Button
-			variant="ghost"
-			size="icon"
-			on:click={togglePlayPause}
-			class="text-gray-300 hover:text-white transition-colors"
-		>
-			{#if isPlaying}
-				<Pause class="h-8 w-8" />
-			{:else}
-				<Play class="h-8 w-8" />
-			{/if}
-		</Button>
-		<Button
-			variant="ghost"
-			size="icon"
-			on:click={skipForward}
-			class="text-gray-300 hover:text-white transition-colors"
-		>
-			<SkipForward class="h-6 w-6" />
-		</Button>
+	<div class="flex justify-between items-center">
+		<AudioPlayerPlaybackControl bind:isPlaying {audioRef} />
+
+		<div class="flex justify-between items-center gap-x-4">
+			<AudioPlayerVolumeController {audioRef} bind:volume bind:isMuted />
+
+			<AudioPlayerDownloadButton {src} {title} />
+		</div>
 	</div>
 </div>
