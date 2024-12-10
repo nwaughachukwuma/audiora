@@ -8,6 +8,7 @@
 	import AudioPlayerVolumeController from './AudioPlayerVolumeController.svelte';
 	import AudioPlayerDownloadButton from './AudioPlayerDownloadButton.svelte';
 	import AudioPlayerPlaybackControl from './AudioPlayerPlaybackControl.svelte';
+	import { debounce } from 'throttle-debounce';
 
 	export let src: string;
 	export let title: string;
@@ -20,28 +21,30 @@
 	let duration = 0;
 	let currentTime = 0;
 
-	let previousSliderValue = 0;
-
 	function setAudioData() {
 		duration = audioRef.duration;
 		currentTime = audioRef.currentTime;
 	}
 
-	function setAudioTime() {
+	function setCurrentTime() {
 		currentTime = audioRef.currentTime;
 	}
+
+	// Use a shorter debounce interval or remove it entirely for a smoother experience
+	const updateAudioTime = debounce(0, (t: number) => (audioRef.currentTime = t));
 
 	onMount(() => {
 		audioRef.volume = volume;
 	});
 
-	const handleSliderChange = (newValue: number[]) => {
-		const BUFFER = 2 * SLIDER_STEP;
-		const [value] = newValue;
-		// Only update if there's a significant change to prevent unnecessary updates
-		if (Math.abs(value - previousSliderValue) > BUFFER) {
-			audioRef.currentTime = (value / 100) * audioRef.duration;
-		}
+	let previousSliderValue = 0;
+
+	// Since the slider value = currentTime and max = duration, we can directly update the time
+	const handleSliderChange = ([value]: number[]) => {
+		const valueDiff = Math.abs(value - previousSliderValue);
+		const seeking = valueDiff > 2 * SLIDER_STEP;
+		if (seeking) updateAudioTime(value);
+
 		previousSliderValue = value;
 	};
 
@@ -52,18 +55,18 @@
 	};
 </script>
 
-<div class="w-full p-6 pb-4 rounded-xl bg-gradient-to-br from-gray-900 to-gray-800 shadow-lg">
+<div class="w-full p-6 pb-3 rounded-xl bg-gradient-to-br from-gray-900 to-gray-800 shadow-lg">
 	<audio
 		bind:this={audioRef}
 		class="w-full animate-fade-in block"
 		on:loadeddata={setAudioData}
-		on:timeupdate={setAudioTime}
+		on:timeupdate={setCurrentTime}
 	>
 		<source {src} type="audio/mpeg" />
 		Your browser does not support the audio element.
 	</audio>
 
-	<div class="mb-3">
+	<div class="mb-2">
 		<Slider
 			value={[currentTime]}
 			max={duration}
