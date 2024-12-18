@@ -4,19 +4,19 @@
 	import { Slider } from '../ui/slider';
 
 	export let audioRef: HTMLAudioElement;
-	export let isMuted = false;
+	export let muted = false;
 	export let volume = 0.75;
 
 	const handleVolumeChange = (newValue: number[]) => {
 		const [value] = newValue;
 		volume = value / 100;
 		audioRef.volume = volume;
-		if (volume > 0) isMuted = false;
+		if (volume > 0) muted = false;
 	};
 
 	const toggleMute = () => {
-		isMuted = !isMuted;
-		audioRef.volume = isMuted ? 0 : volume;
+		muted = !muted;
+		audioRef.volume = muted ? 0 : volume;
 	};
 </script>
 
@@ -27,7 +27,7 @@
 		on:click={toggleMute}
 		class="text-gray-300 hover:text-white transition-colors"
 	>
-		{#if isMuted || volume === 0}
+		{#if muted || volume === 0}
 			<VolumeX class="h-5 w-5" />
 		{:else}
 			<Volume2 class="h-5 w-5" />
@@ -35,7 +35,7 @@
 	</Button>
 
 	<Slider
-		value={[isMuted ? 0 : volume * 100]}
+		value={[muted ? 0 : volume * 100]}
 		max={100}
 		step={1}
 		onValueChange={handleVolumeChange}
