@@ -105,7 +105,7 @@ class AudioScriptMaker:
         response = generate_content(
             prompt=["Now streamline the audio script to match the specified TTS requirements."],
             config=GeminiConfig(
-                model_name="gemini-1.5-flash-002",
+                model_name="gemini-2.0-flash",
                 system_prompt=streamline_audio_script_prompt(audioscript_prompt, audio_script),
                 temperature=0.1,
                 max_output_tokens=8048,

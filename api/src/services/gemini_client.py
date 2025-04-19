@@ -11,7 +11,7 @@ def get_gemini():
     return genai
 
 
-ModelName = Literal["gemini-1.5-flash-002", "gemini-1.5-pro-002", "gemini-1.5-pro-latest"]
+ModelName = Literal["gemini-2.0-flash", "gemini-1.5-pro", "gemini-1.5-pro-latest"]
 
 
 @dataclass
@@ -22,7 +22,7 @@ class GeminiConfig:
     max_output_tokens: int = 8192
     system_prompt: str = "You're a super-intelligent and helpful AI-assistant"
     stream: bool = False
-    model_name: ModelName = "gemini-1.5-pro-002"
+    model_name: ModelName = "gemini-2.0-flash"
 
 
 def generate_content(

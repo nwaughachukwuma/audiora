@@ -17,7 +17,7 @@ class SourceContext(WebSearch):
         result = generate_content(
             prompt=[f"Summarize the following preference summary into a searchable phrase/query: {preference_summary}"],
             config=GeminiConfig(
-                model_name="gemini-1.5-flash-002",
+                model_name="gemini-2.0-flash",
                 system_prompt=searchable_queries_prompt(),
                 temperature=0.1,
                 max_output_tokens=64,
