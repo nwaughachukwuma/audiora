@@ -46,12 +46,8 @@ class WaveformUtils:
                 speed=4,
                 time=0.4,
                 # rate=60,
-                size=(120, 68),
-                fg_color=(
-                    0.0,
-                    1.0,
-                    0.6,
-                ),  # Bright green. Try 0.2 0.2 0.2 for dark green
+                # size=(120, 68),
+                fg_color=(0.0, 1.0, 0.6),  # Bright green. Try 0.2 0.2 0.2 for dark green
                 bg_color=(0.05, 0.05, 0.05),  # Near black
             )
             return output_path
