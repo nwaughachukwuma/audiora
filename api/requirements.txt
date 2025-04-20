@@ -37,3 +37,8 @@ lxml
 beautifulsoup4 
 async-web-search
 python-docx
+
+## test
+pytest
+pytest-cov
+pytest-asyncio
