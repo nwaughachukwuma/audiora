@@ -2,8 +2,12 @@ from dataclasses import dataclass
 from typing import Any, Callable, Literal, Optional
 
 import google.generativeai as genai
+from google import genai as gemini_ai
+from google.genai import types
 
 from src.env_var import GEMINI_API_KEY
+
+ModelName = Literal["gemini-1.5-flash-8b", "gemini-1.5-flash", "gemini-1.5-pro", "gemini-2.0-flash"]
 
 
 def get_gemini():
@@ -11,7 +15,12 @@ def get_gemini():
     return genai
 
 
-ModelName = Literal["gemini-1.5-flash-002", "gemini-1.5-pro-002", "gemini-1.5-pro-latest"]
+class GeminiClient:
+    _client = gemini_ai.Client(api_key=GEMINI_API_KEY)
+    _models = _client.models
+    _types = types
+    _Content = types.Content
+    _Part = types.Part
 
 
 @dataclass
@@ -22,7 +31,7 @@ class GeminiConfig:
     max_output_tokens: int = 8192
     system_prompt: str = "You're a super-intelligent and helpful AI-assistant"
     stream: bool = False
-    model_name: ModelName = "gemini-1.5-pro-002"
+    model_name: ModelName = "gemini-2.0-flash"
 
 
 def generate_content(

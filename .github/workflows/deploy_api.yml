@@ -59,8 +59,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-          cache: "pip" # caching pip dependencies
           check-latest: true
+          # cache: "pip" # caching pip dependencies
 
       - uses: google-github-actions/auth@v2
         with:

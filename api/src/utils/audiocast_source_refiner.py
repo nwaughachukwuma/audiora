@@ -20,7 +20,7 @@ class SourceContentRefiner:
         response = generate_content(
             prompt=["Now refine the content to match the user's preferences."],
             config=GeminiConfig(
-                model_name="gemini-1.5-flash-002",
+                model_name="gemini-2.0-flash",
                 system_prompt=get_source_refiner_prompt(content, self.category, self.preference_summary),
                 temperature=0.1,
                 max_output_tokens=8048,

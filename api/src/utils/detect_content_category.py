@@ -15,7 +15,7 @@ def detect_category_prompt(content: str) -> str:
     return f"""You are an intelligent content type classifier. Your task is to analyze the given content and categorize it into one of the following types:
     CONTENT: "{content}"
 
-    CATEGORIES: {', '.join(content_categories)}
+    CATEGORIES: {", ".join(content_categories)}
 
 
     IMPORTANT NOTE:
@@ -52,7 +52,7 @@ async def detect_content_category(content: str) -> ContentCategory:
     client = get_gemini()
 
     model = client.GenerativeModel(
-        model_name="gemini-1.5-flash-002",
+        model_name="gemini-2.0-flash",
         system_instruction=detect_category_prompt(content),
         generation_config=client.GenerationConfig(
             temperature=0.1,

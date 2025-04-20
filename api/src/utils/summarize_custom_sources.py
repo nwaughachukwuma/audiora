@@ -75,7 +75,7 @@ async def summarize_custom_sources(source_urls: list[str]) -> str:
     client = get_gemini()
 
     model = client.GenerativeModel(
-        model_name="gemini-1.5-flash-002",
+        model_name="gemini-2.0-flash",
         system_instruction=summarize_custom_sources_prompt(content),
         generation_config=client.GenerationConfig(
             temperature=0.1,
