@@ -1,8 +1,7 @@
 from dataclasses import dataclass
 from typing import Any, Callable, Literal, Optional
 
-import google.generativeai as genai
-from google import genai as gemini_ai
+from google import genai
 from google.genai import types
 
 from src.env_var import GEMINI_API_KEY
@@ -10,13 +9,8 @@ from src.env_var import GEMINI_API_KEY
 ModelName = Literal["gemini-1.5-flash-8b", "gemini-1.5-flash", "gemini-1.5-pro", "gemini-2.0-flash"]
 
 
-def get_gemini():
-    genai.configure(api_key=GEMINI_API_KEY)
-    return genai
-
-
 class GeminiClient:
-    _client = gemini_ai.Client(api_key=GEMINI_API_KEY)
+    _client = genai.Client(api_key=GEMINI_API_KEY)
     _models = _client.models
     _types = types
     _Content = types.Content
@@ -26,8 +20,8 @@ class GeminiClient:
 @dataclass
 class GeminiConfig:
     temperature: float = 0.5
-    top_p: float = 0.95
-    top_k: int = 40
+    top_p: Optional[float] = None
+    top_k: Optional[int] = None
     max_output_tokens: int = 8192
     system_prompt: str = "You're a super-intelligent and helpful AI-assistant"
     stream: bool = False
@@ -35,34 +29,66 @@ class GeminiConfig:
 
 
 def generate_content(
-    prompt: list[str],
+    prompt: list[Any],
     config: GeminiConfig,
     on_finish: Optional[Callable[[str], Any]] = None,
 ):
-    model = get_gemini().GenerativeModel(
-        model_name=config.model_name,
-        generation_config={
-            "temperature": config.temperature,
-            "max_output_tokens": config.max_output_tokens,
-            "response_mime_type": "text/plain",
-        },
-        system_instruction=config.system_prompt,
-    )
+    def stream_response():
+        responses = GeminiClient._models.generate_content_stream(
+            model=config.model_name,
+            contents=prompt,
+            config=GeminiClient._types.GenerateContentConfig(
+                temperature=config.temperature,
+                max_output_tokens=config.max_output_tokens,
+                response_mime_type="text/plain",
+                system_instruction=config.system_prompt,
+                top_p=config.top_p,
+                top_k=config.top_k,
+            ),
+        )
 
-    response = model.generate_content(prompt, stream=config.stream)
-    if not config.stream:
-        return response.text
+        def _generator():
+            full_text = ""
+            for res in responses:
+                if not res.candidates:
+                    continue
+                for candidate in res.candidates:
+                    if not candidate.content or not candidate.content.parts:
+                        continue
+                    for part in candidate.content.parts:
+                        if part.text:
+                            full_text += part.text
+                            yield part.text
 
-    def _generator():
-        full_text = ""
-        for chunk in response:
-            full_text += chunk.text
-            yield chunk.text
+            if on_finish:
+                try:
+                    on_finish(full_text)
+                except Exception:
+                    pass
+
+        return _generator()
+
+    def non_stream_response():
+        response = GeminiClient._models.generate_content(
+            model=config.model_name,
+            contents=prompt,
+            config=GeminiClient._types.GenerateContentConfig(
+                temperature=config.temperature,
+                max_output_tokens=config.max_output_tokens,
+                response_mime_type="text/plain",
+                system_instruction=config.system_prompt,
+            ),
+        )
+
+        if not response.text:
+            raise ValueError(f"No response returned from Gemini API using {config.model_name}")
 
         if on_finish:
             try:
-                on_finish(full_text)
+                on_finish(response.text)
             except Exception:
                 pass
 
-    return _generator()
+        return response.text
+
+    return stream_response() if config.stream else non_stream_response()

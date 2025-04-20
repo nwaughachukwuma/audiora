@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from src.services.gemini_client import get_gemini
+from src.services.gemini_client import GeminiClient
 from src.utils.chat_utils import ContentCategory, content_categories
 
 
@@ -49,20 +49,18 @@ async def detect_content_category(content: str) -> ContentCategory:
     """
     Detect the category of the given content using Gemini Flash.
     """
-    client = get_gemini()
-
-    model = client.GenerativeModel(
-        model_name="gemini-2.0-flash",
-        system_instruction=detect_category_prompt(content),
-        generation_config=client.GenerationConfig(
+    response = GeminiClient._models.generate_content(
+        model="gemini-2.0-flash",
+        contents=["Now, please categorize the content."],
+        config=GeminiClient._types.GenerateContentConfig(
             temperature=0.1,
             max_output_tokens=30,
             response_mime_type="text/plain",
+            system_instruction=detect_category_prompt(content),
         ),
     )
 
-    response = model.generate_content(["Now, please categorize the content."])
     if not response.text:
-        raise Exception("Error obtaining response from Gemini Flash")
+        raise ValueError("Error obtaining response from Gemini Flash")
 
     return validate_category_output(response.text)
