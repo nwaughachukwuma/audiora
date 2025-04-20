@@ -2,7 +2,7 @@ import asyncio
 
 from pydantic import BaseModel
 
-from src.services.gemini_client import get_gemini
+from src.services.gemini_client import GeminiClient
 from src.services.storage import StorageManager
 
 from .custom_sources.read_content import ReadContent
@@ -71,21 +71,20 @@ async def summarize_custom_sources(source_urls: list[str]) -> str:
     Summarize the contents of list of custom sources using Gemini Flash.
     """
     content = await get_sources_str(source_urls)
+    system_instruction = summarize_custom_sources_prompt(content)
 
-    client = get_gemini()
-
-    model = client.GenerativeModel(
-        model_name="gemini-2.0-flash",
-        system_instruction=summarize_custom_sources_prompt(content),
-        generation_config=client.GenerationConfig(
+    response = GeminiClient._models.generate_content(
+        model="gemini-2.0-flash",
+        contents=["Now, provide the summary"],
+        config=GeminiClient._types.GenerateContentConfig(
             temperature=0.1,
             max_output_tokens=2048,
             response_mime_type="text/plain",
+            system_instruction=system_instruction,
         ),
     )
 
-    response = model.generate_content(["Now, provide the summary"])
     if not response.text:
-        raise Exception("Error obtaining response from Gemini Flash")
+        raise ValueError("Error obtaining response from Gemini Flash")
 
     return response.text
