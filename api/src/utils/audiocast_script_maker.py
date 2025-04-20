@@ -85,7 +85,7 @@ class AudioScriptMaker:
         response = generate_content(
             prompt=["Now create a TTS-optimized audiocast script."],
             config=GeminiConfig(
-                model_name="gemini-1.5-pro-002",
+                model_name="gemini-2.0-flash",
                 system_prompt=system_prompt,
                 temperature=0.1,
                 max_output_tokens=8048,
