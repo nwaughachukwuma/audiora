@@ -37,7 +37,7 @@ async def get_session_title(request: GetSessionTitleModel, background_tasks: Bac
     response = generate_content(
         prompt=["Now provide the topic or title."],
         config=GeminiConfig(
-            model_name="gemini-2.0-flash",
+            model_name="gemini-2.5-flash-lite",
             system_prompt=system_prompt,
             temperature=0.5,
             max_output_tokens=60,

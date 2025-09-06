@@ -6,20 +6,17 @@ from dataclasses import dataclass, field
 from functools import partial
 from itertools import cycle, islice
 from pathlib import Path
-from typing import Any, List, Optional, Tuple
+from typing import Any, List, Tuple
 
 from src.utils.generate_speech_utils import (
-    ElevenLabsVoice,
     GenerateSpeech,
     OpenaiVoice,
     SpeechJob,
-    TTSProvider,
 )
 
 
 @dataclass
 class AudioManagerConfig:
-    tts_provider: Optional[TTSProvider] = "elevenlabs"
     temp_audio_dir: str = field(default_factory=lambda: "/tmp/audiora")
     outdir_base: str = field(default_factory=lambda: "/tmp/audiora/output")
 
@@ -42,7 +39,7 @@ class AudioManagerSpeechGenerator:
         self,
         nway_content: List[Tuple[str, str]],
         tags: List[str],
-        voices: List[OpenaiVoice] | List[ElevenLabsVoice],
+        voices: List[OpenaiVoice],
         temp_audio_dir: str,
     ):
         jobs: List[SpeechJob] = []
@@ -67,9 +64,9 @@ class AudioManagerSpeechGenerator:
 
         return jobs
 
-    async def _process_speech_jobs(self, jobs: List[SpeechJob], provider: TTSProvider) -> List[str]:
+    async def _process_speech_jobs(self, jobs: List[SpeechJob]) -> List[str]:
         loop = asyncio.get_event_loop()
-        tasks = [loop.run_in_executor(self.executor, partial(GenerateSpeech(provider).run, job)) for job in jobs]
+        tasks = [loop.run_in_executor(self.executor, partial(GenerateSpeech().run, job)) for job in jobs]
 
         results = await asyncio.gather(*tasks)
         audio_files = [f for f in results if f and os.path.exists(f)]
@@ -108,7 +105,7 @@ class ContentSplitter:
             opening_count = content.count(f"<{tag}>")
             closing_count = content.count(f"</{tag}>")
             if opening_count != closing_count:
-                print(f"Mismatched tags for {tag}: " f"{opening_count} opening, {closing_count} closing")
+                print(f"Mismatched tags for {tag}: {opening_count} opening, {closing_count} closing")
                 return False
 
             if opening_count == 0:

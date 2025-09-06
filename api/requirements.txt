@@ -16,7 +16,6 @@ httpx
 redis[hiredis]
 
 anthropic
-elevenlabs
 openai
 
 pycairo

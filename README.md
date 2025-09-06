@@ -19,7 +19,7 @@ Audiora is an AI-enhanced audio platform that transforms user preferences into p
 - Python 3.8+
 - pip (Python package manager)
 - Get your LLM Api keys - Openai | Anthropic | Gemini
-- Get your TTS Api key Openai | Elevenlabs
+- Get your TTS Api key from OpenAI
 
 ### Installation
 
@@ -42,7 +42,6 @@ pip install -r requirements.txt
 OPENAI_API_KEY="your-openai-api-key"
 ANTHROPIC_API_KEY="your-anthropic-api-key"
 GEMINI_API_KEY="your-gemini-api-key"
-ELEVENLABS_API_KEY="your-elevenlabs-api-key"
 APP_URL="http://localhost:8080"
 API_URL="http://localhost:8585"
 ```

@@ -13,7 +13,7 @@ from src.utils.audio_manager_utils import (
 )
 from src.utils.audio_synthesizer import AudioSynthesizer
 from src.utils.clean_tss_markup import clean_tss_markup
-from src.utils.generate_speech_utils import elevenlabs_voices, openai_voices
+from src.utils.generate_speech_utils import openai_voices
 
 logger = logging.getLogger(__name__)
 
@@ -26,12 +26,8 @@ class AudioManager(AudioManagerSpeechGenerator, ContentSplitter):
         self.config.ensure_directories()
 
     def _get_ssml_tags(self) -> List[str]:
-        if self.config.tts_provider == "openai":
-            return []
-        elif self.config.tts_provider == "elevenlabs":
-            return ["say-as", "emphasis", "phoneme", "prosody", "break"]
-        else:
-            return []
+        # OpenAI TTS doesn't support SSML tags
+        return []
 
     def _get_speaker_tags(self, audio_script: str):
         tags: List[str] = re.findall(r"<(Speaker\d+)>", audio_script)
@@ -50,7 +46,7 @@ class AudioManager(AudioManagerSpeechGenerator, ContentSplitter):
 
     async def text_to_speech(self, audio_script: str, output_file: str):
         """
-        Convert audio script to speech and save as an audio file.
+        Convert audio script to speech and save as an audio file using OpenAI TTS.
         Args:
             audio_script (str): Audio script to convert to speech.
             output_file (str): path to save the output audio file.
@@ -65,17 +61,7 @@ class AudioManager(AudioManagerSpeechGenerator, ContentSplitter):
 
         print(f"nway_content: {nway_content}")
 
-        if self.config.tts_provider == "elevenlabs":
-            try:
-                audio_files = await self.__text_to_speech_elevenlabs(nway_content, tags)
-            except Exception as e:
-                logger.warning(f"ElevenLabs TTS failed: {str(e)}. Falling back to OpenAI")
-                self.config.tts_provider = "openai"
-                return await self.text_to_speech(audio_script, output_file)
-        elif self.config.tts_provider == "openai":
-            audio_files = await self.__text_to_speech_openai(nway_content, tags)
-        else:
-            raise Exception("Invalid TTS model specified")
+        audio_files = await self.__text_to_speech_openai(nway_content, tags)
 
         if not audio_files:
             raise Exception("No audio files were generated")
@@ -87,16 +73,9 @@ class AudioManager(AudioManagerSpeechGenerator, ContentSplitter):
         try:
             jobs = self._prepare_speech_jobs(nway_content, tags, openai_voices, self.config.temp_audio_dir)
 
-            return await self._process_speech_jobs(jobs, provider="openai")
+            return await self._process_speech_jobs(jobs)
         except Exception as e:
             raise Exception(f"Error converting text to speech with OpenAI: {str(e)}")
-
-    async def __text_to_speech_elevenlabs(self, nway_content: List[Tuple[str, str]], tags: List[str]) -> List[str]:
-        try:
-            jobs = self._prepare_speech_jobs(nway_content, tags, elevenlabs_voices, self.config.temp_audio_dir)
-            return await self._process_speech_jobs(jobs, provider="elevenlabs")
-        except Exception as e:
-            raise Exception(f"Error converting text to speech with Elevenlabs: {str(e)}")
 
     async def __finalize(self, audio_files: List[str], output_file: str, enhance_audio=False) -> None:
         """

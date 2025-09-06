@@ -53,7 +53,7 @@ class DBManager:
     @classmethod
     def _safe_to_dict(cls, data: dict):
         """
-        safely parse firestore data by converting convert all timestamp to string
+        safely parse firestore data by converting all timestamp to string
         """
 
         def _safe_to_str(value: dict | str | datetime):
