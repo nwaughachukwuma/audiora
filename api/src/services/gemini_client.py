@@ -6,7 +6,7 @@ from google.genai import types
 
 from src.env_var import GEMINI_API_KEY
 
-ModelName = Literal["gemini-1.5-flash-8b", "gemini-1.5-flash", "gemini-1.5-pro", "gemini-2.0-flash"]
+ModelName = Literal["gemini-2.5-flash-lite", "gemini-2.5-flash", "gemini-2.5-pro", "gemini-2.0-flash"]
 
 
 class GeminiClient:
